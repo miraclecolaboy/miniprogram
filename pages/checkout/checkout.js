@@ -1,9 +1,6 @@
 // pages/checkout/checkout.js
-// 结算页：通过“分模块 methods”降低单文件复杂度
-
 const { isLoginOK } = require('../../utils/auth');
 const { CART_CLEAR: KEY_CART_CLEAR } = require('../../utils/storageKeys');
-const { storeSubModeText } = require('./checkout.helpers');
 
 const cartMethods = require('./checkout.cart');
 const locationMethods = require('./checkout.location');
@@ -13,106 +10,110 @@ const syncMethods = require('./checkout.sync');
 
 Page(Object.assign({
   data: {
-    mode: 'ziti',
-    modeText: '自提',
-    storeSubMode: 'ziti', // 到店：堂食(tangshi) / 自提(ziti)
-    kuaidiOn: true,
+    // 核心模式
+    mode: 'ziti',         // 'ziti' | 'waimai' (外部传入)
+    storeSubMode: 'ziti', // 'tangshi' | 'ziti' (内部切换)
+    
+    // UI状态
+    isCartExpanded: false,
+
+    // 核心业务数据
+    cart: [],
+    address: null,
     storeName: '',
-    storeLat: 0,
-    storeLng: 0,
-    waimaiMaxKm: 10,
-    waimaiDeliveryFee: 8,
-    kuaidiDeliveryFee: 10,
-    minOrderWaimai: 88,
-    minOrderKuaidi: 88,
-    distance: '位置',
+    distance: '',
     distanceUnit: '',
     pickupTime: '立即取餐',
     timeList: [],
-    serviceHours: '',
-    isVip: false,
-    memberLevel: 0,
-    vipDiscount: '0.00',
-    cart: [],
+    
+    // 价格与优惠
     totalPrice: '0.00',
     deliveryFee: '0.00',
     finalPay: '0.00',
-    freeDeliveryLine: '0.00',
+    vipDiscount: '0.00',
+    couponDiscount: '0.00',
     needMoreFreeDelivery: '0.00',
-    points: 0,
+    
+    // 用户与支付
+    isVip: false,
+    balance: 0,
+    balanceText: '0.00',
     paySheetVisible: false,
     payMethod: 'wechat',
     payMethodText: '微信支付',
-    balance: 0,
-    balanceText: '0.00',
     remark: '',
-    address: null,
-    paying: false,
-
-    // 优惠券相关
-    userCoupons: [],
-    availableCoupons: [],
+    
+    // 优惠券
     selectedCoupon: null,
-    couponDiscount: '0.00',
+    availableCouponsCount: 0,
   },
 
-  _initPromise: null,
-  _chooseAddrToken: null,
-  _chooseAddrEventToken: null,
+  onLoad(options) {
+    // 1. 初始化模式
+    const mode = options.mode || 'ziti';
+    const subMode = options.storeSubMode || 'ziti';
+    this.setData({ mode, storeSubMode: subMode });
 
-  async onLoad(options) {
-    this._initPromise = (async () => {
-      const mode = options.mode || 'ziti';
-      const rawStoreSubMode = String(options.storeSubMode || '').trim();
-      const storeSubMode = ['tangshi', 'ziti'].includes(rawStoreSubMode) ? rawStoreSubMode : 'ziti';
-      const modeText = mode === 'waimai' ? '外卖' : (mode === 'kuaidi' ? '快递' : storeSubModeText(storeSubMode));
-      this.setData({ mode, modeText, storeSubMode });
+    // 2. 初始化购物车
+    let cartList = [];
+    if (options.cart) {
+      try { cartList = JSON.parse(decodeURIComponent(options.cart)); } catch(e){}
+    }
+    this.initCart(cartList);
 
-      this.syncUserFromStorage();
-      if (mode !== 'waimai') this.syncDefaultAddressFromStorage(false);
+    // 3. 异步加载配置、店铺信息、距离
+    this.genPickupTimes();
+    this.loadShopConfig().then(() => {
+      // 只有外卖模式才预加载地址
+      if (mode !== 'ziti') this.syncDefaultAddressFromStorage();
+      this.refreshDistance();
+    });
 
-      if (options.cart) {
-        try { this.initCart(JSON.parse(decodeURIComponent(options.cart))); } catch (e) { this.initCart([]); }
-      } else {
-        this.initCart([]);
-      }
-
-      this.genPickupTimes();
-      await this.loadShopConfig();
-      if (this.data.mode === 'waimai') this.syncDefaultAddressFromStorage(false);
-      this.recheckAddressForMode(false);
-      await this.refreshDistance(false);
-      await this.syncUserAndCoupons();
-      this.applyDefaultPayMethod();
-    })();
-
-    await this._initPromise;
+    // 4. 用户信息
+    this.syncUserFromStorage();
+    if (isLoginOK()) {
+      this.syncUserAndCoupons();
+    }
   },
 
-  async onShow() {
+  onShow() {
+    // 1. 处理支付成功后的自动返回
     const clearMark = wx.getStorageSync(KEY_CART_CLEAR);
     if (clearMark && clearMark.ts) {
       wx.removeStorageSync(KEY_CART_CLEAR);
-      wx.navigateBack(); // 如果是从支付成功页返回，直接回到上一页
+      wx.navigateBack();
       return;
     }
 
+    // 2. 刷新用户数据(余额/VIP状态)
     this.syncUserFromStorage();
-    const token = this._chooseAddrToken;
-    const needFallback = !!token && this._chooseAddrEventToken !== token;
-    this._chooseAddrToken = null;
-    this._chooseAddrEventToken = null;
 
-    await this.loadShopConfig();
-
-    if (needFallback) this.syncDefaultAddressFromStorage(true);
-    else this.syncDefaultAddressFromStorage(false);
-
-    this.recheckAddressForMode(false);
-
-    if (isLoginOK()) {
-      await this.syncUserAndCoupons();
+    // 3. 【关键】处理从优惠券页面选择返回的数据
+    const pages = getCurrentPages();
+    const curr = pages[pages.length - 1];
+    if (curr.data._selectedCouponFromPage !== undefined) {
+      const coupon = curr.data._selectedCouponFromPage;
+      // 重置标记，避免死循环
+      curr.data._selectedCouponFromPage = undefined; 
+      
+      this.setData({ selectedCoupon: coupon }, () => {
+        this.recalcCart();
+      });
     }
   },
+
+  // 切换 堂食 / 自提
+  switchStoreSubMode(e) {
+    const target = e.currentTarget.dataset.sub;
+    if (target && target !== this.data.storeSubMode) {
+      this.setData({ storeSubMode: target });
+      // 如果将来堂食和自提有不同的打包费逻辑，在这里调用 this.recalcCart()
+    }
+  },
+
+  // 展开/折叠购物车
+  toggleCartExpand() {
+    this.setData({ isCartExpanded: !this.data.isCartExpanded });
+  }
 
 }, cartMethods, locationMethods, shopMethods, payMethods, syncMethods));
