@@ -1,0 +1,42 @@
+.admin-tabbar__spacer {
+  height: 110rpx;
+  height: calc(110rpx + env(safe-area-inset-bottom));
+}
+
+.admin-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 110rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+
+  background: #ffffff;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  z-index: 999;
+}
+
+.admin-tabbar__item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8rpx 0;
+}
+
+.admin-tabbar__text {
+  font-size: 28rpx;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.admin-tabbar__item.is-active .admin-tabbar__text {
+  color: rgba(0, 0, 0, 0.95);
+  font-weight: 600;
+}

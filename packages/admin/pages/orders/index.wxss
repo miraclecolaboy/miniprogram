@@ -1,0 +1,97 @@
+/* packages/admin/pages/orders/index.wxss */
+@import "../../styles/admin.wxss";
+
+.page { padding: 12px; box-sizing: border-box; }
+
+/* ✅ 关键：抵消 .page 的左右 padding，让顶部 tabs 区域横向铺满屏幕 */
+.tabs {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+  padding-bottom: 8px;
+
+  margin-left: -12px;
+  margin-right: -12px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.tabRow { display: flex; gap: 8px; flex-wrap: nowrap; }
+.tabItem {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  padding: 10px 0;
+  border-radius: 14px;
+  background: #f5f5f5;
+  font-size: 13px;
+  color: #333;
+}
+.tabActive { background: #000000; color: #fff; }
+
+.list { padding-top: 6px; }
+.card { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+.row { display: flex; align-items: center; justify-content: space-between; }
+.title { font-size: 15px; font-weight: 600; color: #111; }
+.status { font-size: 13px; color: #000000; }
+
+.sub { font-size: 12px; color: #666; margin-top: 6px; }
+.price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.price-main { color: #111; font-weight: 600; }
+.price-detail { color: #999; font-size: 11px; }
+.goods { margin-top: 8px; }
+.goodsLine { font-size: 12px; color: #333; margin-top: 4px; }
+
+.remark { margin-top: 8px; font-size: 12px; color: #333; background: #fafafa; padding: 8px; border-radius: 8px; }
+
+.btnRow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.btn { background: #f5f5f5; color: #333; border-radius: 10px; }
+.primary { background: #000000; color: #fff; }
+.danger { background: #ff4d4f; color: #fff; }
+
+.tip { text-align: center; color: #999; font-size: 12px; padding: 16px 0; }
+
+.addrBlock { margin-top: 6px; background: #fafafa; padding: 8px; border-radius: 10px; }
+.refund { margin-top: 8px; background: #fff7e6; padding: 8px; border-radius: 10px; }
+
+/* 快递单号弹窗样式 */
+.modalMask {
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+
+.modalCard {
+  width: 84%;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.modalTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 10px;
+}
+
+.modalInput {
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  color: #111;
+}
+
+.modalBtnRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "database": {
+      "read": "allow",
+      "write": "allow",
+      "remove": "allow",
+      "add": "allow"
+    }
+  },
+  "triggers": [
+    {
+      "name": "weeklyCleanup",
+      "type": "timer",
+      "config": "0 0 3 * * 0 *"
+    }
+  ]
+}

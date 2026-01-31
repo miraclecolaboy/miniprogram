@@ -1,0 +1,59 @@
+<view class="page">
+  <view class="card header">
+    <view class="title">积分兑换</view>
+    <view class="sub">当前积分：<text class="strong">{{points}}</text></view>
+  </view>
+
+  <view class="card list">
+    <view class="section-title">可兑换</view>
+
+    <view class="gift" wx:for="{{gifts}}" wx:key="id">
+      <image
+        wx:if="{{item.imageUrl}}"
+        class="gift-img"
+        src="{{item.imageUrl}}"
+        mode="aspectFill"
+        lazy-load="true"
+      ></image>
+
+      <view class="gift-left">
+        <view class="gift-name">{{item.name}}</view>
+        <view class="gift-need">需要 {{item.points}} 积分</view>
+        <view class="gift-stock">库存：{{item.stock}}</view>
+        <view class="gift-desc">{{item.desc}}</view>
+      </view>
+
+      <view class="gift-right">
+        <view class="btn {{points < item.points ? 'btn-disabled' : ''}}" bindtap="onRedeem" data-id="{{item.id}}">
+          {{points < item.points ? '积分不足' : '立即兑换'}}
+        </view>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{!gifts || !gifts.length}}">
+      暂无可兑换商品
+    </view>
+  </view>
+
+  <view class="card list">
+    <view class="section-title">我的兑换码</view>
+
+    <view class="empty" wx:if="{{!vouchers || !vouchers.length}}">
+      暂无兑换码
+    </view>
+
+    <view class="voucher" wx:for="{{vouchers}}" wx:key="id" bindtap="onVoucherTap" data-id="{{item.id}}">
+      <view class="voucher-left">
+        <view class="voucher-name">{{item.giftName}}</view>
+        <view class="voucher-sub">消耗 {{item.costPoints}} 积分 · {{item.timeText}}</view>
+        <view class="voucher-code" selectable="true">核销码：{{item.code || item.id}}</view>
+      </view>
+
+      <view class="voucher-right">
+        <view class="voucher-status">
+          点击复制
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

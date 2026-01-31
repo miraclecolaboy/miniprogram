@@ -1,0 +1,16 @@
+<!-- 占位：防止页面底部内容被固定导航遮住 -->
+<view class="admin-tabbar__spacer"></view>
+
+<view class="admin-tabbar">
+  <view
+    wx:for="{{tabs}}"
+    wx:key="key"
+    class="admin-tabbar__item {{active === item.key ? 'is-active' : ''}}"
+    data-key="{{item.key}}"
+    bindtap="onTap"
+  >
+    <text class="admin-tabbar__text">{{item.text}}</text>
+  </view>
+  <printer-float />
+</view>
+

@@ -1,0 +1,132 @@
+.page {
+  min-height: 100vh;
+  background: #f7f7f7;
+  padding-bottom: 40rpx;
+}
+.tab-bar {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #888;
+}
+.tab-item.active {
+  color: #111;
+  font-weight: 600;
+  position: relative;
+}
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 6rpx;
+  background-color: #111;
+  border-radius: 3rpx;
+}
+.coupon-list {
+  padding: 20rpx;
+}
+.coupon-card {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.03);
+}
+.card-left {
+  width: 180rpx;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  padding: 20rpx 10rpx;
+}
+.discount-value {
+  font-size: 56rpx;
+  font-weight: bold;
+  line-height: 1.1;
+}
+.discount-value .unit {
+  font-size: 32rpx;
+}
+.min-spend {
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}
+.card-main {
+  flex: 1;
+  padding: 24rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.expiry {
+  font-size: 24rpx;
+  color: #888;
+  margin-top: 10rpx;
+}
+.card-right {
+  width: 160rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.action-btn {
+  padding: 12rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.action-btn-disabled {
+  opacity: 0.6;
+}
+.action-btn-hollow {
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.coupon-card.claimable .card-left {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+.coupon-card.claimable .action-btn {
+  background: #fff;
+  color: #e67e22;
+}
+.coupon-card.claimable .action-btn.action-btn-disabled {
+  background: #f5f5f5;
+  color: #bbb;
+}
+.coupon-card.usable .card-left {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+.coupon-card.usable .action-btn-hollow {
+  border: 2rpx solid #c0392b;
+  color: #c0392b;
+}
+.empty-tip, .loading-tip {
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+  padding: 80rpx 0;
+}

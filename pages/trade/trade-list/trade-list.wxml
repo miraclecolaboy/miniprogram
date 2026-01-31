@@ -1,0 +1,40 @@
+<view class="page">
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab==='doing'?'active':''}}" data-tab="doing" bindtap="switchTab">进行中</view>
+    <view class="tab-item {{activeTab==='done'?'active':''}}" data-tab="done" bindtap="switchTab">已完成</view>
+    <view class="tab-item {{activeTab==='refund'?'active':''}}" data-tab="refund" bindtap="switchTab">退款/售后</view>
+  </view>
+
+  <block wx:for="{{['doing', 'done', 'refund']}}" wx:key="item" wx:for-item="tab">
+    <scroll-view class="order-list" scroll-y="true" bindscrolltolower="loadMore" lower-threshold="150" wx:if="{{activeTab === tab}}">
+      <block wx:if="{{orders[tab] && orders[tab].length > 0}}">
+        <view class="order-card" wx:for="{{orders[tab]}}" wx:key="_id" wx:for-item="order" bindtap="goDetail" data-id="{{order._id}}">
+          <view class="order-header">
+            <view class="order-type">{{order.modeText}}</view>
+            <view class="order-pickup-no" wx:if="{{order.mode==='ziti' && order.status==='ready'}}">{{order.pickupInfo.code}}</view>
+            <view class="order-status">{{order.refund ? order.refund.statusText : order.statusText}}</view>
+          </view>
+          <view class="order-main">
+            <scroll-view class="goods-scroll" scroll-x="true" show-scrollbar="{{false}}">
+              <view class="goods-row">
+                <view class="goods-item" wx:for="{{order.goodsView}}" wx:key="index" wx:for-item="g">
+                  <image class="goods-img" src="{{g.image}}" mode="aspectFill" lazy-load="true" />
+                  <view class="goods-name">{{g.productName}} x {{g.count}}</view>
+                </view>
+              </view>
+            </scroll-view>
+            <view class="order-right">
+              <view class="order-price">￥{{order.totalPrice}}</view>
+              <view class="order-count">共 {{order.totalCount}} 件</view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <view class="empty-tip" wx:else>
+        <text wx:if="{{!loading[tab]}}">暂无相关订单</text>
+      </view>
+      <view class="loading-tip" wx:if="{{loading[tab]}}">加载中...</view>
+      <view class="loading-tip" wx:if="{{!hasMore[tab] && orders[tab] && orders[tab].length > 0}}">没有更多了</view>
+    </scroll-view>
+  </block>
+</view>

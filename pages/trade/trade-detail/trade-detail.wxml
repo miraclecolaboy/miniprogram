@@ -1,0 +1,88 @@
+<view class="page" wx:if="{{order}}">
+  <view class="card status-card">
+    <view class="status-title">{{order.statusText}}</view>
+    <view class="status-tip" wx:if="{{order.status === 'processing'}}">商家正快马加鞭为您准备...</view>
+    <view class="status-tip" wx:if="{{order.status === 'ready'}}">商品已备好,请尽快到店取餐!</view>
+    <view class="status-tip" wx:if="{{order.status === 'delivering'}}">骑士正火速配送中,请耐心等待!</view>
+    <view class="status-tip" wx:if="{{order.status === 'done'}}">感谢您的惠顾,期待再次光临!</view>
+    <view class="pickup-no" wx:if="{{order.mode === 'ziti' && order.pickupInfo.code}}">
+      取餐号: <text class="pickup-strong">{{order.pickupInfo.code}}</text>
+    </view>
+  </view>
+
+  <view class="card" bindtap="openNavigate">
+    <view class="section-title">{{order.mode === 'ziti' ? '门店信息' : '收货地址'}}</view>
+    <block wx:if="{{order.mode === 'ziti'}}">
+      <view class="sub nav-line">
+        <view class="nav-text">门店: {{order.storeName}}</view>
+        <image class="nav-icon" src="/assets/address.png" mode="aspectFit" />
+      </view>
+    </block>
+    <block wx:else>
+      <view class="sub">收货人: {{order.shippingInfo.name}} {{order.shippingInfo.phone}}</view>
+      <view class="sub nav-line">
+        <view class="nav-text">地址: {{order.shippingInfo.region}}{{order.shippingInfo.detail}}</view>
+        <image class="nav-icon" src="/assets/address.png" mode="aspectFit" />
+      </view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="section-title">商品明细</view>
+    <view class="goods-line" wx:for="{{order.items}}" wx:key="productId">
+        <view class="goods-left-wrap">
+            <image class="goods-thumb" src="{{item.image}}" mode="aspectFill" lazy-load="true" />
+            <view class="goods-left">
+                <view class="goods-name">{{item.productName}}</view>
+                <view class="goods-spec" wx:if="{{item.specText}}">{{item.specText}}</view>
+            </view>
+        </view>
+        <view class="goods-right">
+            <view class="goods-count">x{{item.count}}</view>
+            <view class="goods-price">￥{{item.price}}</view>
+        </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">费用明细</view>
+    <view class="row"><view class="label">商品小计</view><view class="value">￥{{order.amount.goods}}</view></view>
+    <view class="row"><view class="label">配送费</view><view class="value">￥{{order.amount.delivery}}</view></view>
+    <view class="row" wx:if="{{order.isVip}}"><view class="label">会员折扣</view><view class="value">-￥{{order.amount.vipDiscount}}</view></view>
+    <view class="row" wx:if="{{order.amount.couponDiscount !== '0.00'}}"><view class="label">优惠券</view><view class="value">-￥{{order.amount.couponDiscount}}</view></view>
+    <view class="row total"><view class="label">实付</view><view class="value strong">￥{{order.totalPrice}}</view></view>
+    <view class="sub">本单获得积分: {{order.pointsEarn}}</view>
+  </view>
+
+  <view class="card">
+    <view class="row"><view class="label">下单时间</view><view class="value">{{order.createdAtText}}</view></view>
+    <view class="row"><view class="label">订单号</view><view class="value">{{order.orderNo}}<text class="copy" bindtap="copyOrderId">复制</text></view></view>
+    <view class="row" wx:if="{{order.mode === 'ziti'}}"><view class="label">取餐时间</view><view class="value">{{order.pickupInfo.time}}</view></view>
+    <view class="row" wx:if="{{order.remark}}"><view class="label">备注</view><view class="value">{{order.remark}}</view></view>
+  </view>
+  
+  <view class="card">
+    <view class="btn-row">
+      <button size="mini" class="btn" bindtap="contactShop">联系客服</button>
+      <button size="mini" class="btn" wx:if="{{order.refund && order.refund.status === 'applied'}}" bindtap="cancelRefund">取消售后</button>
+      <button size="mini" class="btn primary" wx:if="{{order.refund}}" bindtap="goRefundDetail">售后详情</button>
+      <button size="mini" class="btn danger" wx:if="{{order.canApplyRefund}}" bindtap="openRefundSheet">申请售后</button>
+    </view>
+  </view>
+</view>
+
+<!-- [新增] 申请售后弹窗 -->
+<view class="mask" wx:if="{{refundSheetVisible}}" bindtap="closeRefundSheet"></view>
+<view class="sheet" wx:if="{{refundSheetVisible}}">
+  <view class="sheet-title">申请售后</view>
+  <view class="reason-list">
+    <block wx:for="{{refundReasonList}}" wx:key="*this" wx:for-item="r" wx:for-index="idx">
+      <view class="reason-item {{refundReasonIndex===idx?'active':''}}" data-index="{{idx}}" bindtap="chooseRefundReason">{{r}}</view>
+    </block>
+  </view>
+  <textarea class="remark" placeholder="补充说明（选填）" maxlength="200" bindinput="onRefundRemarkInput" value="{{refundRemark}}"></textarea>
+  <view class="sheet-btn-row">
+    <button class="btn" bindtap="closeRefundSheet">取消</button>
+    <button class="btn primary" bindtap="submitRefund">提交</button>
+  </view>
+</view>

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "商品管理",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 80,
+  "usingComponents": {
+    "admin-tabbar": "../../components/admin-tabbar/index"
+  }
+}

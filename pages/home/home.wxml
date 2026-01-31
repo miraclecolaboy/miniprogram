@@ -1,0 +1,110 @@
+<view class="page">
+  
+  <view class="header-section">
+    <swiper class="banner-swiper" autoplay interval="5000" circular duration="800">
+      <block wx:if="{{banners.length}}">
+        <swiper-item wx:for="{{banners}}" wx:key="*this">
+          <image class="banner-img" src="{{item}}" mode="aspectFill" />
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
+  <view class="main-container" wx:if="{{showUI}}">
+    
+    <view class="core-nav-card">
+      <view class="nav-item-col" data-mode="ziti" bindtap="onNavTap" hover-class="hover-opacity">
+        <image class="nav-icon" src="/assets/store.png" mode="aspectFit" />
+        <view class="nav-txt-box">
+          <text class="nav-title">门店自提</text>
+          <text class="nav-sub">PICK UP</text>
+        </view>
+      </view>
+
+      <view class="nav-divider"></view>
+
+      <view class="nav-item-col" data-mode="waimai" bindtap="onNavTap" hover-class="hover-opacity">
+        <image class="nav-icon" src="/assets/delivery.png" mode="aspectFit" />
+        <view class="nav-txt-box">
+          <text class="nav-title">外卖配送</text>
+          <text class="nav-sub">DELIVERY</text>
+        </view>
+      </view>
+
+      <view class="nav-divider"></view>
+
+      <view class="nav-item-col" data-mode="kuaidi" bindtap="onNavTap" hover-class="hover-opacity">
+        <image class="nav-icon" src="/assets/express.png" mode="aspectFit" />
+        <view class="nav-txt-box">
+          <text class="nav-title">全国快递</text>
+          <text class="nav-sub">EXPRESS</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="asset-grid">
+      <view class="asset-card" bindtap="goAsset" data-type="member" hover-class="card-hover">
+        <view class="card-top">
+          <text class="card-title">当前等级</text>
+          <view class="icon-halo bg-gold-light">
+            <image class="card-icon" src="/assets/member.png" mode="aspectFit" />
+          </view>
+        </view>
+        <view class="card-bottom">
+          <text class="card-value-txt text-gold">{{memberStats.levelName}}</text>
+          <text class="card-action">查看权益 ></text>
+        </view>
+      </view>
+
+      <view class="asset-card" bindtap="goAsset" data-type="balance" hover-class="card-hover">
+        <view class="card-top">
+          <text class="card-title">账户余额</text>
+          <view class="icon-halo bg-blue-light">
+            <image class="card-icon" src="/assets/wallet.png" mode="aspectFit" />
+          </view>
+        </view>
+        <view class="card-bottom">
+          <view class="price-row">
+            <text class="symbol">¥</text>
+            <text class="card-value-num">{{memberStats.balance}}</text>
+          </view>
+          <text class="card-action">去充值 ></text>
+        </view>
+      </view>
+
+      <view class="asset-card" bindtap="goAsset" data-type="points" hover-class="card-hover">
+        <view class="card-top">
+          <text class="card-title">我的积分</text>
+          <view class="icon-halo bg-orange-light">
+            <image class="card-icon" src="/assets/gift.png" mode="aspectFit" />
+          </view>
+        </view>
+        <view class="card-bottom">
+          <text class="card-value-num">{{memberStats.points}}</text>
+          <text class="card-action">兑好礼 ></text>
+        </view>
+      </view>
+
+      <view class="asset-card" bindtap="goAsset" data-type="coupon" hover-class="card-hover">
+        <view class="card-top">
+          <text class="card-title">优惠券</text>
+          <view class="icon-halo bg-red-light">
+            <image class="card-icon" src="/assets/coupon.png" mode="aspectFit" />
+          </view>
+        </view>
+        <view class="card-bottom">
+          <view class="coupon-row">
+            <text class="card-value-num">{{memberStats.coupons}}</text>
+            <text class="unit">张</text>
+          </view>
+          <text class="card-action">去使用 ></text>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer-tips">
+      <text>· {{storeName}} ·</text>
+    </view>
+
+  </view>
+</view>

@@ -1,0 +1,35 @@
+<view class="page">
+  <view class="card header">
+    <view class="title">联系客服</view>
+    <view class="sub">如遇订单/配送/售后问题，可优先联系门店客服</view>
+  </view>
+
+  <!-- 客服二维码 -->
+  <view class="card qr-card" wx:if="{{qrSrc}}">
+    <view class="section-title">客服微信</view>
+    <view class="qr-wrap" bindtap="previewQr">
+      <image class="qr-img" src="{{qrSrc}}" mode="aspectFit"></image>
+    </view>
+    <view class="qr-tip">点击预览，可长按识别二维码</view>
+  </view>
+
+  <view class="card phone-card">
+    <view class="section-title">商家电话</view>
+    <view class="phone-row">
+      <view class="phone-left">
+        <view class="phone">{{phone}}</view>
+        <view class="phone-sub">工作时间：{{serviceHours}}</view>
+      </view>
+      <view class="phone-actions">
+        <view class="btn ghost" bindtap="copyPhone">复制</view>
+        <view class="btn" bindtap="callPhone">拨打</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card note">
+    <view class="section-title">温馨提示</view>
+    <view class="note-line">• 订单问题：请提供下单手机号、订单号与问题描述</view>
+    <view class="note-line">• 配送问题：请提供地址与联系方式，便于快速处理</view>
+  </view>
+</view>

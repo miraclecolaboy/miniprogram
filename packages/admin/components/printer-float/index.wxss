@@ -1,0 +1,58 @@
+.pf-area{
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 750rpx;
+  height: 100vh;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.pf-view{
+  pointer-events: auto;
+  border-radius: 999rpx;
+  background: rgba(0,0,0,0.72);
+  color: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.18);
+
+  /* 关键：强制裁剪溢出文本 */
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.pf-inner{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 18rpx;
+  box-sizing: border-box;
+
+  /* 关键：允许子元素收缩 */
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pf-dot{
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  margin-right: 10rpx;
+  flex: 0 0 auto;
+}
+.pf-dot.on{
+  background: #1aad19;
+}
+
+.pf-text{
+  /* 关键：让文字在 flex 内可收缩并省略 */
+  flex: 1;
+  min-width: 0;
+
+  font-size: 24rpx;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

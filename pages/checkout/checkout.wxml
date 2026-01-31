@@ -1,0 +1,165 @@
+<view class="page">
+  <scroll-view class="main-scroll" scroll-y="true">
+    
+    <view class="card header-card">
+      <view class="mode-header">
+        <block wx:if="{{mode === 'ziti'}}">
+          <image class="mode-icon" src="/assets/{{storeSubMode === 'tangshi' ? 'icon-dine-in.png' : 'icon-takeaway.png'}}" mode="aspectFit" />
+          <text class="mode-title">{{storeSubMode === 'tangshi' ? '堂食点餐' : '到店自提'}}</text>
+        </block>
+        <block wx:else>
+          <image class="mode-icon" src="/assets/icon-delivery.png" mode="aspectFit" />
+          <text class="mode-title">外卖配送</text>
+        </block>
+      </view>
+
+      <view class="delivery-info-box">
+        <block wx:if="{{mode === 'ziti'}}">
+          <view class="info-row store-row">
+            <view class="store-base">
+              <text class="store-name">{{storeName}}</text>
+              <text class="distance-text" wx:if="{{distance}}">距您 {{distance}}{{distanceUnit}}</text>
+            </view>
+          </view>
+          <picker mode="selector" range="{{timeList}}" bindchange="choosePickupTime">
+            <view class="info-row time-row picker-row">
+              <text class="label">取餐时间</text>
+              <view class="picker-val">
+                <text class="value">{{pickupTime}}</text>
+                <text class="arrow">></text>
+              </view>
+            </view>
+          </picker>
+        </block>
+
+        <block wx:else>
+          <view class="info-row address-row" bindtap="chooseAddress">
+            <view class="address-content" wx:if="{{address}}">
+              <text class="addr-detail">{{address.fullAddress}}</text>
+              <text class="user-detail">{{address.name}} {{address.phone}}</text>
+            </view>
+            <view class="address-placeholder" wx:else>
+              请选择收货地址
+            </view>
+            <text class="arrow">></text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="card product-card">
+      <block wx:for="{{cart}}" wx:key="id" wx:for-item="p">
+        <view class="product-row">
+          <image class="p-img" src="{{p.img || ''}}" mode="aspectFill" />
+          <view class="p-info">
+            <view class="p-top">
+              <text class="p-name">{{p.name}}</text>
+              <text class="p-price">￥{{p.total}}</text>
+            </view>
+            <view class="p-bottom">
+              <text class="p-spec" wx:if="{{p.specText}}">{{p.specText}}</text>
+              <text class="p-count">x{{p.count}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+      
+      <view class="cell-row fee-row" wx:if="{{mode !== 'ziti'}}">
+        <text class="cell-label">配送费</text>
+        <view class="cell-right">
+          <text class="fee-num">￥{{deliveryFee}}</text>
+        </view>
+      </view>
+      <view class="fee-tip" wx:if="{{mode !== 'ziti' && needMoreFreeDelivery !== '0.00'}}">
+        再买 ￥{{needMoreFreeDelivery}} 免配送费
+      </view>
+    </view>
+
+    <view class="card coupon-card">
+      <view class="cell-row" bindtap="onSelectCoupon">
+        <text class="cell-label">优惠券</text>
+        <view class="cell-right {{selectedCoupon ? 'highlight-black' : ''}}">
+          {{selectedCoupon ? '-￥'+couponDiscount : (availableCoupons.length ? availableCoupons.length + '张可用' : '无可用')}}
+          <text class="arrow">></text>
+        </view>
+      </view>
+      
+      <view class="cell-row">
+        <text class="cell-label">本单获得积分</text>
+        <view class="cell-right">{{points}}</view>
+      </view>
+    </view>
+
+    <view class="member-banner-simple" wx:if="{{!isVip}}" bindtap="goOpenVip">
+      <view class="vip-left">
+        <view class="vip-title-row">
+          <image class="vip-icon" src="/assets/vip-w.png" mode="aspectFit" /> <text class="vip-title-text">会员权益</text>
+        </view>
+        <text class="vip-desc-text">开通会员，本单立减 ￥{{vipDiscount}}</text>
+      </view>
+      <view class="vip-btn-simple">立即开通</view>
+    </view>
+     <view class="card member-card-simple" wx:if="{{isVip}}">
+       <view class="cell-row">
+        <view class="vip-label-wrap">
+           <text class="vip-tag">VIP</text>
+           <text class="cell-label">会员折扣</text>
+        </view>
+        <view class="cell-right highlight-black">
+          -￥{{vipDiscount}}
+        </view>
+      </view>
+    </view>
+
+
+    <view class="card pay-card">
+      <view class="card-title">支付方式</view>
+      <view class="pay-option-row" bindtap="choosePay" data-method="wechat">
+        <view class="pay-info">
+          <image class="pay-icon-img" src="/assets/wechat.png" mode="aspectFit" /> <text class="pay-name-text">微信支付</text>
+        </view>
+        <view class="radio-check {{payMethod==='wechat'?'checked':''}}">
+          <view class="radio-dot" wx:if="{{payMethod==='wechat'}}"></view>
+        </view>
+      </view>
+      
+      <view class="pay-option-row" bindtap="choosePay" data-method="balance">
+        <view class="pay-info">
+          <view class="pay-icon-txt">余</view> 
+          <view class="pay-balance-col">
+            <text class="pay-name-text">余额支付</text>
+            <text class="pay-sub-text">剩余: ￥{{balanceText}}</text>
+          </view>
+        </view>
+        <view class="radio-check {{payMethod==='balance'?'checked':''}}">
+           <view class="radio-dot" wx:if="{{payMethod==='balance'}}"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card remark-card">
+      <view class="cell-row picker-row">
+        <text class="cell-label">备注</text>
+        <input class="remark-input" placeholder="请输入口味、包装等要求" placeholder-class="ph-color" bindinput="onRemarkInput" />
+      </view>
+    </view>
+
+    <view class="footer-spacer"></view>
+  </scroll-view>
+
+  <view class="bottom-bar-simple">
+    <view class="bar-left-info">
+      <view class="bar-price-row">
+        <text class="bar-label">合计</text>
+        <text class="bar-symbol">￥</text>
+        <text class="bar-num">{{finalPay}}</text>
+      </view>
+      <view class="bar-disc-row" wx:if="{{vipDiscount > 0 || couponDiscount > 0}}">
+        已优惠 ￥{{(vipDiscount*1 + couponDiscount*1)}}
+      </view>
+    </view>
+    <view class="bar-btn-black" bindtap="onPayTap">
+      <text>立即支付</text>
+    </view>
+  </view>
+</view>

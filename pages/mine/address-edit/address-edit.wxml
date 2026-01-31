@@ -1,0 +1,73 @@
+<view class="page">
+
+<!-- 顶部标题 -->
+<view class="header">
+  <view class="header-title">{{pageTitle}}</view>
+</view>
+
+<!-- 表单卡片 -->
+<view class="card">
+
+  <view class="form-item">
+    <view class="form-label">收货人</view>
+    <input
+      class="form-input"
+      placeholder="请输入收货人姓名"
+      value="{{form.name}}"
+      bindinput="onInputName"
+    />
+  </view>
+
+  <view class="form-item">
+    <view class="form-label">手机号</view>
+    <input
+      class="form-input"
+      placeholder="请输入手机号"
+      type="number"
+      maxlength="11"
+      value="{{form.phone}}"
+      bindinput="onInputPhone"
+    />
+  </view>
+
+
+<!-- 合并：所在地区（点击地图定位后直接写在这一行） -->
+<view class="form-item" bindtap="chooseLocation">
+  <view class="form-label">所在地区</view>
+  <view class="form-value {{form.poiAddress ? '' : 'placeholder'}}">
+    {{form.poiAddress || '点击地图选择定位'}}
+  </view>
+</view>
+
+
+  <view class="form-item">
+    <view class="form-label">详细地址</view>
+    <input
+      class="form-input"
+      placeholder="街道、门牌号等"
+      value="{{form.detail}}"
+      bindinput="onInputDetail"
+    />
+  </view>
+
+</view>
+
+<!-- 默认地址 -->
+<view class="card switch-card">
+  <view class="switch-row">
+    <view class="switch-text">设为默认地址</view>
+    <switch
+      checked="{{form.isDefault}}"
+      bindchange="onToggleDefault"
+    />
+  </view>
+</view>
+
+<!-- 底部按钮 -->
+<view class="bottom-bar">
+  <view class="save-btn" bindtap="onSave">
+    保存地址
+  </view>
+</view>
+
+</view>

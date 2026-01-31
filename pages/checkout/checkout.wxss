@@ -1,0 +1,258 @@
+/* pages/checkout/checkout.wxss */
+/* 基础变量定义 - 黑白灰 */
+page {
+  --bg-page: #F7F8FA;
+  --bg-card: #FFFFFF;
+  --text-main: #000000; /* 纯黑用于强调 */
+  --text-normal: #333333; /* 常规正文 */
+  --text-sub: #999999; /* 次要信息 */
+  --border-color: #EEEEEE;
+  --accent-black: #000000; /* 黑色强调色 */
+  background-color: var(--bg-page);
+  font-family: -apple-system, Helvetica, sans-serif;
+  color: var(--text-normal);
+}
+
+.page {
+  min-height: 100vh;
+}
+.main-scroll {
+  height: 100vh;
+}
+
+/* 通用原子类 */
+.arrow {
+  font-family: monospace;
+  color: #C7C7CC;
+  font-size: 26rpx;
+  margin-left: 10rpx;
+}
+.highlight-black {
+  color: var(--accent-black) !important;
+  font-weight: 600;
+}
+
+/* 卡片通用样式 - 直角或微圆角，无明显阴影 */
+.card {
+  background: var(--bg-card);
+  margin: 20rpx 24rpx;
+  padding: 30rpx;
+  border-radius: 16rpx; /* 微圆角 */
+  /* box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.02); 可选：非常淡的阴影 */
+}
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 24rpx;
+}
+
+/* --- 1. Header Card --- */
+.header-card {
+  padding-bottom: 0; /* 底部留给内部元素 */
+}
+.mode-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+.mode-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 16rpx;
+}
+.mode-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.delivery-info-box {
+  border-top: 1rpx solid var(--border-color);
+  padding-top: 20rpx;
+}
+.info-row {
+  padding: 24rpx 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.picker-row {
+  border-top: 1rpx solid var(--border-color);
+}
+
+/* 自提信息 */
+.store-base {
+  display: flex;
+  flex-direction: column;
+}
+.store-name { font-size: 30rpx; font-weight: 600; margin-bottom: 8rpx; }
+.distance-text { font-size: 24rpx; color: var(--text-sub); }
+
+.time-row .label { font-size: 28rpx; }
+.picker-val { display: flex; align-items: center; }
+.picker-val .value { font-size: 30rpx; font-weight: 600; color: var(--text-main); }
+
+/* 外卖地址 */
+.address-row { align-items: center; }
+.address-content { flex: 1; }
+.addr-detail { font-size: 30rpx; font-weight: 600; display: block; margin-bottom: 8rpx; }
+.user-detail { font-size: 26rpx; color: var(--text-sub); }
+.address-placeholder { font-size: 30rpx; color: var(--text-main); font-weight: 600; }
+
+/* --- 2. Product Card --- */
+.product-row {
+  display: flex;
+  padding-bottom: 24rpx;
+  margin-bottom: 24rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+.product-row:last-child { border-bottom: none; padding-bottom: 0; }
+.p-img {
+  width: 110rpx;
+  height: 110rpx;
+  background: #f0f0f0;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.p-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4rpx 0;
+}
+.p-top, .p-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.p-name { font-size: 28rpx; color: var(--text-normal); }
+.p-price { font-size: 28rpx; font-weight: 600; color: var(--text-main); }
+.p-spec { font-size: 24rpx; color: var(--text-sub); }
+.p-count { font-size: 24rpx; color: var(--text-sub); }
+
+.fee-row {
+  padding: 24rpx 0 0 0;
+  border-top: 1rpx solid var(--border-color);
+  margin-top: 0;
+}
+.fee-num { font-weight: 600; color: var(--text-main); }
+.fee-tip {
+  font-size: 22rpx;
+  color: var(--text-sub);
+  text-align: right;
+  margin-top: 10rpx;
+}
+
+/* --- 3. Cell Row (Coupon, Points, Remark) --- */
+.cell-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+}
+.coupon-card .cell-row:not(:last-child) {
+  border-bottom: 1rpx solid var(--border-color);
+}
+.cell-label { color: var(--text-normal); }
+.cell-right { color: var(--text-sub); display: flex; align-items: center; }
+
+/* --- 4. Member Banner (纯黑极简) --- */
+.member-banner-simple {
+  margin: 20rpx 24rpx;
+  background: #000000; /* 纯黑背景 */
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #FFFFFF;
+}
+.vip-left { display: flex; flex-direction: column; }
+.vip-title-row { display: flex; align-items: center; margin-bottom: 10rpx; }
+.vip-icon { width: 28rpx; height: 28rpx; margin-right: 10rpx; }
+.vip-title-text { font-size: 28rpx; font-weight: 600; color: #fff;}
+.vip-desc-text { font-size: 24rpx; color: rgba(255,255,255,0.8); }
+.vip-btn-simple {
+  background: #FFFFFF;
+  color: #000000;
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 10rpx 24rpx;
+  border-radius: 4rpx; /* 方形按钮 */
+}
+
+/* 已是会员的简单展示 */
+.member-card-simple .vip-label-wrap { display: flex; align-items: center; }
+.vip-tag { background: #000; color: #fff; font-size: 20rpx; padding: 2rpx 8rpx; border-radius: 4rpx; margin-right: 10rpx; }
+
+
+/* --- 5. Pay Card (嵌入式) --- */
+.pay-option-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--border-color);
+}
+.pay-option-row:last-child { border-bottom: none; }
+.pay-info { display: flex; align-items: center; }
+.pay-icon-img { width: 40rpx; height: 40rpx; margin-right: 20rpx; }
+.pay-icon-txt {
+  width: 40rpx; height: 40rpx; background: #f0f0f0; color: #666; 
+  font-size: 22rpx; text-align: center; line-height: 40rpx; border-radius: 4rpx; margin-right: 20rpx;
+}
+.pay-balance-col { display: flex; flex-direction: column; }
+.pay-name-text { font-size: 28rpx; color: var(--text-normal); }
+.pay-sub-text { font-size: 22rpx; color: var(--text-sub); margin-top: 4rpx; }
+
+/* 黑白风格单选框 */
+.radio-check {
+  width: 36rpx; height: 36rpx;
+  border: 2rpx solid #CCCCCC;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.radio-check.checked {
+  border-color: var(--accent-black);
+}
+.radio-dot {
+  width: 20rpx; height: 20rpx;
+  background: var(--accent-black);
+  border-radius: 50%;
+}
+
+/* --- 6. Remark --- */
+.remark-input { flex: 1; text-align: right; color: var(--text-normal); }
+.ph-color { color: #CCCCCC; }
+
+/* --- Bottom Bar --- */
+.footer-spacer { height: 160rpx; }
+.bottom-bar-simple {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #FFFFFF;
+  border-top: 1rpx solid #eee;
+  padding: 20rpx 30rpx calc(20rpx + env(safe-area-inset-bottom));
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 99;
+}
+.bar-left-info { display: flex; flex-direction: column; }
+.bar-price-row { display: flex; align-items: baseline; color: var(--text-main); }
+.bar-label { font-size: 28rpx; margin-right: 8rpx; }
+.bar-symbol { font-size: 24rpx; font-weight: 600; }
+.bar-num { font-size: 44rpx; font-weight: 800; line-height: 1; }
+.bar-disc-row { font-size: 22rpx; color: var(--text-sub); margin-top: 8rpx; }
+
+.bar-btn-black {
+  background: var(--accent-black);
+  color: #FFFFFF;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 60rpx;
+  border-radius: 4rpx; /* 直角或微圆角按钮 */
+  font-size: 28rpx;
+  font-weight: 600;
+}

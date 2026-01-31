@@ -1,0 +1,28 @@
+// utils/storageKeys.js
+// 集中管理本地存储 key，避免散落硬编码 + 便于后续迁移/兼容。
+
+module.exports = {
+  // ===== 用户端 =====
+  USER: 'LLJ_USER',
+  BALANCE: 'LLJ_BALANCE',
+  POINTS: 'LLJ_POINTS',
+  MEMBER_LEVEL: 'LLJ_MEMBER_LEVEL',
+  TOTAL_RECHARGE: 'LLJ_TOTAL_RECHARGE',
+  ADDRESS: 'LLJ_ADDRESS',
+  ORDER_STATS: 'LLJ_ORDER_STATS',
+
+  CART_CLEAR: 'LLJ_CART_CLEAR',
+  ORDER_MODE: 'LLJ_ORDER_MODE',
+  LOC_CACHE: 'LLJ_LOC_CACHE',
+
+  POINTS_GIFTS_CACHE: 'LLJ_POINTS_GIFTS_CACHE',
+  POINTS_GIFTS_CACHE_AT: 'LLJ_POINTS_GIFTS_CACHE_AT',
+
+  SHOP_CONTACT_CACHE_MAIN: 'shop_contact_cache_main_v1',
+
+  // ===== 商家端（admin 子包）=====
+  IS_MERCHANT: 'IS_MERCHANT_V1',
+  MERCHANT_SESSION: 'merchant_session_v1',
+  PRINTER_FLOAT_POS: 'LLJ_PRINTER_FLOAT_POS_V1',
+};
+

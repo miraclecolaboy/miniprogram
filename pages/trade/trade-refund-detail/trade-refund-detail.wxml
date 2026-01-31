@@ -1,0 +1,78 @@
+<view class="page">
+  <view class="card status-card">
+    <view class="status-title">{{order.refund.statusText || '售后处理中'}}</view>
+    <view wx:if="{{order.refund.latestText}}" class="sub">进度：{{order.refund.latestText}}</view>
+    <view wx:if="{{order.refund.latestTime}}" class="sub">时间：{{order.refund.latestTime}}</view>
+    <view wx:if="{{order.refund.handleRemark}}" class="sub">处理备注：{{order.refund.handleRemark}}</view>
+    <view wx:if="{{order.refund.applyReasonText}}" class="sub">申请原因：{{order.refund.applyReasonText}}</view>
+    <view wx:if="{{order.refund.pointsTip}}" class="sub">{{order.refund.pointsTip}}</view>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <view class="label">下单时间</view>
+      <view class="value">{{order.createdAtText}}</view>
+    </view>
+    <view class="row">
+      <view class="label">订单号</view>
+      <view class="value">{{order.orderNo || order._id}}<text class="copy" bindtap="copyOrderId">复制</text></view>
+    </view>
+    <view wx:if="{{order.expressNoText}}" class="row">
+      <view class="label">快递单号</view>
+      <view class="value">{{order.expressNoText}}</view>
+    </view>
+    <view class="row total">
+        <view class="label">实付金额</view>
+        <view class="value strong">￥{{order.totalPrice}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{order.mode!=='ziti'}}" class="card">
+    <view class="section-title">收货地址</view>
+    <view class="sub">收货人：{{order.shippingInfo.name}} {{order.shippingInfo.phone}}</view>
+    <view class="sub">地址：{{order.shippingInfo.region}}{{order.shippingInfo.detail}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">商品明细</view>
+    <block wx:for="{{order.items}}" wx:key="productId" wx:for-item="g">
+      <view class="goods-line">
+        <view class="goods-left-wrap">
+          <image wx:if="{{g.image}}" class="goods-thumb" src="{{g.image}}" mode="aspectFill" lazy-load="true" />
+          <view class="goods-left">
+            <view class="goods-name">{{g.productName}}</view>
+            <view wx:if="{{g.specText}}" class="goods-spec">{{g.specText}}</view>
+          </view>
+        </view>
+        <view class="goods-right">
+          <view class="goods-count">x{{g.count}}</view>
+          <view class="goods-price">￥{{g.price}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="btn-row">
+      <button size="mini" class="btn" bindtap="contactShop">联系客服</button>
+      <button size="mini" class="btn danger" disabled="{{order.refund.actionDisabled}}" bindtap="handleRefundAction">
+        {{order.refund.actionText}}
+      </button>
+    </view>
+  </view>
+
+  <view class="mask" wx:if="{{refundSheetVisible}}" bindtap="closeRefundSheet"></view>
+  <view class="sheet" wx:if="{{refundSheetVisible}}">
+    <view class="sheet-title">申请售后</view>
+    <view class="reason-list">
+      <block wx:for="{{refundReasonList}}" wx:key="*this" wx:for-item="r" wx:for-index="idx">
+        <view class="reason-item {{refundReasonIndex===idx?'active':''}}" data-index="{{idx}}" bindtap="chooseRefundReason">{{r}}</view>
+      </block>
+    </view>
+    <textarea class="remark" placeholder="补充说明（选填）" maxlength="200" bindinput="onRefundRemarkInput" value="{{refundRemark}}"></textarea>
+    <view class="sheet-btn-row">
+      <button class="btn" bindtap="closeRefundSheet">取消</button>
+      <button class="btn primary" bindtap="submitRefund">提交</button>
+    </view>
+  </view>
+</view>

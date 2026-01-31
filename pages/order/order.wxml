@@ -1,0 +1,260 @@
+<view class="page">
+
+<!-- 顶部区域 -->
+<view class="page-header">
+
+  <!-- 顶部门店卡片（公告并入同一卡片） -->
+  <view class="top-card">
+
+    <!-- 新增：第一行容器，保持原左右布局 -->
+    <view class="top-card-main">
+      <view class="top-card-left">
+        <view class="store-name">{{storeName}}</view>
+        <view class="store-distance" bindtap="onTapStoreLocation" hover-class="hover-opacity">去这里</view>
+      </view>
+
+      <view class="top-card-right">
+        <view
+          class="mode-pill {{mode=='ziti'?'active':''}}"
+          data-mode="ziti"
+          bindtap="changeMode"
+          hover-class="hover-scale-sm"
+        >到店</view>
+        <view
+          class="mode-pill {{mode=='waimai'?'active':''}}"
+          data-mode="waimai"
+          bindtap="changeMode"
+          hover-class="hover-scale-sm"
+        >外卖</view>
+        <view
+          class="mode-pill {{mode=='kuaidi'?'active':''}}"
+          data-mode="kuaidi"
+          bindtap="changeMode"
+          wx:if="{{kuaidiOn}}"
+          hover-class="hover-scale-sm"
+        >快递</view>
+      </view>
+    </view>
+
+    <!-- 公告条：移入卡片内部（原 class 保留） -->
+    <view class="notice-bar notice-bar-in-card">
+      <view class="notice-text-wrapper">
+        <view class="notice-dot"></view>
+        <view class="notice-marquee">{{notice}}</view>
+      </view>
+      <!-- <view class="notice-more" bindtap="showNotice">详情</view> -->
+    </view>
+
+  </view>
+
+</view>
+
+<!-- 主体点单区域 -->
+<view class="page-body">
+  <view class="order-container">
+
+    <!-- 左侧分类栏 -->
+    <scroll-view class="categories" scroll-y enhanced="true" show-scrollbar="false">
+      <block wx:for="{{categories}}" wx:key="id">
+        <view
+          class="category-item {{selectedCategoryId === item.id ? 'active' : ''}}"
+          bindtap="selectCategory"
+          data-id="{{item.id}}"
+          hover-class="category-hover"
+        >
+          {{item.name}}
+        </view>
+      </block>
+    </scroll-view>
+
+    <!-- 右侧商品列表 -->
+    <scroll-view class="products" scroll-y bindscrolltolower="onProductsReachBottom" lower-threshold="200" enhanced="true" show-scrollbar="false">
+      <block wx:for="{{filteredProducts}}" wx:key="id">
+        <view
+          class="product-card"
+          data-id="{{item.id}}"
+          bindtap="goDetail"
+          hover-class="product-hover"
+        >
+          <image class="product-img" src="{{item.img}}" mode="aspectFill" lazy-load="true" />
+
+          <view class="product-content">
+            <view class="product-title">{{item.name}}</view>
+            <view class="product-meta">
+              <text>库存 {{item.stock < 0 ? 0 : item.stock}}</text>
+            </view>
+
+            <view class="product-bottom">
+              <view class="product-price">￥{{item.priceWithSpec || item.price}}</view>
+
+              <!-- 右侧数量 / 选规格 -->
+              <view class="product-qty">
+
+                <!-- 有规格：显示“选规格”按钮 -->
+                <view wx:if="{{item.hasSpecs}}" class="qty-control">
+                  <view
+                    class="qty-btn qty-btn-solid qty-btn-spec"
+                    catchtap="openSpecPopup"
+                    data-id="{{item.id}}"
+                    hover-class="btn-hover"
+                  >
+                    选择
+                  </view>
+                </view>
+
+                <!-- 无规格：显示 + - 数量 -->
+                <view wx:else class="qty-control">
+                  <view wx:if="{{item.count > 0}}" class="qty-control">
+                    <view class="qty-btn qty-btn-plain" catchtap="decreaseCount" data-id="{{item.id}}" hover-class="btn-hover">-</view>
+                    <text class="qty-count">{{item.count}}</text>
+                    <view class="qty-btn qty-btn-solid" catchtap="addToCart" data-id="{{item.id}}" hover-class="btn-hover">+</view>
+                  </view>
+                  <view wx:else class="qty-control">
+                    <view class="qty-btn qty-btn-solid" catchtap="addToCart" data-id="{{item.id}}" hover-class="btn-hover">+</view>
+                  </view>
+                </view>
+
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+
+  </view>
+</view>
+
+<!-- 规格选择弹窗遮罩 -->
+<view
+  wx:if="{{showSpecPopup}}"
+  class="spec-mask"
+  bindtap="closeSpecPopup"
+></view>
+
+<!-- 规格选择弹窗：新版布局 -->
+<view wx:if="{{showSpecPopup}}" class="spec-popup" catchtap="noop">
+
+  <!-- 弹窗把手 (视觉优化) -->
+  <view class="popup-handle-bar"><view class="popup-handle"></view></view>
+
+  <!-- 顶部 商品图片 + 文案 -->
+  <view class="spec-top">
+    <image class="spec-top-img" src="{{specProduct.img}}" mode="aspectFill" lazy-load="true"></image>
+    <view class="spec-top-info">
+      <view class="spec-top-title">{{specProduct.name}}</view>
+      <view class="spec-top-stock">库存 {{specSkuStock < 0 ? 0 : specSkuStock}}
+</view>
+      <view class="spec-top-desc">{{specProduct.desc || '暂无描述'}}</view>
+    </view>
+  </view>
+
+  <!-- 内容滚动 -->
+  <scroll-view class="spec-scroll" scroll-y enhanced="true" show-scrollbar="false">
+
+    <!-- 规格组 -->
+    <block wx:for="{{specProduct.specs}}" wx:key="name">
+      <view class="spec-group">
+        <view class="spec-group-title">{{item.name}}</view>
+
+        <view class="spec-options">
+          <block wx:for="{{item.options}}" wx:for-item="opt" wx:key="label">
+            <view
+              class="spec-option {{specSelectedSpecs[item.name] === opt.label ? 'active' : ''}}"
+              data-group="{{item.name}}"
+              data-option="{{opt.label}}"
+              bindtap="selectSpecOption"
+              hover-class="spec-option-hover"
+            >
+              {{opt.label}}
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+
+    <!-- 数量选择 -->
+    <view class="spec-qty">
+      <view class="spec-qty-label">数量</view>
+      <view class="spec-qty-control">
+        <view class="qty-btn qty-btn-plain" bindtap="decreaseSpecQty" hover-class="btn-hover">-</view>
+        <text class="qty-count">{{specQuantity}}</text>
+        <view class="qty-btn qty-btn-solid" bindtap="increaseSpecQty" hover-class="btn-hover">+</view>
+      </view>
+    </view>
+
+  </scroll-view>
+
+  <!-- 底部金额栏 -->
+  <view class="spec-bottom">
+    <view class="spec-bottom-left">
+      <view class="spec-bottom-label">合计</view>
+      <view class="spec-bottom-price">￥{{specTotalPrice}}</view>
+    </view>
+
+    <button class="spec-bottom-btn" bindtap="confirmSpecAdd" hover-class="btn-hover-dark">
+      加入购物车
+    </button>
+  </view>
+</view>
+
+<!-- 购物车遮罩 -->
+<view wx:if="{{showCartDetailFlag}}" class="cart-mask" bindtap="closeCartDetail"></view>
+
+<!-- 购物车详情弹层 -->
+<view wx:if="{{showCartDetailFlag}}" class="cart-sheet">
+  <view class="cart-sheet-header">
+    <view class="cart-sheet-title">已选商品</view>
+    <view class="cart-sheet-clear" bindtap="clearCart">清空</view>
+  </view>
+
+  <scroll-view class="cart-sheet-list" scroll-y enhanced="true" show-scrollbar="false">
+    <block wx:for="{{cart}}" wx:key="cartKey">
+      <view wx:if="{{item.count > 0}}" class="cart-item">
+        <image class="cart-item-img" src="{{item.img}}" mode="aspectFill" lazy-load="true" />
+        <view class="cart-item-content">
+          <view class="cart-item-title">{{item.name}}</view>
+
+          <!-- 规格 + 单价同一行（有规格时） -->
+          <view wx:if="{{item.specText}}" class="cart-item-sub cart-item-sub-row">
+            <text class="cart-item-spec">{{item.specText}}</text>
+            <text class="cart-item-unit">单价 ￥{{item.price}}</text>
+          </view>
+
+          <!-- 无规格：单价独占一行 -->
+          <view wx:else class="cart-item-sub">单价 ￥{{item.price}}</view>
+
+          <view class="cart-item-bottom">
+            <view class="cart-item-total">小计 ￥{{item.total}}</view>
+            <view class="cart-item-qty">
+              <view class="qty-btn qty-btn-plain" bindtap="decreaseCount" data-id="{{item.cartKey}}" hover-class="btn-hover">-</view>
+              <text class="qty-count">{{item.count}}</text>
+              <view class="qty-btn qty-btn-solid" bindtap="increaseCartItemCount" data-id="{{item.cartKey}}" hover-class="btn-hover">+</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+</view>
+
+<!-- 底部结算栏 -->
+<view class="cart-bar">
+  <view class="cart-bar-left" bindtap="showCartDetail" hover-class="hover-opacity">
+    <view class="cart-icon-wrapper">
+      <image class="cart-icon-img" src="/assets/shopping-cart.png" mode="aspectFit" />
+      <view class="cart-icon-dot" wx:if="{{totalCount > 0}}">{{totalCount}}</view>
+    </view>
+
+    <view class="cart-bar-text">
+      <view class="cart-bar-label">合计</view>
+      <view class="cart-bar-price">￥{{totalPrice}}</view>
+      <view class="cart-bar-tip" wx:if="{{mode!='ziti' && totalCount>0 && needMoreFreeDelivery>0}}">还差￥{{needMoreFreeDelivery}}免配送费</view>
+    </view>
+  </view>
+
+  <button class="checkout-btn {{checkoutDisabled?'disabled':''}} {{checkoutActive?'active':''}}" bindtap="goToCart" hover-class="btn-hover-dark">
+    {{checkoutBtnText}}
+  </button>
+</view>
+
+</view>

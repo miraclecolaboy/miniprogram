@@ -1,0 +1,382 @@
+@import "../../styles/admin.wxss";
+/* pages/goods/index.wxss */
+
+/* 关键：让页面有可计算高度（配合 .page height:100% 更稳） */
+page {
+  height: 100%;
+}
+
+.page {
+  height: 100%;
+  overflow: hidden; /* 页面本身不滚，列表区域滚 */
+  background-color: #f7f7f7;
+  color: #111;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部固定区域（不在 scroll-view 里，自然固定） */
+.page-header {
+  padding: 20rpx 20rpx 0 20rpx;
+  box-sizing: border-box;
+}
+
+/* 列表容器：占满剩余空间，允许子 scroll-view 收缩并滚动 */
+.page-body {
+  flex: 1;
+  min-height: 0;              /* 解决 flex 下 scroll-view 不滚 */
+  padding: 20rpx;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 列表滚动区域：吃满 page-body */
+.listScroll {
+  flex: 1;
+  min-height: 0;              /* 解决 flex 子元素撑开问题 */
+  height: 100%;
+}
+
+/* 卡片 */
+.top-card, .card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.04);
+}
+
+.card { margin-bottom: 18rpx; }
+
+.row { display: flex; align-items: center; }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+
+.title {
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 44rpx;
+}
+
+.sub {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 10rpx;
+  line-height: 34rpx;
+}
+
+.section-title {
+  margin-top: 18rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #111;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-top: 16rpx;
+}
+
+.field { margin-top: 16rpx; }
+.field-row { display: flex; gap: 16rpx; margin-top: 16rpx; }
+.field.half { flex: 1; }
+
+.label {
+  font-size: 26rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.hint {
+  font-size: 22rpx;
+  color: #888;
+  margin-top: 10rpx;
+  line-height: 32rpx;
+}
+
+.input {
+  width: 100%;
+  background: #f5f5f5;
+  border-radius: 14rpx;
+  box-sizing: border-box;
+  color: #222;
+
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+
+.input.small {
+  padding: 0 16rpx;
+  font-size: 26rpx;
+  flex: 1;
+  height: 64rpx;
+  line-height: 64rpx;
+}
+
+.textarea {
+  width: 100%;
+  background: #f5f5f5;
+  border-radius: 14rpx;
+  padding: 18rpx 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  min-height: 150rpx;
+}
+
+/* picker */
+.picker-inline { width: 320rpx; }
+.picker-full { width: 100%; }
+
+.picker-view {
+  background: #f5f5f5;
+  border-radius: 14rpx;
+  padding: 18rpx 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.picker-text { font-size: 26rpx; color: #333; }
+.picker-arrow { font-size: 30rpx; color: #777; }
+
+/* 按钮 */
+.btn {
+  padding: 0 18rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 14rpx;
+  background: #f5f5f5;
+  color: #111;
+  font-size: 26rpx;
+  text-align: center;
+}
+.btn-mini {
+  height: 56rpx;
+  line-height: 56rpx;
+  padding: 0 16rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+}
+.btn-primary { background: #111; color: #fff; }
+.btn-danger { background: #fa5151; color: #fff; }
+.btn-disabled { opacity: 0.7; }
+
+.pill-group {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 8rpx;
+}
+.pill {
+  padding: 0 18rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  border-radius: 14rpx;
+  background: #f5f5f5;
+  color: #666;
+  font-size: 26rpx;
+}
+.pill-on { background: #111; color: #fff; }
+
+.spec-box {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #fafafa;
+  border-radius: 16rpx;
+}
+.spec-group {
+  margin-top: 16rpx;
+  padding: 14rpx;
+  background: #fff;
+  border-radius: 16rpx;
+}
+.spec-option {
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+  margin-top: 12rpx;
+}
+
+.img-box {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+.img { width: 160rpx; height: 160rpx; }
+.img-actions { display: flex; flex-direction: column; gap: 12rpx; }
+
+.item-left { flex: 1; padding-right: 18rpx; }
+.thumb {
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: #f5f5f5;
+  margin-right: 16rpx;
+}
+.thumb-img { width: 92rpx; height: 92rpx; }
+
+.info { flex: 1; }
+.item-title { font-size: 30rpx; font-weight: 700; line-height: 40rpx; }
+.item-sub { font-size: 24rpx; color: #666; margin-top: 8rpx; line-height: 32rpx; }
+
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.footer-tip {
+  text-align: center;
+  color: #888;
+  font-size: 24rpx;
+  padding: 18rpx 0 30rpx 0;
+}
+
+/* 分组弹窗 */
+.mask {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1000;
+}
+.modal {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1001;
+  padding: 18rpx;
+  box-sizing: border-box;
+}
+.modal-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 22rpx;
+  box-shadow: 0 16rpx 50rpx rgba(0,0,0,0.12);
+}
+
+/* 表单弹层：底部弹窗 + 内部滚动 */
+.formMask {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.formBg {
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+}
+
+.formWrap {
+  position: relative;
+  width: 100%;
+  margin: 18rpx;
+  height: 92vh;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.formScroll {
+  height: 100%;
+}
+
+/* 弹层内的 card 不要 margin-bottom */
+.formCard {
+  margin-bottom: 0;
+}
+
+
+/* ===== SKU库存弹层 ===== */
+.sku-list {
+  margin-top: 18rpx;
+}
+
+.sku-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid rgba(0,0,0,0.06);
+}
+
+.sku-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: #111;
+  padding-right: 16rpx;
+  word-break: break-all;
+}
+
+.sku-stock {
+  width: 180rpx;
+  text-align: right;
+}
+
+
+/* ===== 多图上传（最多3张） ===== */
+.img-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10rpx;
+}
+
+.img-grid .img-box {
+  position: relative;
+  margin-right: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.img-remove {
+  position: absolute;
+  top: 6rpx;
+  right: 6rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 20rpx;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  text-align: center;
+}
+
+.img-box-add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx dashed #d6d6d6;
+  background: #fafafa;
+}
+
+.img-add-plus {
+  font-size: 52rpx;
+  color: #999;
+  line-height: 1;
+}
+
+.img-add-sub {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+/* 让弹层表单底部有足够空白可滚动区避免键盘盖住最后的输入/textarea */
+.form {
+  padding-bottom: 620rpx;
+  padding-bottom: calc(620rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* 在 goods/index.wxss 中补充 */
+.sku-item { align-items: center; }
+.sku-price, .sku-stock { width: 140rpx; text-align: right; }
+.sku-item-header { display: flex; font-weight: bold; }
+.sku-price-header, .sku-stock-header { width: 140rpx; text-align: right; border: none; background: transparent; }

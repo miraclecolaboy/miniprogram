@@ -1,0 +1,98 @@
+.page {
+  background: #f7f7f7;
+  min-height: 100vh;
+  padding-bottom: 160rpx;
+  box-sizing: border-box;
+}
+
+/* 顶部 */
+.header {
+  padding: 30rpx 24rpx 10rpx;
+}
+
+.header-title {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+/* 卡片 */
+.card {
+  background: #ffffff;
+  border-radius: 20rpx;
+  margin: 20rpx;
+  padding: 20rpx 24rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.03);
+}
+
+/* 表单项 */
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  width: 140rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.form-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.form-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #111;
+}
+
+.placeholder {
+  color: #aaa;
+}
+
+/* 默认地址 */
+.switch-card {
+  padding: 24rpx;
+}
+
+.switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.switch-text {
+  font-size: 28rpx;
+}
+
+/* 底部 */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140rpx;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 -10rpx 30rpx rgba(0,0,0,0.06);
+}
+
+.save-btn {
+  width: calc(100% - 80rpx);
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  background: #111;
+  color: #fff;
+  font-size: 30rpx;
+  border-radius: 16rpx;
+}

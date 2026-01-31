@@ -1,0 +1,87 @@
+<view class="modern-nav {{extClass}}">
+  <!-- 导航栏容器 -->
+  <view class="nav-container" style="padding-top: {{safeAreaTop}}; background: {{background || 'var(--gradient-primary)'}};">
+    
+    <!-- 左侧区域 -->
+    <view class="nav-left">
+      <block wx:if="{{showBack}}">
+        <view class="nav-btn back-btn" bindtap="onBack" hover-class="btn-hover">
+          <text class="btn-icon">‹</text>
+          <text class="btn-text" wx:if="{{backText}}">{{backText}}</text>
+        </view>
+      </block>
+      
+      <block wx:if="{{showHome}}">
+        <view class="nav-btn home-btn" bindtap="onHome" hover-class="btn-hover">
+          <text class="btn-icon">🏠</text>
+        </view>
+      </block>
+      
+      <slot name="left"></slot>
+    </view>
+    
+    <!-- 中间区域 -->
+    <view class="nav-center">
+      <block wx:if="{{loading}}">
+        <view class="nav-loading">
+          <view class="loading-spinner"></view>
+        </view>
+      </block>
+      
+      <block wx:if="{{title}}">
+        <view class="nav-title">
+          <text class="title-text">{{title}}</text>
+          <view class="title-badge" wx:if="{{badge}}">{{badge}}</view>
+        </view>
+      </block>
+      
+      <slot name="center"></slot>
+    </view>
+    
+    <!-- 右侧区域 -->
+    <view class="nav-right">
+      <block wx:if="{{actions && actions.length}}">
+        <view class="nav-actions">
+          <block wx:for="{{actions}}" wx:key="id">
+            <view 
+              class="nav-action" 
+              bindtap="onAction" 
+              data-id="{{item.id}}"
+              hover-class="action-hover"
+            >
+              <text class="action-icon">{{item.icon}}</text>
+              <view class="action-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
+            </view>
+          </block>
+        </view>
+      </block>
+      
+      <slot name="right"></slot>
+    </view>
+    
+    <!-- 搜索栏（可选） -->
+    <block wx:if="{{showSearch}}">
+      <view class="nav-search">
+        <view class="search-container">
+          <text class="search-icon">🔍</text>
+          <input 
+            class="search-input" 
+            type="text" 
+            placeholder="{{searchPlaceholder || '搜索...'}}"
+            placeholder-class="search-placeholder"
+            bindinput="onSearchInput"
+            bindconfirm="onSearchConfirm"
+            value="{{searchValue}}"
+          />
+          <view 
+            class="search-clear" 
+            bindtap="onClearSearch"
+            wx:if="{{searchValue}}"
+          >
+            <text class="clear-icon">×</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

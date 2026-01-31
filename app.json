@@ -1,0 +1,78 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/order/order",
+    "pages/mine/mine",
+    "pages/checkout/checkout",
+    "pages/order/detail/detail",
+    "pages/mine/address/address",
+    "pages/mine/address-edit/address-edit",
+    "pages/trade/trade-list/trade-list",
+    "pages/trade/trade-detail/trade-detail",
+    "pages/trade/trade-refund-detail/trade-refund-detail",
+    "pages/mine/recharge/recharge",
+    "pages/mine/points/points",
+    "pages/mine/member/member",
+    "pages/mine/service/service",
+    "pages/mine/coupon/index" 
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于计算您到门店的距离和地址自动填写"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1aad19",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "assets/home.png",
+        "selectedIconPath": "assets/home_active.png"
+      },
+      {
+        "pagePath": "pages/order/order",
+        "text": "点单",
+        "iconPath": "assets/order.png",
+        "selectedIconPath": "assets/order_active.png"
+      },
+      {
+        "pagePath": "pages/trade/trade-list/trade-list",
+        "text": "订单",
+        "iconPath": "assets/orders.png",
+        "selectedIconPath": "assets/orders_active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "assets/mine.png",
+        "selectedIconPath": "assets/mine_active.png"
+      }
+    ]
+  },
+  "subpackages": [
+    {
+      "root": "packages/admin",
+      "pages": [
+        "pages/goods/index",
+        "pages/login/login",
+        "pages/orders/index",
+        "pages/orders/refund-handle/index",
+        "pages/shop/index",
+        "pages/coupon/index"
+      ]
+    }
+  ]
+}

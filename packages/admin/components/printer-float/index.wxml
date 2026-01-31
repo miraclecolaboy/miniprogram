@@ -1,0 +1,18 @@
+<movable-area class="pf-area">
+  <movable-view
+    class="pf-view"
+    direction="all"
+    inertia="{{true}}"
+    out-of-bounds="{{false}}"
+    x="{{x}}"
+    y="{{y}}"
+    style="width: 250rpx; height: 72rpx;"
+    bindchange="onMoveChange"
+    bindtap="onTap"
+  >
+    <view class="pf-inner">
+      <view class="pf-dot {{bound ? 'on' : ''}}"></view>
+      <view class="pf-text">{{boundText}}</view>
+    </view>
+  </movable-view>
+</movable-area>
