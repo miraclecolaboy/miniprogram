@@ -77,18 +77,18 @@
       </view>
     </view>
     
-    <view class="vip-entry-row" wx:if="{{!isVip}}" bindtap="goOpenVip">
-      <view class="vip-left">
-        <image class="vip-icon" src="/assets/member.png" mode="aspectFit" />
-        <text>开通会员，本单立减 ￥{{vipDiscount}}</text>
+    <view class="cell-row" wx:if="{{!isVip}}" bindtap="goOpenVip">
+      <text class="cell-label">会员折扣</text>
+      <view class="cell-right" style="color: var(--gold-dark); font-weight: 500;">
+        <text class="shimmer-anim">开通立减 ￥{{vipDiscount}}</text>
+        <text class="arrow">></text>
       </view>
-      <text class="vip-link">去开通</text>
     </view>
 
     <view class="cell-row" wx:if="{{isVip}}">
-      <view>
-        <text class="vip-tag">VIP</text>
+      <view style="display: flex; align-items: center;">
         <text class="cell-label">会员折扣</text>
+        <text class="vip-tag">VIP</text>
       </view>
       <view class="cell-right highlight-gold">-￥{{vipDiscount}}</view>
     </view>
