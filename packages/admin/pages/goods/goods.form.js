@@ -4,33 +4,7 @@ const { requireLogin, getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
 const { safeStr, toNum } = require('../../../../utils/common');
 const { toInt, normalizeModes } = require('./goods.helpers');
-
-// 保证最低质量为 30%
-async function compressToMaxKB(srcPath, maxKB = 200) {
-  try {
-    const info0 = await wx.getImageInfo({ src: srcPath });
-    const sizeKB = info0.size / 1024;
-    if (sizeKB <= maxKB) return srcPath;
-
-    // 将最低质量限制在 30，保证详情图的展示效果
-    const qualities = [80, 70, 60, 50, 40, 30];
-    let bestPath = srcPath;
-
-    for (const q of qualities) {
-      const r = await wx.compressImage({ src: srcPath, quality: q });
-      const p = r.tempFilePath;
-      bestPath = p;
-
-      const info = await wx.getImageInfo({ src: p });
-      if ((info.size / 1024) <= maxKB) return p;
-    }
-
-    return bestPath;
-  } catch (e) {
-    console.warn('compressToMaxKB error', e);
-    return srcPath;
-  }
-}
+const { compressImage, generateThumbnail: generateThumbnailUtil } = require('../../../../utils/uploader');
 
 module.exports = {
   openAdd() {
@@ -141,32 +115,15 @@ module.exports = {
     this.setData({ formModesMap: map, 'form.modes': Object.keys(map).filter((k) => map[k]) });
   },
 
-  async generateThumbnail(filePath) {
+  // 直接调用 uploader.js 的 generateThumbnail
+  // 必须确保 WXML 里有 canvas-id="image-cropper"
+  async triggerThumbnailGen(filePath) {
     if (!filePath) return;
     try {
-      const ctx = wx.createCanvasContext('image-cropper');
-      const imageInfo = await wx.getImageInfo({ src: filePath });
-      const { width, height } = imageInfo;
-      const size = Math.min(width, height);
-      const x = (width - size) / 2;
-      const y = (height - size) / 2;
-
-      ctx.drawImage(filePath, x, y, size, size, 0, 0, 300, 300);
-      await new Promise((resolve) => ctx.draw(false, resolve));
-
-      const res = await wx.canvasToTempFilePath({
-        canvasId: 'image-cropper',
-        width: 300,
-        height: 300,
-        destWidth: 300,
-        destHeight: 300,
-        fileType: 'jpg',
-        quality: 0.8,
-      });
-
-      this.setData({ 'form.thumb.localPath': res.tempFilePath });
+      const thumbPath = await generateThumbnailUtil(filePath);
+      this.setData({ 'form.thumb.localPath': thumbPath });
     } catch (e) {
-      console.error('generateThumbnail error', e);
+      console.error('triggerThumbnailGen error', e);
       wx.showToast({ title: '缩略图生成失败', icon: 'none' });
     }
   },
@@ -192,7 +149,7 @@ module.exports = {
       this.setData({ 'form.displayImages': [...displayImages, newImage] });
 
       if (this.data.form.displayImages.length === 1) {
-        await this.generateThumbnail(localPath);
+        await this.triggerThumbnailGen(localPath);
       }
     } catch (e) {
       if (e.errMsg && !e.errMsg.includes('cancel')) {
@@ -220,12 +177,12 @@ module.exports = {
       if (newDisplayImages.length > 0) {
         const nextFirstImage = newDisplayImages[0];
         if (nextFirstImage.type === 'local') {
-          await this.generateThumbnail(nextFirstImage.path);
+          await this.triggerThumbnailGen(nextFirstImage.path);
         } else if (nextFirstImage.type === 'cloud') {
           wx.showLoading({ title: '处理主图...', mask: true });
           try {
             const downloadRes = await wx.downloadFile({ url: nextFirstImage.path });
-            await this.generateThumbnail(downloadRes.tempFilePath);
+            await this.triggerThumbnailGen(downloadRes.tempFilePath);
           } catch (err) {
             wx.showToast({ title: '主图处理失败', icon: 'none' });
           } finally {
@@ -296,7 +253,7 @@ module.exports = {
       const newImages = f.displayImages.filter((img) => img.type === 'local');
 
       for (const [index, img] of newImages.entries()) {
-        const compressedPath = await compressToMaxKB(img.path);
+        const compressedPath = await compressImage(img.path, 200);
         uploadTasks.push(
           wx.cloud.uploadFile({
             cloudPath: `products/${Date.now()}-${index}.jpg`,
@@ -409,4 +366,3 @@ module.exports = {
     }
   },
 };
-
