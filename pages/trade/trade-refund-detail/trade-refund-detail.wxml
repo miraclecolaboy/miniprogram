@@ -30,7 +30,7 @@
   <view wx:if="{{order.mode!=='ziti'}}" class="card">
     <view class="section-title">收货地址</view>
     <view class="sub">收货人：{{order.shippingInfo.name}} {{order.shippingInfo.phone}}</view>
-    <view class="sub">地址：{{order.shippingInfo.region}}{{order.shippingInfo.detail}}</view>
+    <view class="sub">地址：{{order.shippingAddressText}}</view>
   </view>
 
   <view class="card">

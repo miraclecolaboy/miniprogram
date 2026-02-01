@@ -162,12 +162,6 @@ Page(Object.assign({
   
   // --- UI 交互 ---
 
-  setDiningMode(e) {
-    const type = e.currentTarget.dataset.type;
-    if (type === this.data.storeSubMode) return;
-    this.setData({ storeSubMode: type });
-  },
-
   toggleMenuExpand() {
     this.setData({ isMenuExpanded: !this.data.isMenuExpanded });
   },

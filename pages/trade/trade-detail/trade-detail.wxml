@@ -21,7 +21,7 @@
     <block wx:else>
       <view class="sub">收货人: {{order.shippingInfo.name}} {{order.shippingInfo.phone}}</view>
       <view class="sub nav-line">
-        <view class="nav-text">地址: {{order.shippingInfo.region}}{{order.shippingInfo.detail}}</view>
+        <view class="nav-text">地址: {{order.shippingAddressText}}</view>
         <image class="nav-icon" src="/assets/address.png" mode="aspectFit" />
       </view>
     </block>

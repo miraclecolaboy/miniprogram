@@ -1,11 +1,13 @@
 <view class="page">
   <view class="header-section">
-    <view class="mode-tabs">
-      <view class="mode-tab {{mode === 'ziti' ? 'active' : ''}}" bindtap="switchMode" data-target="ziti">
-        <text>{{storeSubMode === 'tangshi' ? '堂食点餐' : '到店自提'}}</text>
+    <view class="submode-tabs" wx:if="{{mode === 'ziti'}}">
+      <view class="submode-tab {{storeSubMode === 'tangshi' ? 'active' : ''}}" bindtap="changeStoreSubMode" data-submode="tangshi" hover-class="hover-opacity">
+        <image class="submode-icon" src="/assets/in-store.png" mode="aspectFit" />
+        <text>堂食</text>
       </view>
-      <view class="mode-tab {{mode !== 'ziti' ? 'active' : ''}}" bindtap="switchMode" data-target="waimai">
-        <text>外卖配送</text>
+      <view class="submode-tab {{storeSubMode !== 'tangshi' ? 'active' : ''}}" bindtap="changeStoreSubMode" data-submode="ziti" hover-class="hover-opacity">
+        <image class="submode-icon" src="/assets/take-away.png" mode="aspectFit" />
+        <text>自提</text>
       </view>
     </view>
 
@@ -17,7 +19,7 @@
         </view>
         <picker mode="selector" range="{{timeList}}" bindchange="choosePickupTime">
           <view class="pickup-time-row">
-            <text class="label">取餐时间</text>
+            <text class="label">{{storeSubMode === 'tangshi' ? '到店时间' : '取餐时间'}}</text>
             <view class="time-val">
               {{pickupTime}} <text class="arrow">></text>
             </view>

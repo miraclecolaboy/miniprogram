@@ -154,26 +154,39 @@ page {
   margin-bottom: 16rpx;
 }
 
-/* 模式切换 Tabs */
-.mode-tabs {
+/* 到店模式：堂食/自提切换 */
+.submode-tabs {
   display: flex;
-  background: #EEEEEE;
-  border-radius: 32rpx;
+  background: #F1F2F4;
+  border-radius: 999rpx;
   padding: 6rpx;
   width: fit-content;
-  margin-bottom: 30rpx;
+  margin-bottom: 22rpx;
+  margin-left: 10rpx;
 }
-.mode-tab {
-  padding: 10rpx 32rpx;
+.submode-tab {
+  display: flex;
+  align-items: center;
+  padding: 10rpx 24rpx;
   font-size: 26rpx;
   color: #666;
-  border-radius: 28rpx;
+  border-radius: 999rpx;
   transition: all 0.2s;
 }
-.mode-tab.active {
-  background: var(--text-main);
-  color: #fff;
-  font-weight: 600;
+.submode-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 10rpx;
+  opacity: 0.55;
+}
+.submode-tab.active {
+  background: #FFFFFF;
+  color: var(--text-main);
+  font-weight: 700;
+  box-shadow: 0 10rpx 28rpx rgba(0,0,0,0.06);
+}
+.submode-tab.active .submode-icon {
+  opacity: 1;
 }
 
 /* 地址/门店信息 */

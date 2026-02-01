@@ -1,5 +1,19 @@
 const { callUser } = require('../../../utils/cloud');
 
+function s(v) { return String(v == null ? '' : v).trim(); }
+
+function buildShippingAddressText(shippingInfo) {
+  if (!shippingInfo) return '';
+  const full = s(shippingInfo.address || shippingInfo.fullAddress || shippingInfo.poiAddress);
+  if (full) return full;
+  return [s(shippingInfo.region), s(shippingInfo.detail)].filter(Boolean).join(' ');
+}
+
+function mapOrderToView(order) {
+  if (!order || typeof order !== 'object') return order;
+  return { ...order, shippingAddressText: buildShippingAddressText(order.shippingInfo) };
+}
+
 Page({
   data: {
     orderId: '',
@@ -18,7 +32,7 @@ Page({
 
     const eventChannel = this.getOpenerEventChannel();
     eventChannel.on('initOrder', ({ order }) => {
-      if (order) this.setData({ order });
+      if (order) this.setData({ order: mapOrderToView(order) });
       this.refreshOrderDetail();
     });
   },
@@ -36,7 +50,7 @@ Page({
       const res = await callUser('getOrderDetail', { orderId });
       const orderData = res?.result?.data;
       if (orderData) {
-        this.setData({ order: orderData });
+        this.setData({ order: mapOrderToView(orderData) });
       } else {
         throw new Error(res?.result?.message || '加载订单失败');
       }
@@ -54,8 +68,8 @@ Page({
     const lat = isZiti ? order.storeLat : order.shippingInfo?.lat;
     const lng = isZiti ? order.storeLng : order.shippingInfo?.lng;
     const name = isZiti ? order.storeName : order.shippingInfo?.name;
-    const address = isZiti ? order.storeName : `${order.shippingInfo?.region || ''}${order.shippingInfo?.detail || ''}`;
-    if (lat && lng) {
+    const address = isZiti ? order.storeName : (order.shippingAddressText || buildShippingAddressText(order.shippingInfo));
+    if (lat != null && lng != null) {
       wx.openLocation({ latitude: lat, longitude: lng, name, address });
     }
   },

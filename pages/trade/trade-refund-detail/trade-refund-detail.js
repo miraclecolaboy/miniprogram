@@ -4,6 +4,15 @@ const { fmtTime } = require('../../../utils/common');
 
 const AFTER_SALE_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
 
+function s(v) { return String(v == null ? '' : v).trim(); }
+
+function buildShippingAddressText(shippingInfo) {
+  if (!shippingInfo) return '';
+  const full = s(shippingInfo.address || shippingInfo.fullAddress || shippingInfo.poiAddress);
+  if (full) return full;
+  return [s(shippingInfo.region), s(shippingInfo.detail)].filter(Boolean).join(' ');
+}
+
 Page({
   data: {
     orderId: '',
@@ -92,7 +101,7 @@ Page({
           actionDisabled
       };
 
-      return { ...order, refund: mappedRefund };
+      return { ...order, refund: mappedRefund, shippingAddressText: buildShippingAddressText(order.shippingInfo) };
   },
 
   handleRefundAction() {
