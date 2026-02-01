@@ -1,158 +1,94 @@
 <view class="page">
-
-  <!-- 顶部信息卡：对齐 Order 页“门店+模式”结构 -->
-  <view class="top-card">
-
-    <view class="top-card-main">
-      <view class="top-card-left">
-        <view class="store-name">{{storeName || '门店'}}</view>
-
-        <view class="store-sub" wx:if="{{mode === 'ziti'}}" bindtap="onTapLocation" hover-class="hover-opacity">
-          <block wx:if="{{distance}}">距您 {{distance}}{{distanceUnit}}</block>
-          <block wx:else>点击获取距离</block>
-        </view>
-        <view class="store-sub" wx:elif="{{mode === 'kuaidi'}}">全国快递</view>
-        <view class="store-sub" wx:else>外卖配送</view>
+  <view class="header-section">
+    <view class="mode-tabs">
+      <view class="mode-tab {{mode === 'ziti' ? 'active' : ''}}" bindtap="switchMode" data-target="ziti">
+        <text>{{storeSubMode === 'tangshi' ? '堂食点餐' : '到店自提'}}</text>
       </view>
-
-      <view class="top-card-right">
-        <!-- 到店：堂食/自提切换（使用你提供的图标） -->
-        <view wx:if="{{mode === 'ziti'}}" class="submode-switch">
-          <view
-            class="submode-pill {{storeSubMode === 'tangshi' ? 'active' : ''}}"
-            data-type="tangshi"
-            bindtap="setDiningMode"
-            hover-class="hover-scale-sm"
-          >
-            <image class="submode-icon" src="/assets/in-store.png" mode="aspectFit" />
-            <text class="submode-text">堂食</text>
-          </view>
-
-          <view
-            class="submode-pill {{storeSubMode === 'ziti' ? 'active' : ''}}"
-            data-type="ziti"
-            bindtap="setDiningMode"
-            hover-class="hover-scale-sm"
-          >
-            <image class="submode-icon" src="/assets/take-away.png" mode="aspectFit" />
-            <text class="submode-text">自提</text>
-          </view>
-        </view>
-
-        <!-- 外卖/快递：模式徽章 -->
-        <view wx:else class="mode-badge">
-          <image
-            class="mode-badge-icon"
-            src="/assets/{{mode === 'kuaidi' ? 'express.png' : 'delivery.png'}}"
-            mode="aspectFit"
-          />
-          <text class="mode-badge-text">{{mode === 'kuaidi' ? '快递' : '外卖'}}</text>
-        </view>
+      <view class="mode-tab {{mode !== 'ziti' ? 'active' : ''}}" bindtap="switchMode" data-target="waimai">
+        <text>外卖配送</text>
       </view>
     </view>
 
-    <view class="top-card-body">
-      <!-- 到店：取餐时间 -->
+    <view class="main-info-box">
       <block wx:if="{{mode === 'ziti'}}">
+        <view class="store-info">
+          <text class="store-name">{{storeName || '加载中...'}}</text>
+          <text class="distance-tag" wx:if="{{distance}}">距您 {{distance}}{{distanceUnit}}</text>
+        </view>
         <picker mode="selector" range="{{timeList}}" bindchange="choosePickupTime">
-          <view class="cell-row cell-row-compact">
-            <text class="cell-label">取餐时间</text>
-            <view class="cell-right">
-              <text class="value">{{pickupTime}}</text>
-              <text class="arrow">></text>
+          <view class="pickup-time-row">
+            <text class="label">取餐时间</text>
+            <view class="time-val">
+              {{pickupTime}} <text class="arrow">></text>
             </view>
           </view>
         </picker>
       </block>
 
-      <!-- 外卖/快递：地址 -->
       <block wx:else>
-        <view class="address-row" bindtap="chooseAddress" hover-class="hover-scale-sm">
-          <view class="address-left">
-            <block wx:if="{{address}}">
-              <text class="addr-detail">{{address.fullAddress}}</text>
-              <text class="user-detail">{{address.name}} {{address.phone}}</text>
-            </block>
-            <block wx:else>
-              <text class="address-placeholder">请选择收货地址</text>
-              <text class="user-detail">用于{{mode === 'kuaidi' ? '快递寄送' : '外卖配送'}}</text>
-            </block>
-          </view>
-          <text class="arrow">></text>
+        <view class="address-info" bindtap="chooseAddress">
+          <block wx:if="{{address}}">
+            <text class="addr-detail">{{address.fullAddress}}</text>
+            <text class="user-detail">{{address.name}} {{address.phone}}</text>
+          </block>
+          <block wx:else>
+            <text class="addr-placeholder">请选择收货地址</text>
+          </block>
+          <text class="arrow-right">></text>
         </view>
       </block>
     </view>
-
   </view>
 
-  <!-- 商品明细 -->
-  <view class="card">
-    <view class="card-head">
-      <view class="card-title-sm">商品明细</view>
-      <view class="card-action" wx:if="{{cart.length > 2}}" bindtap="toggleMenuExpand" hover-class="hover-opacity">
-        <text class="card-action-text">{{isMenuExpanded ? '收起' : '展开'}}</text>
-        <text class="arrow">></text>
-      </view>
-    </view>
-
-    <block wx:for="{{cart}}" wx:key="id" wx:for-item="p" wx:for-index="idx">
-      <view wx:if="{{isMenuExpanded || idx < 2}}" class="product-row">
-        <image class="p-img" src="{{p.img}}" mode="aspectFill" />
-        <view class="p-info">
-          <view class="p-top">
+  <view class="card product-card">
+    <block wx:for="{{cart}}" wx:key="id" wx:for-item="p">
+      <view class="product-item">
+        <image class="p-img" src="{{p.img || ''}}" mode="aspectFill" />
+        <view class="p-content">
+          <view class="p-row-top">
             <text class="p-name">{{p.name}}</text>
             <text class="p-price">￥{{p.total}}</text>
           </view>
-          <view class="p-bottom">
-            <text class="p-spec" wx:if="{{p.specText}}">{{p.specText}}</text>
-            <text class="p-spec" wx:else></text>
+          <view class="p-row-bottom">
+            <text class="p-spec">{{p.specText || ''}}</text>
             <text class="p-count">x{{p.count}}</text>
           </view>
         </view>
       </view>
     </block>
-
-    <view class="more-row" wx:if="{{!isMenuExpanded && cart.length > 2}}" bindtap="toggleMenuExpand" hover-class="hover-opacity">
-      还有 {{cart.length - 2}} 件商品，点击展开
-    </view>
-
+    
     <view class="fee-row" wx:if="{{mode !== 'ziti'}}">
-      <text class="label">{{mode === 'kuaidi' ? '运费' : '配送费'}}</text>
-      <view>
-        <text class="fee-num">￥{{deliveryFee}}</text>
-        <view class="fee-tip" wx:if="{{needMoreFreeDelivery > 0}}">
-          再买 ￥{{needMoreFreeDelivery}} 免{{mode === 'kuaidi' ? '运费' : '配送费'}}
-        </view>
-      </view>
+      <text class="label">配送费</text>
+      <text class="val">￥{{deliveryFee}}</text>
+    </view>
+    <view class="fee-tip" wx:if="{{mode !== 'ziti' && needMoreFreeDelivery !== '0.00'}}">
+      再买 ￥{{needMoreFreeDelivery}} 免配送费
     </view>
   </view>
 
-  <view class="vip-banner" wx:if="{{!isVip}}" bindtap="goOpenVip">
-    <view class="vip-left">
-      <view class="vip-title-row">
-        <image class="vip-icon" src="/assets/member.png" mode="aspectFit" />
-        <text class="vip-title-text">加入会员</text>
-      </view>
-      <text class="vip-desc-text">开通会员，本单立减 ￥{{vipDiscount}}</text>
-    </view>
-    <view class="vip-btn">立即开通</view>
-  </view>
-
-  <view class="card {{isVip ? 'vip-card-active' : ''}}">
-    <view class="cell-row" wx:if="{{isVip}}">
-      <view>
-        <text class="vip-tag">VIP</text>
-        <text class="cell-label">会员折扣</text>
-      </view>
-      <view class="cell-right highlight-gold">-￥{{vipDiscount}}</view>
-    </view>
-
+  <view class="card benefit-card">
     <view class="cell-row" bindtap="onSelectCoupon">
       <text class="cell-label">优惠券</text>
       <view class="cell-right {{selectedCoupon ? 'highlight-gold' : ''}}">
         {{selectedCoupon ? '-￥'+couponDiscount : (availableCoupons.length ? availableCoupons.length + '张可用' : '无可用')}}
         <text class="arrow">></text>
       </view>
+    </view>
+    
+    <view class="vip-entry-row" wx:if="{{!isVip}}" bindtap="goOpenVip">
+      <view class="vip-left">
+        <image class="vip-icon" src="/assets/member.png" mode="aspectFit" />
+        <text>开通会员，本单立减 ￥{{vipDiscount}}</text>
+      </view>
+      <text class="vip-link">去开通</text>
+    </view>
+
+    <view class="cell-row" wx:if="{{isVip}}">
+      <view>
+        <text class="vip-tag">VIP</text>
+        <text class="cell-label">会员折扣</text>
+      </view>
+      <view class="cell-right highlight-gold">-￥{{vipDiscount}}</view>
     </view>
     
     <view class="cell-row">

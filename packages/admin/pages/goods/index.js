@@ -1,5 +1,6 @@
 // packages/admin/pages/goods/index.js
 // 商品管理页：按客户端页面的方式拆分 methods，降低单文件复杂度
+
 const listMethods = require('./goods.list');
 const formMethods = require('./goods.form');
 const skuMethods = require('./goods.sku');
@@ -45,4 +46,8 @@ Page(Object.assign({
     categorySaving: false,
     categoryForm: { name: '', sort: '0' }
   },
+
+  // [修复] 空函数，用于 wxml 中 catchtap="noop" 阻止事件冒泡
+  noop() {}
+
 }, listMethods, formMethods, skuMethods, categoryMethods));

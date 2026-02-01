@@ -1,4 +1,7 @@
+// packages/admin/pages/login/login.js
 const { getSession, setSession } = require('../../utils/auth');
+// [修复] 引入 missing 的 call 方法
+const { call } = require('../../utils/cloud'); 
 const { IS_MERCHANT } = require('../../../../utils/storageKeys');
 
 Page({
@@ -37,6 +40,7 @@ Page({
     this.setData({ logging: true });
 
     try {
+      // 这里的 call 之前未定义，现在已在顶部引入
       const result = await call(
         'admin',
         { action: 'login', username, password },

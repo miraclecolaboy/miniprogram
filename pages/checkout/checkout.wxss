@@ -1,6 +1,6 @@
 /* pages/checkout/checkout.wxss */
 page {
-  /* --- 核心变量 (对齐 Home/Order) --- */
+  /* --- 核心变量 (保持你原有的) --- */
   --bg-page: #F7F8FA;
   --bg-card: #FFFFFF;
   
@@ -26,21 +26,21 @@ page {
 
 .page {
   min-height: 100vh;
-  padding: 16rpx; /* 对齐 Order 页左右留白 */
+  padding: 16rpx;
   box-sizing: border-box;
 }
 
-/* --- 通用组件 --- */
+/* --- 通用组件 (保持原样) --- */
 .arrow {
   color: #C5C6CB;
   font-size: 24rpx;
   margin-left: 8rpx;
   font-family: monospace;
 }
-
 .hover-opacity { opacity: 0.6; }
 .hover-scale-sm { transform: scale(0.98); opacity: 0.92; }
 
+/* 通用卡片 (保持原样，用于支付、备注等) */
 .card {
   background: var(--bg-card);
   border-radius: 24rpx;
@@ -51,7 +51,6 @@ page {
   position: relative;
   overflow: hidden;
 }
-
 .card-title {
   font-size: 30rpx;
   font-weight: 700;
@@ -60,277 +59,7 @@ page {
   letter-spacing: 1rpx;
 }
 
-/* --- 1) 顶部信息卡（对齐 Home/Order 风格） --- */
-.top-card {
-  background: #ffffff;
-  border-radius: 24rpx;
-  padding: 24rpx 30rpx;
-  border: 1rpx solid #F2F2F2;
-  box-shadow: 0 14rpx 48rpx rgba(0,0,0,0.035);
-  margin-bottom: 16rpx;
-  box-sizing: border-box;
-}
-
-.top-card-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 18rpx;
-}
-
-.top-card-left {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-}
-
-.store-name {
-  font-size: 38rpx;
-  font-weight: 700;
-  letter-spacing: 2rpx;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.store-sub {
-  font-size: 24rpx;
-  color: #888;
-  display: inline-flex;
-  align-items: center;
-  line-height: 1.1;
-}
-
-.top-card-right {
-  display: flex;
-  align-items: center;
-}
-
-.submode-switch {
-  display: flex;
-  align-items: center;
-  padding: 6rpx;
-  border-radius: 999rpx;
-  background-color: #F5F5F5;
-  gap: 6rpx;
-}
-
-.submode-pill {
-  height: 52rpx;
-  padding: 0 18rpx;
-  border-radius: 999rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24rpx;
-  color: #777;
-  transition: transform 0.12s ease, opacity 0.12s ease;
-}
-
-.submode-pill.active {
-  background-color: #FFFFFF;
-  color: #111;
-  box-shadow: 0 10rpx 26rpx rgba(0,0,0,0.08);
-}
-
-.submode-icon {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 10rpx;
-  opacity: 0.72;
-}
-
-.submode-pill.active .submode-icon { opacity: 1; }
-
-.mode-badge {
-  display: flex;
-  align-items: center;
-  padding: 10rpx 16rpx;
-  border-radius: 999rpx;
-  background-color: #F5F5F5;
-}
-
-.mode-badge-icon {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 10rpx;
-  opacity: 0.78;
-}
-
-.mode-badge-text {
-  font-size: 24rpx;
-  color: #777;
-}
-
-.top-card-body {
-  margin-top: 18rpx;
-  padding-top: 18rpx;
-  border-top: 1rpx solid #F0F0F0;
-}
-
-.address-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 18rpx;
-  transition: transform 0.12s ease, opacity 0.12s ease;
-}
-
-.address-left {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.addr-detail {
-  font-size: 30rpx;
-  font-weight: 600;
-  margin-bottom: 6rpx;
-  color: var(--text-main);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.user-detail {
-  font-size: 24rpx;
-  color: var(--text-sub);
-}
-
-.address-placeholder {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 6rpx;
-}
-
-.label {
-  font-size: 28rpx;
-  color: var(--text-main);
-  font-weight: 500;
-}
-
-.value {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-/* --- 2. 商品明细卡片 --- */
-.card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12rpx;
-}
-
-.card-title-sm {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: 1rpx;
-}
-
-.card-action {
-  display: flex;
-  align-items: center;
-  font-size: 24rpx;
-  color: #888;
-  transition: transform 0.12s ease, opacity 0.12s ease;
-}
-
-.product-row {
-  display: flex;
-  padding: 18rpx 0;
-}
-.product-row + .product-row { border-top: 1rpx solid #F2F3F5; }
-
-.p-img {
-  width: 112rpx;
-  height: 112rpx;
-  border-radius: 16rpx;
-  background-color: #F7F8FA;
-  margin-right: 24rpx;
-  flex-shrink: 0;
-}
-
-.p-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 2rpx 0;
-}
-
-.p-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-.p-name {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: var(--text-main);
-  line-height: 1.4;
-  margin-right: 16rpx;
-}
-.p-price {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--text-price);
-}
-
-.p-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.p-spec {
-  font-size: 22rpx;
-  color: var(--text-sub);
-  background: #F7F8FA;
-  padding: 4rpx 10rpx;
-  border-radius: 6rpx;
-}
-.p-count {
-  font-size: 24rpx;
-  color: var(--text-sub);
-  font-family: 'DIN Alternate', sans-serif;
-}
-
-.more-row {
-  margin-top: 6rpx;
-  padding-top: 18rpx;
-  border-top: 1rpx solid #F2F3F5;
-  font-size: 24rpx;
-  color: #888;
-  text-align: center;
-  transition: transform 0.12s ease, opacity 0.12s ease;
-}
-
-/* 费用行 */
-.fee-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 24rpx;
-  padding-top: 24rpx;
-  border-top: 1rpx solid #F2F3F5;
-}
-.fee-num {
-  font-weight: 600;
-}
-.fee-tip {
-  font-size: 20rpx;
-  color: #FF3B30;
-  text-align: right;
-  margin-top: 6rpx;
-}
-
-/* --- 3. 单元格列表 (优惠券/备注) --- */
+/* --- 单元格列表 (优惠券/备注/会员权益) --- */
 .cell-row {
   display: flex;
   justify-content: space-between;
@@ -341,89 +70,10 @@ page {
 .cell-row:first-child { padding-top: 0; }
 .cell-row:last-child { padding-bottom: 0; border-bottom: none; }
 
-.cell-row.cell-row-compact {
-  padding: 18rpx 0;
-  border-bottom: none;
-}
-.cell-row.cell-row-compact:first-child { padding-top: 18rpx; }
-.cell-row.cell-row-compact:last-child { padding-bottom: 18rpx; }
+.cell-label { font-size: 28rpx; font-weight: 500; }
+.cell-right { font-size: 28rpx; color: var(--text-sub); display: flex; align-items: center; }
+.highlight-gold { color: #CFAA5E !important; font-weight: 600; }
 
-.cell-label {
-  font-size: 28rpx;
-  font-weight: 500;
-}
-.cell-right {
-  font-size: 28rpx;
-  color: var(--text-sub);
-  display: flex;
-  align-items: center;
-}
-.highlight-gold {
-  color: #CFAA5E !important; /* 优惠券高亮 */
-  font-weight: 600;
-}
-
-/* --- 4. 会员权益 Banner (黑金风格) --- */
-.vip-banner {
-  background: linear-gradient(135deg, #2C2C2E 0%, #141414 100%);
-  border-radius: 24rpx;
-  padding: 30rpx 36rpx;
-  margin-bottom: 16rpx;
-  box-shadow: 0 12rpx 30rpx rgba(0,0,0,0.12);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #FCECB9; /* 浅金文字 */
-}
-
-.vip-left {
-  display: flex;
-  flex-direction: column;
-}
-.vip-title-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8rpx;
-}
-.vip-icon {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: 12rpx;
-}
-.vip-title-text {
-  font-size: 30rpx;
-  font-weight: 700;
-  letter-spacing: 1rpx;
-  background: linear-gradient(90deg, #FCECB9, #D4B675);
-  -webkit-background-clip: text;
-  color: transparent;
-}
-.vip-desc-text {
-  font-size: 22rpx;
-  color: rgba(252, 236, 185, 0.7);
-}
-
-.vip-btn {
-  background: linear-gradient(90deg, #FCECB9, #D4B675);
-  color: #141414;
-  font-size: 24rpx;
-  font-weight: 700;
-  padding: 12rpx 28rpx;
-  border-radius: 999rpx;
-  box-shadow: 0 4rpx 12rpx rgba(212, 182, 117, 0.3);
-}
-
-/* 已是会员状态 */
-.vip-card-active {
-  background: linear-gradient(135deg, #1F1F1F 0%, #000000 100%);
-  border: none;
-  box-shadow: 0 14rpx 48rpx rgba(0,0,0,0.12);
-}
-.vip-card-active .cell-row { border-bottom-color: rgba(255, 255, 255, 0.10); }
-.vip-card-active .cell-label { color: rgba(255, 255, 255, 0.92); }
-.vip-card-active .cell-right { color: rgba(255, 255, 255, 0.72); }
-.vip-card-active .arrow { color: rgba(255, 255, 255, 0.28); }
-.vip-card-active .p-spec { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.70); }
 .vip-tag {
   background: var(--gold);
   color: #000;
@@ -435,110 +85,49 @@ page {
   vertical-align: middle;
 }
 
-/* --- 5. 支付方式 --- */
+/* --- 支付方式 (完全复原) --- */
 .pay-option {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 24rpx 0;
 }
-.pay-left {
-  display: flex;
-  align-items: center;
-}
-.pay-icon-img {
-  width: 40rpx;
-  height: 40rpx;
-  margin-right: 20rpx;
-}
-.pay-text-group {
-  display: flex;
-  flex-direction: column;
-}
-.pay-main-text {
-  font-size: 28rpx;
-  font-weight: 500;
-}
-.pay-sub-text {
-  font-size: 22rpx;
-  color: var(--text-sub);
-}
+.pay-left { display: flex; align-items: center; }
+.pay-icon-img { width: 40rpx; height: 40rpx; margin-right: 20rpx; }
+.pay-text-group { display: flex; flex-direction: column; }
+.pay-main-text { font-size: 28rpx; font-weight: 500; }
+.pay-sub-text { font-size: 22rpx; color: var(--text-sub); }
 
-/* 单选框美化 */
 .radio-circle {
-  width: 36rpx;
-  height: 36rpx;
+  width: 36rpx; height: 36rpx;
   border: 2rpx solid #E5E6EB;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
-.radio-circle.checked {
-  border-color: var(--text-main);
-  background: var(--text-main);
-}
-.radio-dot {
-  width: 14rpx;
-  height: 14rpx;
-  background: #fff;
-  border-radius: 50%;
-}
+.radio-circle.checked { border-color: var(--text-main); background: var(--text-main); }
+.radio-dot { width: 14rpx; height: 14rpx; background: #fff; border-radius: 50%; }
 
-/* --- 6. 备注输入 --- */
-.remark-input {
-  flex: 1;
-  text-align: right;
-  font-size: 28rpx;
-  color: var(--text-main);
-}
-.ph-color {
-  color: #C5C6CB;
-}
+/* --- 备注输入 (完全复原) --- */
+.remark-input { flex: 1; text-align: right; font-size: 28rpx; color: var(--text-main); }
+.ph-color { color: #C5C6CB; }
 
-/* --- 7. 底部结算栏 (Fixed) --- */
+/* --- 底部结算栏 (完全复原) --- */
 .bottom-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: fixed; left: 0; right: 0; bottom: 0;
   background: #FFFFFF;
   box-shadow: var(--shadow-bar);
-  height: 124rpx; /* 对齐 Order */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  height: 124rpx; 
+  display: flex; align-items: center; justify-content: space-between;
   padding: 0 24rpx;
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 100;
 }
-
-.bar-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.price-box {
-  display: flex;
-  align-items: baseline;
-  color: var(--text-main);
-}
-.currency {
-  font-size: 28rpx;
-  font-weight: 600;
-  margin-right: 4rpx;
-}
-.total-num {
-  font-size: 44rpx;
-  font-weight: 800;
-  font-family: 'DIN Alternate', sans-serif;
-}
-.discount-tip {
-  font-size: 22rpx;
-  color: var(--text-sub);
-  margin-top: 4rpx;
-}
+.bar-left { display: flex; flex-direction: column; }
+.price-box { display: flex; align-items: baseline; color: var(--text-main); }
+.currency { font-size: 28rpx; font-weight: 600; margin-right: 4rpx; }
+.total-num { font-size: 44rpx; font-weight: 800; font-family: 'DIN Alternate', sans-serif; }
+.discount-tip { font-size: 22rpx; color: var(--text-sub); margin-top: 4rpx; }
 
 .pay-btn {
   background: var(--text-main);
@@ -548,10 +137,97 @@ page {
   height: 80rpx;
   line-height: 80rpx;
   padding: 0 56rpx;
-  border-radius: 999rpx; /* 胶囊按钮 */
+  border-radius: 999rpx;
   box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.15);
   transition: transform 0.1s;
 }
-.pay-btn:active {
-  transform: scale(0.98);
+.pay-btn:active { transform: scale(0.98); }
+
+
+/* =================================================================
+   以下为【新版头部】补充样式 
+   ================================================================= */
+
+/* 1. Header Section (沉浸式) */
+.header-section {
+  padding: 10rpx 14rpx 10rpx; 
+  margin-bottom: 16rpx;
 }
+
+/* 模式切换 Tabs */
+.mode-tabs {
+  display: flex;
+  background: #EEEEEE;
+  border-radius: 32rpx;
+  padding: 6rpx;
+  width: fit-content;
+  margin-bottom: 30rpx;
+}
+.mode-tab {
+  padding: 10rpx 32rpx;
+  font-size: 26rpx;
+  color: #666;
+  border-radius: 28rpx;
+  transition: all 0.2s;
+}
+.mode-tab.active {
+  background: var(--text-main);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 地址/门店信息 */
+.main-info-box { margin-bottom: 10rpx; padding-left: 10rpx; }
+.store-name, .addr-detail {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--text-main);
+  display: block;
+  margin-bottom: 12rpx;
+  line-height: 1.3;
+}
+.distance-tag, .user-detail { font-size: 26rpx; color: var(--text-sub); }
+
+.pickup-time-row {
+  display: flex; align-items: center; margin-top: 24rpx; font-size: 28rpx;
+}
+.pickup-time-row .label { color: var(--text-sub); margin-right: 20rpx; }
+.pickup-time-row .time-val { font-weight: 600; color: var(--text-main); display: flex; align-items: center; }
+
+.address-info { position: relative; padding-right: 40rpx; }
+.addr-placeholder { font-size: 36rpx; font-weight: 700; color: var(--text-main); }
+.arrow-right { position: absolute; right: 0; top: 50%; transform: translateY(-50%); color: #ccc; }
+
+/* 2. Product Card (大图模式) */
+.product-item { display: flex; margin-bottom: 30rpx; }
+.p-img {
+  width: 130rpx; height: 130rpx; border-radius: 16rpx; background: #F7F8FA;
+  margin-right: 24rpx; flex-shrink: 0;
+}
+.p-content {
+  flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 4rpx 0;
+}
+.p-row-top, .p-row-bottom {
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.p-name { font-size: 28rpx; font-weight: 600; color: var(--text-main); width: 70%; line-height: 1.4; }
+.p-price { font-size: 30rpx; font-weight: 700; color: var(--text-price); }
+.p-spec, .p-count { font-size: 24rpx; color: var(--text-sub); }
+
+.fee-row {
+  display: flex; justify-content: space-between; padding-top: 24rpx;
+  border-top: 1rpx solid #F2F3F5; font-size: 28rpx; color: var(--text-main); font-weight: 500;
+}
+.fee-tip { font-size: 22rpx; color: #FF3B30; text-align: right; margin-top: 10rpx; }
+
+/* 3. VIP Entry (融合版) */
+.vip-entry-row {
+  background: var(--gold-bg); 
+  border-radius: 12rpx; 
+  padding: 20rpx;
+  display: flex; justify-content: space-between; align-items: center; 
+  margin: 10rpx 0;
+}
+.vip-left { display: flex; align-items: center; font-size: 24rpx; color: var(--gold-dark); }
+.vip-icon { width: 32rpx; height: 32rpx; margin-right: 12rpx; }
+.vip-link { font-size: 24rpx; font-weight: 600; color: var(--gold-dark); }
