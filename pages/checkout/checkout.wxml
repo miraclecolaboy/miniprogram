@@ -69,10 +69,14 @@
   </view>
 
   <view class="card benefit-card">
-    <view class="cell-row" bindtap="onSelectCoupon">
+    <view class="cell-row" bindtap="onSelectCoupon" hover-class="hover-opacity">
       <text class="cell-label">优惠券</text>
-      <view class="cell-right {{selectedCoupon ? 'highlight-gold' : ''}}">
-        {{selectedCoupon ? '-￥'+couponDiscount : (availableCoupons.length ? availableCoupons.length + '张可用' : '无可用')}}
+      <view class="cell-right">
+        <view wx:if="{{selectedCoupon}}" class="coupon-cell">
+          <text class="coupon-cell-title">{{selectedCoupon.title}}</text>
+          <text class="coupon-cell-discount">-￥{{couponDiscount}}</text>
+        </view>
+        <text wx:else class="coupon-cell-placeholder">{{availableCoupons.length ? availableCoupons.length + '张可用' : '无可用'}}</text>
         <text class="arrow">></text>
       </view>
     </view>
@@ -147,4 +151,53 @@
   </view>
   
   <view class="pay-btn" bindtap="onPayTap">立即支付</view>
+</view>
+
+<!-- 优惠券弹窗 -->
+<view class="coupon-mask" wx:if="{{showCouponPopup}}" bindtap="closeCouponPopup" catchtouchmove="noop"></view>
+<view class="coupon-sheet" wx:if="{{showCouponPopup}}" catchtap="noop" catchtouchmove="noop">
+  <view class="coupon-handle-bar"><view class="coupon-handle"></view></view>
+
+  <view class="coupon-header">
+    <text class="coupon-sheet-title">选择优惠券</text>
+    <view class="coupon-close" bindtap="closeCouponPopup" hover-class="hover-opacity">×</view>
+  </view>
+  <view class="coupon-sub">{{availableCoupons.length}} 张可用</view>
+
+  <scroll-view class="coupon-list" scroll-y="true" enhanced="true" show-scrollbar="false">
+    <view class="coupon-option coupon-none {{!selectedCoupon ? 'active' : ''}}" bindtap="useNoCoupon" hover-class="hover-opacity">
+      <view class="coupon-main">
+        <text class="coupon-none-text">不使用优惠券</text>
+      </view>
+      <view class="coupon-radio {{!selectedCoupon ? 'checked' : ''}}">
+        <view class="coupon-radio-dot" wx:if="{{!selectedCoupon}}"></view>
+      </view>
+    </view>
+
+    <view
+      class="coupon-option {{selectedCouponKey === item.groupKey ? 'active' : ''}}"
+      wx:for="{{availableCoupons}}"
+      wx:key="groupKey"
+      data-key="{{item.groupKey}}"
+      bindtap="useCoupon"
+      hover-class="hover-opacity"
+    >
+      <view class="coupon-left">
+        <text class="coupon-currency">￥</text>
+        <text class="coupon-discount">{{item.discount}}</text>
+      </view>
+
+      <view class="coupon-main">
+        <view class="coupon-main-top">
+          <text class="coupon-name">{{item.title}}</text>
+          <text class="coupon-count" wx:if="{{item.count > 1}}">x{{item.count}}</text>
+        </view>
+        <text class="coupon-rule">{{item.minSpend > 0 ? ('满' + item.minSpend + '元可用') : '无门槛'}}</text>
+      </view>
+
+      <view class="coupon-radio {{selectedCouponKey === item.groupKey ? 'checked' : ''}}">
+        <view class="coupon-radio-dot" wx:if="{{selectedCouponKey === item.groupKey}}"></view>
+      </view>
+    </view>
+  </scroll-view>
 </view>

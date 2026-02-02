@@ -45,7 +45,9 @@ Page(Object.assign({
     
     // 权益
     selectedCoupon: null,
+    selectedCouponKey: '',
     availableCoupons: [], 
+    showCouponPopup: false,
     isVip: false
   },
 
@@ -134,32 +136,6 @@ Page(Object.assign({
     this.setData({ timeList: times });
   },
 
-  // --- 2. 优惠券选择逻辑 (跳转页面) ---
-  onSelectCoupon() {
-    const that = this;
-    // 跳转到优惠券页面，标记 from=checkout
-    wx.navigateTo({
-      url: '/pages/mine/coupon/index?from=checkout&select=1', 
-      
-      events: {
-        // 监听：在优惠券页面触发 'acceptSelectedCoupon'
-        acceptSelectedCoupon: function(couponData) {
-          console.log('Checkout页收到优惠券:', couponData);
-          
-          // 如果 couponData 为 null，表示不使用/取消选择
-          that.setData({ 
-            selectedCoupon: couponData 
-          }, () => {
-            // 选完后重新计算购物车总价
-            if (that.recalcCart) {
-              that.recalcCart(); 
-            }
-          });
-        }
-      }
-    });
-  },
-  
   // --- UI 交互 ---
 
   toggleMenuExpand() {
@@ -175,6 +151,8 @@ Page(Object.assign({
       showCancel: false,
       confirmText: '确定'
     });
-  }
+  },
+
+  noop() {}
 
 }, cartMethods, locationMethods, shopMethods, payMethods, syncMethods));
