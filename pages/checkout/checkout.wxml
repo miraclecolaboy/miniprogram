@@ -1,17 +1,31 @@
 <view class="page">
   <view class="header-section">
-    <view class="submode-tabs" wx:if="{{mode === 'ziti'}}">
-      <view class="submode-tab {{storeSubMode === 'tangshi' ? 'active' : ''}}" bindtap="changeStoreSubMode" data-submode="tangshi" hover-class="hover-opacity">
-        <image class="submode-icon" src="/assets/in-store.png" mode="aspectFit" />
-        <text>堂食</text>
+    <view class="top-right-mode">
+      <view
+        class="mode-badge {{mode === 'waimai' ? 'mode-badge--waimai' : (mode === 'kuaidi' ? 'mode-badge--kuaidi' : '')}}"
+        wx:if="{{mode !== 'ziti'}}"
+      >
+        <image
+          class="mode-icon"
+          src="{{mode === 'waimai' ? '/assets/delivery.png' : (mode === 'kuaidi' ? '/assets/express.png' : '')}}"
+          mode="aspectFit"
+        />
+        <text class="mode-text">{{mode === 'waimai' ? '外卖配送' : (mode === 'kuaidi' ? '快递配送' : '')}}</text>
       </view>
-      <view class="submode-tab {{storeSubMode !== 'tangshi' ? 'active' : ''}}" bindtap="changeStoreSubMode" data-submode="ziti" hover-class="hover-opacity">
-        <image class="submode-icon" src="/assets/take-away.png" mode="aspectFit" />
-        <text>自提</text>
+
+      <view class="submode-tabs" wx:if="{{mode === 'ziti'}}">
+        <view class="submode-tab {{storeSubMode === 'tangshi' ? 'active' : ''}}" bindtap="changeStoreSubMode" data-submode="tangshi" hover-class="hover-opacity">
+          <image class="submode-icon" src="/assets/in-store.png" mode="aspectFit" />
+          <text>堂食</text>
+        </view>
+        <view class="submode-tab {{storeSubMode !== 'tangshi' ? 'active' : ''}}" bindtap="changeStoreSubMode" data-submode="ziti" hover-class="hover-opacity">
+          <image class="submode-icon" src="/assets/take-away.png" mode="aspectFit" />
+          <text>自提</text>
+        </view>
       </view>
     </view>
 
-    <view class="main-info-box">
+    <view class="main-info-box {{mode !== 'ziti' ? 'main-info-box--delivery' : ''}}">
       <block wx:if="{{mode === 'ziti'}}">
         <view class="store-info">
           <text class="store-name">{{storeName || '加载中...'}}</text>
@@ -69,10 +83,14 @@
   </view>
 
   <view class="card benefit-card">
-    <view class="cell-row" bindtap="onSelectCoupon">
+    <view class="cell-row" bindtap="onSelectCoupon" hover-class="hover-opacity">
       <text class="cell-label">优惠券</text>
-      <view class="cell-right {{selectedCoupon ? 'highlight-gold' : ''}}">
-        {{selectedCoupon ? '-￥'+couponDiscount : (availableCoupons.length ? availableCoupons.length + '张可用' : '无可用')}}
+      <view class="cell-right">
+        <view wx:if="{{selectedCoupon}}" class="coupon-cell">
+          <text class="coupon-cell-title">{{selectedCoupon.title}}</text>
+          <text class="coupon-cell-discount">-￥{{couponDiscount}}</text>
+        </view>
+        <text wx:else class="coupon-cell-placeholder">{{availableCoupons.length ? availableCoupons.length + '张可用' : '无可用'}}</text>
         <text class="arrow">></text>
       </view>
     </view>
@@ -101,7 +119,6 @@
 
   <view class="card">
     <view class="card-title">支付方式</view>
-    
     <view class="pay-option" bindtap="choosePay" data-method="wechat">
       <view class="pay-left">
         <image class="pay-icon-img" src="/assets/wechat.png" mode="aspectFit" />
@@ -111,7 +128,6 @@
         <view class="radio-dot" wx:if="{{payMethod==='wechat'}}"></view>
       </view>
     </view>
-    
     <view class="pay-option" bindtap="choosePay" data-method="balance">
       <view class="pay-left">
         <image class="pay-icon-img" src="/assets/wallet.png" mode="aspectFit" />
@@ -132,7 +148,6 @@
       <input class="remark-input" placeholder="请输入口味、包装等要求" placeholder-class="ph-color" bindinput="onRemarkInput" />
     </view>
   </view>
-
 </view>
 
 <view class="bottom-bar">
@@ -145,6 +160,67 @@
       已优惠 ￥{{vipDiscount*1 + couponDiscount*1}}
     </view>
   </view>
-  
   <view class="pay-btn" bindtap="onPayTap">立即支付</view>
+</view>
+
+
+<view class="coupon-mask" wx:if="{{showCouponPopup}}" bindtap="closeCouponPopup" catchtouchmove="noop"></view>
+<view class="coupon-sheet" wx:if="{{showCouponPopup}}" catchtap="noop" catchtouchmove="noop">
+  
+  <view class="coupon-handle-bar"><view class="coupon-handle"></view></view>
+
+  <view class="coupon-header">
+    <text class="coupon-sheet-title">选择优惠券</text>
+    <view class="coupon-close" bindtap="closeCouponPopup" hover-class="hover-opacity">×</view>
+  </view>
+
+  <scroll-view class="coupon-list" scroll-y="true" enhanced="true" show-scrollbar="false">
+    
+    <view class="coupon-option coupon-none {{!selectedCoupon ? 'active' : ''}}" bindtap="useNoCoupon" hover-class="hover-opacity">
+      <text class="coupon-none-text">不使用优惠券</text>
+      <view class="coupon-radio {{!selectedCoupon ? 'checked' : ''}}">
+        <view class="coupon-radio-dot" wx:if="{{!selectedCoupon}}"></view>
+      </view>
+    </view>
+
+    <view
+      class="coupon-option {{selectedCouponKey === item.groupKey ? 'active' : ''}}"
+      wx:for="{{availableCoupons}}"
+      wx:key="groupKey"
+      data-key="{{item.groupKey}}"
+      bindtap="useCoupon"
+      hover-class="hover-opacity"
+    >
+      <view class="coupon-left">
+        <view class="price-group">
+          <text class="symbol">￥</text>
+          <text class="amount">{{item.discount}}</text>
+        </view>
+        <text class="condition">{{item.minSpend > 0 ? ('满' + item.minSpend + '可用') : '无门槛'}}</text>
+      </view>
+
+      <view class="split-line-box">
+        <view class="split-dash"></view>
+        <view class="circle-top"></view>
+        <view class="circle-bottom"></view>
+      </view>
+
+      <view class="coupon-right">
+        <view class="info-top">
+          <text class="c-title">{{item.title}}</text>
+          <text class="c-count" wx:if="{{item.count > 1}}">x{{item.count}}</text>
+        </view>
+        <text class="c-tag">全场通用</text>
+      </view>
+
+      <view class="radio-box">
+        <view class="coupon-radio {{selectedCouponKey === item.groupKey ? 'checked' : ''}}">
+          <view class="coupon-radio-dot" wx:if="{{selectedCouponKey === item.groupKey}}"></view>
+        </view>
+      </view>
+
+    </view>
+    
+    <view style="height: 40rpx;"></view>
+  </scroll-view>
 </view>

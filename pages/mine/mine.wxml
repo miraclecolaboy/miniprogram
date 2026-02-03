@@ -73,7 +73,7 @@
       </view>
       <view class="action-divider"></view>
       <view class="action-item" hover-class="item-hover-lift" bindtap="onTapAddress">
-        <image class="action-icon" src="../../assets/address.png"/>
+        <image class="action-icon" src="../../assets/adress.png"/>
         <text class="action-text">我的地址</text>
       </view>
       <view class="action-divider"></view>

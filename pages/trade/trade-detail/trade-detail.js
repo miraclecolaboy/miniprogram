@@ -1,23 +1,14 @@
 const { callUser } = require('../../../utils/cloud');
 
-function s(v) { return String(v == null ? '' : v).trim(); }
-
-function buildShippingAddressText(shippingInfo) {
-  if (!shippingInfo) return '';
-  const full = s(shippingInfo.address || shippingInfo.fullAddress || shippingInfo.poiAddress);
-  if (full) return full;
-  return [s(shippingInfo.region), s(shippingInfo.detail)].filter(Boolean).join(' ');
-}
-
-function mapOrderToView(order) {
-  if (!order || typeof order !== 'object') return order;
-  return { ...order, shippingAddressText: buildShippingAddressText(order.shippingInfo) };
-}
-
 Page({
   data: {
     orderId: '',
     order: null,
+    
+    // UI状态
+    isInfoExpanded: false, // 控制底部信息折叠
+    
+    // 售后弹窗
     refundSheetVisible: false,
     refundReasonList: ['不想要了', '商品有问题', '信息填写错误', '其他原因'],
     refundReasonIndex: 0,
@@ -25,22 +16,31 @@ Page({
   },
 
   onLoad(options) {
-    wx.setNavigationBarTitle({ title: '订单详情' });
-
-    const orderId = options.orderId || options.id || '';
+    const orderId = options.orderId; 
     if (orderId) this.setData({ orderId });
 
+    // 尝试从 EventChannel 获取预加载数据
     const eventChannel = this.getOpenerEventChannel();
-    eventChannel.on('initOrder', ({ order }) => {
-      if (order) this.setData({ order: mapOrderToView(order) });
-      this.refreshOrderDetail();
-    });
+    if (eventChannel && eventChannel.on) {
+       eventChannel.on('initOrder', ({ order }) => {
+         if (order) this.setData({ order });
+         this.refreshOrderDetail(); // 静默刷新
+       });
+    }
+    
+    if (!this.data.order && orderId) {
+        this.refreshOrderDetail();
+    }
   },
 
   onShow() {
-    this.refreshOrderDetail();
+    // 每次显示都刷新最新状态
+    if(this.data.orderId || (this.data.order && this.data.order._id)) {
+        this.refreshOrderDetail();
+    }
   },
 
+  // 获取订单详情
   async refreshOrderDetail() {
     const orderId = this.data.orderId || this.data.order?._id;
     if (!orderId) return;
@@ -50,40 +50,50 @@ Page({
       const res = await callUser('getOrderDetail', { orderId });
       const orderData = res?.result?.data;
       if (orderData) {
-        this.setData({ order: mapOrderToView(orderData) });
-      } else {
-        throw new Error(res?.result?.message || '加载订单失败');
+        this.setData({ order: orderData });
       }
     } catch (e) {
-      wx.showToast({ title: e.message || '加载失败', icon: 'none' });
+      console.error(e);
     } finally {
       wx.hideNavigationBarLoading();
     }
   },
 
+  // [新增] 切换底部信息展开/收起
+  toggleInfoExpand() {
+    this.setData({
+      isInfoExpanded: !this.data.isInfoExpanded
+    });
+  },
+
+  // 导航
   openNavigate() {
     const { order } = this.data;
     if (!order) return;
-    const isZiti = order.mode === 'ziti';
-    const lat = isZiti ? order.storeLat : order.shippingInfo?.lat;
-    const lng = isZiti ? order.storeLng : order.shippingInfo?.lng;
-    const name = isZiti ? order.storeName : order.shippingInfo?.name;
-    const address = isZiti ? order.storeName : (order.shippingAddressText || buildShippingAddressText(order.shippingInfo));
-    if (lat != null && lng != null) {
-      wx.openLocation({ latitude: lat, longitude: lng, name, address });
+    
+    if (order.mode === 'ziti' && order.storeLocation) {
+        wx.openLocation({
+            latitude: order.storeLocation.latitude,
+            longitude: order.storeLocation.longitude,
+            name: order.storeName,
+            address: order.storeAddress
+        });
     }
   },
 
+  // 复制订单号
   copyOrderId() {
     if (this.data.order?.orderNo) {
       wx.setClipboardData({ data: this.data.order.orderNo });
     }
   },
-  
+
+  // 联系商家/客服
   contactShop() {
-    wx.navigateTo({ url: '/pages/mine/service/service' });
+    wx.makePhoneCall({ phoneNumber: '13800138000' }); // 请替换为真实配置
   },
 
+  // --- 售后逻辑 ---
   openRefundSheet() {
     if (!this.data.order?.canApplyRefund) return;
     this.setData({
@@ -92,9 +102,14 @@ Page({
       refundRemark: ''
     });
   },
-
+  
   closeRefundSheet() { this.setData({ refundSheetVisible: false }); },
-  chooseRefundReason(e) { this.setData({ refundReasonIndex: e.currentTarget.dataset.index }); },
+  
+  chooseRefundReason(e) { 
+      const index = e.currentTarget.dataset.index;
+      this.setData({ refundReasonIndex: index }); 
+  },
+  
   onRefundRemarkInput(e) { this.setData({ refundRemark: e.detail.value }); },
 
   async submitRefund() {
@@ -130,19 +145,15 @@ Page({
   async cancelRefund() {
       const { order } = this.data;
       if (!order) return;
-  
       const { confirm } = await new Promise(resolve => wx.showModal({
-          title: '提示',
-          content: '确定要取消本次售后申请吗？',
-          success: resolve
+          title: '提示', content: '确定要取消本次售后申请吗？', success: resolve
       }));
       if (!confirm) return;
-  
-      wx.showLoading({ title: '正在取消...', mask: true });
+      
+      wx.showLoading({ title: '处理中...', mask: true });
       try {
           const res = await callUser('cancelRefund', { orderId: order._id });
           if (!res?.result?.ok) throw new Error(res?.result?.message || '取消失败');
-  
           wx.showToast({ title: '已取消', icon: 'none' });
           this.refreshOrderDetail();
       } catch (e) {
