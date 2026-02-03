@@ -2,7 +2,7 @@
 // 结算页：购物车/优惠券计算相关方法
 
 const { toNum, pickImg } = require('../../utils/common');
-const { groupCouponInstancesForCheckout } = require('../../utils/coupon');
+const { groupCouponInstancesForCheckout, buildCouponGroupKey } = require('../../utils/coupon');
 const { computeDeliveryFee } = require('./checkout.helpers');
 
 module.exports = {
@@ -53,6 +53,7 @@ module.exports = {
       totalPrice: goodsTotal.toFixed(2),
       availableCoupons,
       selectedCoupon,
+      selectedCouponKey: selectedCoupon ? buildCouponGroupKey(selectedCoupon) : '',
       couponDiscount: couponDiscount.toFixed(2),
       vipDiscount: vipDiscountNum.toFixed(2),
       deliveryFee: deliveryFeeNum.toFixed(2),
@@ -65,28 +66,20 @@ module.exports = {
 
   onSelectCoupon() {
     const { availableCoupons } = this.data;
-    if (availableCoupons.length === 0) {
-      return wx.showToast({ title: '暂无可用优惠券', icon: 'none' });
-    }
+    if (availableCoupons.length === 0) return wx.showToast({ title: '暂无可用优惠券', icon: 'none' });
+    this.setData({ showCouponPopup: true });
+  },
 
-    const itemList = availableCoupons.map(c => `${c.title} (-￥${c.discount})${Number(c.count || 0) > 1 ? ` x${c.count}` : ''}`);
-    itemList.push('不使用优惠券');
+  closeCouponPopup() { this.setData({ showCouponPopup: false }); },
 
-    wx.showActionSheet({
-      itemList,
-      success: (res) => {
-        if (typeof res.tapIndex !== 'number') return;
-        if (res.tapIndex >= itemList.length - 1) { // 选择了"不使用"或取消
-          this.setData({ selectedCoupon: null }, () => this.recalcCart());
-        } else {
-          const g = availableCoupons[res.tapIndex];
-          const groupKey = g && g.groupKey;
-          const list = (this._availableCouponItemsMap && groupKey) ? (this._availableCouponItemsMap.get(groupKey) || []) : [];
-          const picked = list[0] || null;
-          this.setData({ selectedCoupon: picked }, () => this.recalcCart());
-        }
-      }
-    });
+  useNoCoupon() {
+    this.setData({ showCouponPopup: false, selectedCoupon: null }, () => this.recalcCart());
+  },
+
+  useCoupon(e) {
+    const groupKey = String(e?.currentTarget?.dataset?.key || '').trim();
+    const list = (this._availableCouponItemsMap && groupKey) ? (this._availableCouponItemsMap.get(groupKey) || []) : [];
+    const picked = list[0] || null;
+    this.setData({ showCouponPopup: false, selectedCoupon: picked }, () => this.recalcCart());
   },
 };
-
