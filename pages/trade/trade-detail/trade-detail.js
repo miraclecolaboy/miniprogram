@@ -1,9 +1,11 @@
 const { callUser } = require('../../../utils/cloud');
+const { toNum } = require('../../../utils/common');
 
 Page({
   data: {
     orderId: '',
     order: null,
+    shopCfg: {},
     
     // UI状态
     isInfoExpanded: false, // 控制底部信息折叠
@@ -18,6 +20,8 @@ Page({
   onLoad(options) {
     const orderId = options.orderId; 
     if (orderId) this.setData({ orderId });
+
+    this.loadShopConfig();
 
     // 尝试从 EventChannel 获取预加载数据
     const eventChannel = this.getOpenerEventChannel();
@@ -37,6 +41,23 @@ Page({
     // 每次显示都刷新最新状态
     if(this.data.orderId || (this.data.order && this.data.order._id)) {
         this.refreshOrderDetail();
+    }
+  },
+
+  async loadShopConfig() {
+    try {
+      const res = await callUser('getShopConfig');
+      const cfg = res?.result?.data || {};
+      this.setData({
+        shopCfg: {
+          storeName: cfg.storeName || '',
+          storeAddress: cfg.storeAddress || '',
+          storeLat: toNum(cfg.storeLat, 0),
+          storeLng: toNum(cfg.storeLng, 0),
+        }
+      });
+    } catch (e) {
+      console.error('[trade-detail] loadShopConfig error', e);
     }
   },
 
@@ -71,13 +92,21 @@ Page({
     const { order } = this.data;
     if (!order) return;
     
-    if (order.mode === 'ziti' && order.storeLocation) {
-        wx.openLocation({
-            latitude: order.storeLocation.latitude,
-            longitude: order.storeLocation.longitude,
-            name: order.storeName,
-            address: order.storeAddress
-        });
+    if (order.mode === 'ziti') {
+      const latitude = toNum(this.data.shopCfg.storeLat, 0);
+      const longitude = toNum(this.data.shopCfg.storeLng, 0);
+
+      if (!latitude || !longitude) {
+        wx.showToast({ title: '暂未配置门店位置', icon: 'none' });
+        return;
+      }
+
+      wx.openLocation({
+        latitude,
+        longitude,
+        name: this.data.shopCfg.storeName || '门店位置',
+        address: this.data.shopCfg.storeAddress || '',
+      });
     }
   },
 

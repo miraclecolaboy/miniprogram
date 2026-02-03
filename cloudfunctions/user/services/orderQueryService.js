@@ -78,6 +78,15 @@ async function _mapOrderForView(order) {
   
   const canCancelPayment = status === 'pending_payment';
 
+  const refundView = order.refund
+    ? {
+        ...order.refund,
+        statusText: (String(order.refund.status || '').toLowerCase() === 'applied')
+          ? '审核中'
+          : (order.refund.statusText || ''),
+      }
+    : null;
+
   return {
     _id: order._id,
     orderNo: order.orderNo,
@@ -95,7 +104,7 @@ async function _mapOrderForView(order) {
     canApplyRefund,
     canCancelPayment,
     isVip: !!order.isVip,
-    refund: order.refund || null,
+    refund: refundView,
     pickupInfo: order.pickupInfo || {},
     shippingInfo: order.shippingInfo || {},
     remark: order.remark || '',

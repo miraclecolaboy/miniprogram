@@ -206,14 +206,14 @@ async function setNotice(notice) {
   if (!notice) return { ok: false, message: '公告不能为空' };
   const docId = 'main';
   const ref = db.collection(COL_SHOP_CONFIG).doc(docId);
-  const patch = { notice: safeStr(notice), updatedAt: now() };
-
   const got = await ref.get().catch(() => null);
-  if (got && got.data) {
-    await ref.update({ data: patch });
-  } else {
-    await ref.set({ data: patch });
-  }
+  const cfg = got?.data || null;
+
+  const patch = { notice: safeStr(notice), updatedAt: now() };
+  if (!cfg || cfg.storeAddress === undefined) patch.storeAddress = '';
+
+  if (cfg) await ref.update({ data: patch });
+  else await ref.set({ data: patch });
   return { ok: true };
 }
 

@@ -23,6 +23,7 @@ const _ = db.command;
 async function getShopConfig() {
   const DEFAULT_CFG = { 
     storeName: '', 
+    storeAddress: '',
     storeLat: 0, 
     storeLng: 0, 
     notice: '', 

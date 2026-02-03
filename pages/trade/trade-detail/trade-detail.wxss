@@ -17,7 +17,7 @@
 }
 
 .status-big-title {
-  font-size: 46rpx;
+  font-size: 42rpx;
   font-weight: 800;
   color: #111;
   /* [修正] 改为正间距，不再挤 */
@@ -28,18 +28,8 @@
   align-items: center;
 }
 
-.status-dot {
-  width: 12rpx; height: 12rpx;
-  border-radius: 50%;
-  background: #111;
-  margin-left: 12rpx;
-  position: relative; top: -2rpx; 
-}
-.status-dot.processing { background: #ffaa00; }
-.status-dot.done { background: #00c250; }
-
 .status-desc {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #555; 
   font-weight: 400;
   line-height: 1.4;
@@ -108,7 +98,7 @@
   font-weight: 500;
 }
 .pickup-code { 
-  font-size: 72rpx; 
+  font-size: 66rpx; 
   font-weight: 900; 
   color: #111; 
   line-height: 1; 
@@ -184,7 +174,7 @@
 .total-count-lbl { font-size: 26rpx; color: #111; margin-right: 8rpx; }
 .total-lbl { font-size: 26rpx; color: #111; margin-right: 12rpx; font-weight: 600; }
 .total-val { 
-  font-size: 44rpx; 
+  font-size: 40rpx; 
   font-weight: 800; 
   color: #111; 
   font-family: "DINAlternate-Bold", Impact, sans-serif; 

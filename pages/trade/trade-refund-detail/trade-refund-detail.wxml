@@ -3,7 +3,6 @@
   <view class="header-area">
     <view class="status-big-title">
       <text>{{order.refund.statusText || '售后处理中'}}</text>
-      <view class="status-dot {{order.refund.status === 'success' ? 'done' : 'processing'}}"></view>
     </view>
     
     <view class="status-desc">
@@ -16,9 +15,9 @@
         <view class="step-icon">●</view>
         <view class="step-text">已提交</view>
       </view>
-      <view class="step-line {{order.refund.status!=='applied'?'active':''}}"></view>
+      <view class="step-line {{order.refund ? 'active' : ''}}"></view>
       
-      <view class="step-item {{order.refund.status!=='applied'?'active':''}}">
+      <view class="step-item {{order.refund ? 'active' : ''}}">
         <view class="step-icon">●</view>
         <view class="step-text">审核中</view>
       </view>

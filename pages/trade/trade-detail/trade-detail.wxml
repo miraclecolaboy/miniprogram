@@ -3,7 +3,6 @@
   <view class="header-area">
     <view class="status-big-title">
       <text>{{order.statusText}}</text>
-      <view class="status-dot {{order.status}}"></view>
     </view>
     
     <block wx:if="{{order.status === 'processing'}}">
@@ -39,13 +38,13 @@
 
     <view class="card address-card" bindtap="openNavigate">
       <view class="card-header">
-        <text class="addr-name">{{order.mode === 'ziti' ? order.storeName : '配送信息'}}</text>
+        <text class="addr-name">{{order.mode === 'ziti' ? (shopCfg.storeName || '门店') : '配送信息'}}</text>
         <image class="icon-img" src="/assets/location.png" mode="aspectFit" />
       </view>
       
       <view class="addr-detail-box">
         <block wx:if="{{order.mode === 'ziti'}}">
-          <text class="addr-text">{{order.storeAddress || '店铺地址加载中...'}}</text>
+          <text class="addr-text">{{shopCfg.storeAddress || '请在后台配置门店地址'}}</text>
         </block>
         <block wx:else>
           <view class="addr-text">{{order.shippingInfo.region}}{{order.shippingInfo.detail}}</view>

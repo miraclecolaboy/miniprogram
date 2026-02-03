@@ -399,7 +399,7 @@ async function applyRefund(orderId, openid, reason, remark) {
   const nowTs = now();
   const refundDoc = {
     status: 'applied',
-    statusText: '等待商家处理',
+    statusText: '审核中',
     reason: reason,
     remark: remark || '',
     source: 'customer',
