@@ -10,22 +10,30 @@
       <block wx:if="{{orders[tab] && orders[tab].length > 0}}">
         <view class="order-card" wx:for="{{orders[tab]}}" wx:key="_id" wx:for-item="order" bindtap="goDetail" data-id="{{order._id}}">
           <view class="order-header">
-            <view class="order-type">{{order.modeText}}</view>
-            <view class="order-pickup-no" wx:if="{{order.mode==='ziti' && order.status==='ready'}}">{{order.pickupInfo.code}}</view>
-            <view class="order-status">{{order.refund ? order.refund.statusText : order.statusText}}</view>
+            <view class="order-mode">{{order.modeText}}</view>
+            <view class="order-status-block">
+              <view class="order-status">{{order.refund ? order.refund.statusText : order.statusText}}</view>
+              <view class="order-subinfo" wx:if="{{order.mode==='ziti' && order.pickupInfo.code}}">取餐号 {{order.pickupInfo.code}}</view>
+            </view>
           </view>
           <view class="order-main">
             <scroll-view class="goods-scroll" scroll-x="true" show-scrollbar="{{false}}">
               <view class="goods-row">
                 <view class="goods-item" wx:for="{{order.goodsView}}" wx:key="index" wx:for-item="g">
                   <image class="goods-img" src="{{g.image}}" mode="aspectFill" lazy-load="true" />
-                  <view class="goods-name">{{g.productName}} x {{g.count}}</view>
                 </view>
               </view>
             </scroll-view>
-            <view class="order-right">
-              <view class="order-price">￥{{order.totalPrice}}</view>
-              <view class="order-count">共 {{order.totalCount}} 件</view>
+          </view>
+
+          <view class="order-footer">
+            <view class="order-footer-left">
+              <view class="order-time" wx:if="{{order.createdAtText}}">{{order.createdAtText}} 下单</view>
+              <view class="order-summary">
+                <text>共{{order.totalCount}}件，</text>
+                <text>{{order.refund && order.refund.status === 'success' ? '退款' : '实付'}}</text>
+                <text class="order-summary-price">￥{{order.totalPrice}}</text>
+              </view>
             </view>
           </view>
         </view>

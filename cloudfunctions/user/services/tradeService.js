@@ -205,7 +205,7 @@ async function createOrder(event, openid) {
       const orderDoc = {
         _openid: openid, orderNo,
         status: paidImmediately ? 'processing' : 'pending_payment',
-        statusText: paidImmediately ? '商家准备中' : '待支付',
+        statusText: paidImmediately ? '准备中' : '待支付',
         mode,
         storeSubMode: storeSubModeFinal,
         items: orderItems,
@@ -278,7 +278,7 @@ async function sysHandlePaySuccess(payEvent) {
     
     await db.collection('orders').doc(order._id).update({
       data: {
-        status: 'processing', statusText: '商家准备中', paidAt: nowTs,
+        status: 'processing', statusText: '准备中', paidAt: nowTs,
         'payment.status': 'paid', 'payment.paidAt': nowTs,
         'payment.transactionId': payEvent.transactionId || payEvent.transaction_id || ''
       }

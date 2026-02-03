@@ -18,12 +18,12 @@ async function _mapOrderForView(order) {
     : '';
   const storeSubModeText = storeSubMode === 'tangshi' ? '堂食' : (storeSubMode === 'ziti' ? '自提' : '');
   let status = order.status || 'processing';
-  let statusText = order.statusText || '商家准备中';
+  let statusText = order.statusText || '准备中';
 
   if (status === 'pending_payment') {
     statusText = '待支付';
   } else if (status === 'processing') {
-    statusText = '商家准备中';
+    statusText = '准备中';
   } else if (status === 'ready') {
     statusText = '待取餐';
   } else if (status === 'delivering') {

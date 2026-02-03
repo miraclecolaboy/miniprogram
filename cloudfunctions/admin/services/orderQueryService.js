@@ -15,11 +15,11 @@ async function _mapOrderForView(order) {
     ? (['tangshi', 'ziti'].includes(rawStoreSubMode) ? rawStoreSubMode : 'ziti')
     : '';
   const storeSubModeText = storeSubMode === 'tangshi' ? '堂食' : (storeSubMode === 'ziti' ? '自提' : '');
-  let statusText = order.statusText || '商家准备中';
+  let statusText = order.statusText || '准备中';
 
   switch (order.status) {
     case 'pending_payment': statusText = '待支付'; break;
-    case 'processing': statusText = '商家准备中'; break;
+    case 'processing': statusText = '准备中'; break;
     case 'ready': statusText = '待取餐'; break;
     case 'delivering': statusText = '派送中'; break;
     case 'done': statusText = '已完成'; break;
