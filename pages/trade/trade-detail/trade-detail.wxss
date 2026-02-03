@@ -17,11 +17,11 @@
 }
 
 .status-big-title {
-  font-size: 52rpx;
+  font-size: 46rpx;
   font-weight: 800;
   color: #111;
   /* [修正] 改为正间距，不再挤 */
-  letter-spacing: 2rpx; 
+  letter-spacing: 1rpx; 
   line-height: 1.2; 
   margin-bottom: 16rpx;
   display: flex;
@@ -39,7 +39,7 @@
 .status-dot.done { background: #00c250; }
 
 .status-desc {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #555; 
   font-weight: 400;
   line-height: 1.4;
@@ -108,7 +108,7 @@
   font-weight: 500;
 }
 .pickup-code { 
-  font-size: 80rpx; 
+  font-size: 72rpx; 
   font-weight: 900; 
   color: #111; 
   line-height: 1; 
@@ -193,7 +193,7 @@
 }
 
 /* D. 信息卡片 */
-.info-row { display: flex; justify-content: space-between; margin-bottom: 20rpx; font-size: 24rpx; }
+.info-row { display: flex; justify-content: space-between; margin-bottom: 20rpx; font-size: 26rpx; }
 .info-label { color: #999; }
 .info-val { color: #333; font-weight: 500; }
 .info-right { display: flex; align-items: center; }

@@ -18,10 +18,10 @@
 }
 
 .status-big-title {
-  font-size: 52rpx;
+  font-size: 46rpx;
   font-weight: 800;
   color: #111;
-  letter-spacing: 2rpx; /* 正间距 */
+  letter-spacing: 1rpx; /* 正间距 */
   line-height: 1.2;
   margin-bottom: 12rpx;
   display: flex;
@@ -39,7 +39,7 @@
 .status-dot.done { background: #00c250; }
 
 .status-desc {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #666;
   font-weight: 400;
   line-height: 1.4;
@@ -59,7 +59,7 @@
   flex-direction: column;
   align-items: center;
   color: #ccc;
-  font-size: 24rpx;
+  font-size: 22rpx;
   position: relative;
   z-index: 2;
 }
