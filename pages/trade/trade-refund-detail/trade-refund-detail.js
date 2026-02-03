@@ -6,17 +6,15 @@ const AFTER_SALE_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
 
 function s(v) { return String(v == null ? '' : v).trim(); }
 
-function buildShippingAddressText(shippingInfo) {
-  if (!shippingInfo) return '';
-  const full = s(shippingInfo.address || shippingInfo.fullAddress || shippingInfo.poiAddress);
-  if (full) return full;
-  return [s(shippingInfo.region), s(shippingInfo.detail)].filter(Boolean).join(' ');
-}
-
 Page({
   data: {
     orderId: '',
     order: null,
+    
+    // UI状态：控制折叠
+    isInfoExpanded: false, // 底部申请信息
+    isCostExpanded: false, // [新增] 金额明细
+
     refundSheetVisible: false,
     refundReasonList: ['不想要了', '商品有问题', '信息填写错误', '其他原因'],
     refundReasonIndex: 0,
@@ -38,11 +36,21 @@ Page({
     }
   },
   
+  // 切换底部信息
+  toggleInfoExpand() {
+    this.setData({ isInfoExpanded: !this.data.isInfoExpanded });
+  },
+
+  // [新增] 切换费用明细
+  toggleCostExpand() {
+    this.setData({ isCostExpanded: !this.data.isCostExpanded });
+  },
+
   async refreshFromCloud(showLoading) {
     const key = this.data.orderId;
     if (!key) return;
 
-    if (showLoading) wx.showLoading({ title: '加载中...' });
+    if (showLoading) wx.showNavigationBarLoading();
 
     try {
       const res = await callUser('getOrderDetail', { orderId: key });
@@ -53,9 +61,10 @@ Page({
       this.setData({ order: mappedOrder });
       
     } catch (e) {
+      console.error(e);
       wx.showToast({ title: e.message || '加载失败', icon: 'none' });
     } finally {
-      if (showLoading) wx.hideLoading();
+      if (showLoading) wx.hideNavigationBarLoading();
     }
   },
 
@@ -71,21 +80,23 @@ Page({
       const windowExpired = order.status === 'done' && (Date.now() - (order.doneAt || 0)) > AFTER_SALE_WINDOW_MS;
 
       let actionType = 'none';
-      let actionText = '不可操作';
+      let actionText = '售后处理中';
       let actionDisabled = true;
 
-      if (isApplied && !windowExpired) {
+      if (isApplied) {
           actionType = 'cancel';
           actionText = '取消售后';
           actionDisabled = false;
-      } else if ((isRejected || isCancelled) && !windowExpired) {
-          actionType = 'reapply';
-          actionText = '重新申请';
-          actionDisabled = false;
+      } else if (isRejected || isCancelled) {
+          if (!windowExpired) {
+            actionType = 'reapply';
+            actionText = '重新申请';
+            actionDisabled = false;
+          } else {
+            actionText = '已关闭';
+          }
       } else if (isSuccess) {
           actionText = '售后已完成';
-      } else if (windowExpired) {
-          actionText = '已超出售后期';
       }
       
       const applyReasonText = [String(refund.reason || '').trim(), String(refund.remark || '').trim()].filter(Boolean).join('；');
@@ -93,15 +104,13 @@ Page({
       const mappedRefund = {
           ...refund,
           statusText: refund.statusText || '售后处理中',
-          latestTime: refund.latestAt ? fmtTime(refund.latestAt) : (refund.logs && refund.logs.length > 0 ? fmtTime(refund.logs[refund.logs.length-1].ts) : ''),
-          latestText: refund.logs && refund.logs.length > 0 ? refund.logs[refund.logs.length-1].text : '等待处理',
           applyReasonText: applyReasonText,
           actionType,
           actionText,
           actionDisabled
       };
 
-      return { ...order, refund: mappedRefund, shippingAddressText: buildShippingAddressText(order.shippingInfo) };
+      return { ...order, refund: mappedRefund };
   },
 
   handleRefundAction() {
@@ -166,8 +175,7 @@ Page({
         if (!res?.result?.ok) throw new Error(res?.result?.message || '取消失败');
 
         wx.showToast({ title: '已取消', icon: 'none' });
-        // 返回上一页，因为当前售后已不存在
-        setTimeout(() => wx.navigateBack(), 400);
+        this.refreshFromCloud(true);
     } catch (e) {
         wx.showToast({ title: e.message || '取消失败', icon: 'none' });
     } finally {
