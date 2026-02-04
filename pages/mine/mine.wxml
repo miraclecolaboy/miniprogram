@@ -1,86 +1,108 @@
 <view class="page">
-  <canvas 
-    canvas-id="avatar-cropper" 
-    id="avatar-cropper" 
-    style="position: fixed; left: -9999px; top: -9999px; width: 300px; height: 300px;"
-  ></canvas>
-
-  <view class="header-hero">
-    <view class="stars stars1"></view>
-    <view class="stars stars2"></view>
-    <view class="stars stars3"></view>
-    <view class="hero-content">
-      <view class="hero-user" bindtap="onTapUserCard">
-        <view class="hero-avatar-wrap">
-          <image wx:if="{{isLogin && userInfo.avatarUrl}}" class="hero-avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
-          <text wx:else class="hero-avatar-text"></text>
-        </view>
-        <view class="hero-name">{{isLogin ? userInfo.nickName : '点击登录'}}</view>
-        <view class="hero-sub">{{isLogin ? userInfo.userSub : '同步订单与会员权益'}}</view>
-      </view>
-      <view class="asset-strip">
-        <view class="asset-strip-item" bindtap="onRecharge" hover-class="asset-hover">
-          <view class="asset-strip-value">￥{{userInfo.balance || '0.00'}}</view>
-          <view class="asset-strip-label">
-            <text>余额</text>
-            <text class="asset-arrow">›</text>
-          </view>
-        </view>
-        <view class="asset-strip-divider"></view>
-        <view class="asset-strip-item" bindtap="onPoints" hover-class="asset-hover">
-          <view class="asset-strip-value">{{userInfo.points || 0}}</view>
-          <view class="asset-strip-label">
-            <text>积分</text>
-            <text class="asset-arrow">›</text>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <view 
-    class="card vip-card {{userInfo.memberActive ? 'vip-on' : 'vip-off'}}" 
-    bindtap="onTapMember"
-    style="height: {{vipCardHeight}}px;"
-  >
-    <view class="vip-bg">
-      <view class="vip-circle c1"></view>
-      <view class="vip-circle c2"></view>
-    </view>
-    <view class="vip-header">
-      <view class="vip-status">{{userInfo.memberActive ? '等级会员' : '开通等级会员'}}</view>
-      <view class="vip-entry">
-        <text>Lv{{userInfo.memberLevel || 0}}</text>
+  <view class="user-header" bindtap="onTapUserCard">
+    <view class="user-info">
+      <view class="user-name">{{isLogin ? userInfo.nickName : '点击登录/注册'}}</view>
+      <view class="user-sub">
+        <text>{{isLogin ? userInfo.userSub : '登录同步订单与权益'}}</text>
         <text class="arrow">›</text>
       </view>
     </view>
-    <view class="vip-footer">
-      <view class="vip-benefit">{{userInfo.memberLevel >= 4 ? '全场下单享 9.5 折' : (userInfo.memberActive ? '升级送券，礼包仅发一次' : '充值升级送券')}}</view>
-      <view wx:if="{{userInfo.memberActive}}" class="vip-expire">{{userInfo.memberTag}}</view>
+    <view class="avatar-wrap">
+      <image 
+        class="user-avatar" 
+        src="{{isLogin && userInfo.avatarUrl ? userInfo.avatarUrl : '/assets/mine.png'}}" 
+        mode="aspectFill" 
+      />
     </view>
   </view>
 
-  <view class="bottom-section">
-    <view class="action-capsule">
-      <view class="action-item" hover-class="item-hover-lift" bindtap="onTapOrder">
-        <image class="action-icon" src="../../assets/orders.png"/>
-        <text class="action-text">我的订单</text>
+  <view class="vip-card-wrap">
+    <view class="vip-card {{memberCardExpanded ? 'expanded' : ''}}" bindtap="toggleMemberCard">
+      <view class="vip-texture"></view>
+      
+      <view class="vip-main-content">
+        <view class="vip-top">
+          <view class="vip-title">
+            <image class="vip-icon" src="/assets/member.png" mode="aspectFit" />
+            <text>会员权益卡</text>
+          </view>
+          <view class="vip-level">Lv.{{userInfo.memberLevel || 0}}</view>
+        </view>
+        
+        <view class="vip-bottom">
+          <view class="vip-desc">{{userInfo.memberActive ? '已解锁会员尊享权益' : '升级解锁 9.5 折权益'}}</view>
+          <view class="vip-btn" catchtap="onTapMemberDetail">{{userInfo.memberActive ? '查看权益' : '立即开通'}}</view>
+        </view>
       </view>
-      <view class="action-divider"></view>
-      <view class="action-item" hover-class="item-hover-lift" bindtap="onTapCoupon">
-        <image class="action-icon" src="../../assets/coupon.png"/>
-        <text class="action-text">优惠券</text>
+
+      <view class="qrcode-area">
+        <view class="qr-divider"></view>
+        <view class="qr-box">
+          <image class="qr-img" src="/assets/home_active.png" mode="aspectFit" style="opacity:0.5" />
+          <view class="qr-text">付款时请出示此码</view>
+        </view>
       </view>
-      <view class="action-divider"></view>
-      <view class="action-item" hover-class="item-hover-lift" bindtap="onTapAddress">
-        <image class="action-icon" src="../../assets/adress.png"/>
-        <text class="action-text">我的地址</text>
+
+      <view class="expand-indicator {{memberCardExpanded ? 'rotate' : ''}}">
+        <text>⌄</text>
       </view>
-      <view class="action-divider"></view>
-      <view class="action-item" hover-class="item-hover-lift" bindtap="onTapService">
-        <image class="action-icon" src="../../assets/service.png"/>
-        <text class="action-text">联系客服</text>
+
+    </view>
+  </view>
+
+  <view class="dashboard-section">
+    <view class="data-board">
+      
+      <view class="data-item" bindtap="onRecharge" hover-class="item-hover">
+        <view class="data-num">{{userInfo.balance || '0.00'}}</view>
+        <view class="data-label">余额</view>
       </view>
+      
+      <view class="data-divider"></view>
+      
+      <view class="data-item" bindtap="onPoints" hover-class="item-hover">
+        <view class="data-num">{{userInfo.points || 0}}</view>
+        <view class="data-label">积分</view>
+      </view>
+      
+      <view class="data-divider"></view>
+      
+      <view class="data-item" bindtap="onTapCoupon" hover-class="item-hover">
+        <view class="data-num" style="color: #BFA15F">{{userInfo.coupons || 0}}</view>
+        <view class="data-label">优惠券</view>
+      </view>
+
+    </view>
+  </view>
+
+  <view class="menu-section">
+    <view class="menu-grid">
+      
+      <view class="menu-item" bindtap="onTapOrder" hover-class="item-hover-scale">
+        <view class="icon-wrap">
+          <image class="menu-icon" src="/assets/orders.png" mode="aspectFit" />
+        </view>
+        <text class="menu-text">我的订单</text>
+      </view>
+
+      <view class="menu-item" bindtap="onTapAddress" hover-class="item-hover-scale">
+        <view class="icon-wrap">
+          <image class="menu-icon" src="/assets/address.png" mode="aspectFit" />
+        </view>
+        <text class="menu-text">收货地址</text>
+      </view>
+
+      <view class="menu-item" bindtap="onTapService" hover-class="item-hover-scale">
+        <view class="icon-wrap">
+          <image class="menu-icon" src="/assets/service.png" mode="aspectFit" />
+        </view>
+        <text class="menu-text">联系客服</text>
+      </view>
+
+      <view class="menu-item" style="opacity: 0; pointer-events: none;">
+         <view class="icon-wrap"></view>
+      </view>
+
     </view>
   </view>
 
@@ -108,4 +130,6 @@
       <button class="profile-btn profile-btn-save" bindtap="onSaveProfile" loading="{{profileSaving}}" disabled="{{profileSaving}}">保存</button>
     </view>
   </view>
+
+  <canvas canvas-id="avatar-cropper" style="position: fixed; left: -9999px; top: -9999px; width: 300px; height: 300px;"></canvas>
 </view>

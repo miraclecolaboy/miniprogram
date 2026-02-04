@@ -1,38 +1,72 @@
 <view class="page">
 
-<!-- 会员卡片（主页核心） -->
-<view 
-  class="card vip-card {{memberActive ? 'vip-on' : 'vip-off'}}" 
-  bindtap="onTapMember"
+<!-- 不同等级会员卡片：左右滑动 -->
+<swiper
+  class="vip-swiper"
+  current="{{currentIndex}}"
+  bindchange="onSwiperChange"
+  previous-margin="56rpx"
+  next-margin="56rpx"
   style="height: {{vipCardHeight}}px;"
 >
-  <!-- 半圆形背景装饰 -->
-  <view class="vip-bg">
-    <view class="vip-circle c1"></view>
-    <view class="vip-circle c2"></view>
-  </view>
-  
-  <!-- 顶部信息 -->
-  <view class="vip-header">
-    <view class="vip-status">{{memberActive ? '等级会员' : '开通等级会员'}}</view>
-    <view class="vip-entry">
-      <text>Lv{{memberLevel || 0}}</text>
-      <text class="arrow">›</text>
+  <swiper-item wx:for="{{levelCards}}" wx:key="level">
+    <view class="vip-swiper-item">
+      <view
+        class="card vip-card {{memberLevel >= item.level ? 'unlocked' : 'locked'}} {{index === currentIndex ? 'active' : ''}}"
+        style="height: {{vipCardHeight}}px;"
+        data-index="{{index}}"
+        bindtap="onTapCard"
+      >
+        <!-- 半圆形背景装饰 -->
+        <view class="vip-bg">
+          <view class="vip-circle c1"></view>
+          <view class="vip-circle c2"></view>
+        </view>
+
+        <!-- 顶部信息 -->
+        <view class="vip-header">
+          <view class="vip-status">{{item.level === 0 ? '普通会员' : '等级会员'}}</view>
+          <view class="vip-entry">
+            <text class="vip-lv">Lv{{item.level}}</text>
+          </view>
+        </view>
+
+        <!-- 底部信息 -->
+        <view class="vip-footer">
+          <view class="vip-benefit">{{item.brief}}</view>
+          <view class="vip-expire">{{item.hint}}</view>
+        </view>
+      </view>
+    </view>
+  </swiper-item>
+</swiper>
+
+<!-- 权益详情 + 经验条（信息集中，减少碎片化卡片） -->
+<view class="card detail-card">
+  <view class="detail-header">
+    <view class="detail-title">{{currentCard.title}}</view>
+    <view class="detail-pill {{memberLevel >= currentCard.level ? 'pill-on' : 'pill-off'}}">
+      <text wx:if="{{memberLevel >= currentCard.level}}">已解锁</text>
+      <text wx:else>解锁需 ￥{{currentCard.thresholdText}}</text>
     </view>
   </view>
-  <!-- 底部信息 -->
-  <view class="vip-footer">
-    <view class="vip-benefit">{{memberLevel >= 4 ? '全场下单享 9.5 折' : (memberActive ? '升级送券，礼包仅发一次' : '充值升级送券')}}</view>
-    <view class="vip-expire">{{memberActive ? memberTag : nextHint}}</view>
-  </view>
-</view>
 
-<!-- 会员说明 -->
-<view class="card desc-card">
-  <text class="desc-line">• 累计充值满 100/300/500/1000 元，分别升级 Lv1/Lv2/Lv3/Lv4</text>
-  <text class="desc-line">• 每个等级礼包仅发放一次，单次充值跨级会自动补发缺失等级礼包</text>
-  <text class="desc-line">• Lv4 享受永久 9.5 折优惠（下单自动抵扣）</text>
-  <text class="desc-line">• 默认赠送无门槛券：满100(2张5)；满300(3张5+1张10)；满500(5张5+1张20)；满1000(5张10+2张20)（必要时可在数据库手动改）</text>
+  <view class="detail-exp">
+    <view class="exp-bar">
+      <view class="exp-bar-inner" style="width: {{expPercent}}%;"></view>
+    </view>
+    <view class="exp-row">
+      <text class="exp-text">{{expText}}</text>
+      <text class="exp-sub">{{expSub}}</text>
+    </view>
+  </view>
+
+  <view class="benefits">
+    <view class="benefit-row" wx:for="{{currentCard.benefits}}" wx:key="*this">
+      <view class="dot"></view>
+      <text class="benefit-txt">{{item}}</text>
+    </view>
+  </view>
 </view>
 
 <!-- 底部操作 -->

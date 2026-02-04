@@ -1,298 +1,312 @@
-/* page 基础样式 */
-.page {
-  min-height: 100vh;
-  background-color: #F8F8F8;
-  /* 原 padding: 24rpx; */
-  /* 【修改】增加底部 padding，为页脚图片留出空间 */
-  padding: 24rpx 24rpx 24rpx;
-  box-sizing: border-box;
-  position: relative;
-  overflow-x: hidden;
-}
+/* pages/mine/mine.wxss */
 
-
-/* ======================================= */
-/* 星空/炉火微光 CSS 实现 */
-/* ======================================= */
-.header-hero {
-  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
-  border-radius: 28rpx;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 0; 
-}
-
-/* 星星背景层 */
-.stars { 
-  position: absolute; 
-  top: 0; left: 0; right: 0; bottom: 0; 
-  z-index: 1; 
-  background-size: 100% 100%;
-  will-change: opacity; /* 性能优化 */
-}
-
-.stars1 { 
-  background-image: radial-gradient(1px 1px at 10% 20%, #fff, transparent), radial-gradient(1px 1px at 40% 50%, #fff, transparent), radial-gradient(2px 2px at 80% 30%, #fff, transparent), radial-gradient(1px 1px at 90% 70%, #fff, transparent); 
-  animation: sparkle 6s infinite alternate; 
-}
-.stars2 { 
-  background-image: radial-gradient(1px 1px at 25% 90%, #fff, transparent), radial-gradient(2px 2px at 55% 60%, #fff, transparent), radial-gradient(1px 1px at 70% 95%, #fff, transparent), radial-gradient(1px 1px at 85% 10%, #fff, transparent); 
-  animation: sparkle 8s infinite alternate; 
-}
-.stars3 { 
-  background-image: radial-gradient(2px 2px at 5% 60%, #fff, transparent), radial-gradient(1px 1px at 50% 10%, #fff, transparent), radial-gradient(1px 1px at 65% 85%, #fff, transparent); 
-  animation: sparkle 10s infinite alternate; 
-}
-
-@keyframes sparkle { 
-  0% { opacity: 0; } 
-  20% { opacity: 1; } 
-  80% { opacity: 1; } 
-  100% { opacity: 0; } 
-}
-
-/* 前景内容 */
-.hero-content {
-  position: relative;
-  z-index: 2;
-  padding: 32rpx 30rpx 40rpx;
-  color: #fff;
-}
-
-.hero-user {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.hero-avatar-wrap {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 50%;
-  border: 3rpx solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.2), inset 0 0 1px 1px rgba(255, 255, 255, 0.08);
-  margin-bottom: 18rpx;
-}
-
-.hero-avatar-img { width: 100%; height: 100%; border-radius: 50%; }
-.hero-avatar-text { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 48rpx; font-weight: 800; color: #E5E7EB; background: rgba(255, 255, 255, 0.1); border-radius: 50%; }
-
-.hero-name { font-size: 32rpx; font-weight: 700; }
-.hero-sub { margin-top: 8rpx; font-size: 24rpx; color: rgba(255, 255, 255, 0.6); }
-
-.asset-strip {
-  margin-left: 25rpx;
-  margin-right: 25rpx;
-  margin-top: 32rpx; 
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 18rpx;
-  padding: 16rpx 0;
-}
-
-.asset-strip-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  border-radius: 18rpx;
-}
-.asset-strip-value { font-size: 32rpx; font-weight: 700; }
-.asset-strip-label {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.7);
+/* ===================================
+   变量定义
+   =================================== */
+   page {
+    --bg-page: #F7F8FA;
+    --card-bg: #FFFFFF;
+    --text-main: #1D1D1F;
+    --text-sub: #86909C;
+    --gold: #BFA15F;
+    --black: #1A1A1A;
+    
+    --shadow-float: 0 20rpx 60rpx rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 8rpx 24rpx rgba(0, 0, 0, 0.02);
   
-  /* 【新增】让文字和箭头横向对齐 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 小箭头样式 */
-.asset-arrow {
-  margin-left: 6rpx; /* 箭头和文字的间距 */
-  font-size: 26rpx;  /* 箭头稍微大一点点，看着清楚 */
-  line-height: 1;    /* 防止箭头位置偏上或偏下 */
-  opacity: 0.8;      /* 稍微淡一点，不抢眼 */
-  padding-bottom: 4rpx; /* 微调垂直位置，根据实际情况增减 */
-}
-
-.asset-strip-divider { width: 1rpx; height: 40rpx; background: rgba(255, 255, 255, 0.15); }
-
-/* ================================= */
-/* 会员卡片 (悬浮堆叠版) */
-/* ================================= */
-.vip-card {
-  background: #FFFFFF;
-  border-radius: 28rpx;
-  position: relative;
-  z-index: 10; /* 确保层级高于头部背景 */
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-sizing: border-box;
+    background-color: var(--bg-page);
+    font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
+    box-sizing: border-box;
+    color: var(--text-main);
+    min-height: 100vh;
+    padding-bottom: 40rpx;
+  }
   
-  /* 【核心调整】 */
-  /* 1. 负边距实现向上堆叠 */
-  /* 2. 左右缩进 40rpx，比头部略窄 */
-  margin: 30rpx 40rpx 30rpx; 
+  /* ===================================
+     1. 头部用户信息
+     =================================== */
+  .user-header {
+    padding: 40rpx 40rpx 20rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
   
-  /* 增加内边距提升呼吸感 */
-  padding: 32rpx;
+  .user-info {
+    display: flex;
+    flex-direction: column;
+  }
   
-  /* 加深阴影，营造悬浮感 */
-  box-shadow: 0 16rpx 48rpx rgba(0,0,0,0.08);
-}
-
-.vip-bg { position: absolute; inset: 0; pointer-events: none; }
-.vip-circle{
-  position:absolute;
-  border-radius:999rpx;
-  background:#fff;
-  opacity:0.14;
-}
-.c1 { width: 220rpx; height: 240rpx; right: -70rpx; top: -100rpx; }
-.c2 { width: 160rpx; height: 140rpx; left: -65rpx; bottom: -65rpx; }
-
-.vip-header { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
-.vip-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40rpx; position: relative; z-index: 2; }
-
-.vip-status { font-size: 30rpx; font-weight: bold; }
-.vip-entry { display: flex; align-items: center; opacity: 0.8; font-size: 24rpx; }
-.vip-entry .arrow { margin-left: 6rpx; font-size: 22rpx; }
-.vip-benefit { font-size: 24rpx; font-weight: 500; opacity: 0.9; }
-.vip-expire { font-size: 22rpx; opacity: 0.7; }
-
-
-.vip-off {
-  background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
-  color: #111;
-  box-shadow: 0 10rpx 24rpx rgba(0,0,0,0.08);
-}
-
-.vip-on { background: #000000; color: #f9fafb;
-/* 增加微弱边框增强实体感 */
-border: 1rpx solid rgba(255, 255, 255, 0.15); 
-box-shadow: 
-  0 30rpx 60rpx -12rpx rgba(0, 0, 0, 0.5), /* 深色悬浮影 */
-  inset 0 2rpx 2rpx rgba(255, 255, 255, 0.2); /* 顶部边缘高光 */
- }
-.vip-on .vip-status, .vip-on .vip-benefit { color: #D1BFA6; }
-
-/* ================================= */
-/* 功能入口 (极简黑金胶囊版) */
-/* ================================= */
-
-.bottom-section {
-  padding: 0rpx 24rpx 32rpx;
-  margin: 0 -24rpx -24rpx;
-  background: #F8F8F8;
-  border-top: none;
-}
-
-/* 整体黑色胶囊 */
-.action-capsule {
-  display: flex;
-  /* 背景：深空黑 */
-  background: #111111; 
-  /* 增加一点点光泽感（微弱渐变） */
-  background-image: linear-gradient(180deg, #1C1C1E 0%, #000000 100%);
+  .user-name {
+    font-size: 52rpx;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 12rpx;
+  }
   
-  border-radius: 32rpx;
-  /* 深色投影 */
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.2);
+  .user-sub {
+    font-size: 26rpx;
+    color: var(--text-sub);
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.04);
+    padding: 6rpx 16rpx;
+    border-radius: 999rpx;
+    align-self: flex-start;
+  }
   
-  /* 恢复原本的紧凑布局 */
-  padding: 0;
-  gap: 0; 
-  border: 1px solid rgba(255, 255, 255, 0.1); /* 微弱的描边提升质感 */
-}
-
-/* 按钮项 */
-.page .action-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 26rpx 0;
+  .user-sub .arrow { margin-left: 6rpx; font-size: 24rpx; margin-top: -2rpx; }
   
-  /* 移除之前的独立背景 */
-  background: transparent !important; 
-  border-radius: 0;
-}
-
-/* 【关键】恢复分割线，并设为半透明白 */
-.action-divider {
-  display: block; /* 恢复显示 */
-  width: 1rpx;
-  height: 40rpx;
-  align-self: center;
-  background-color: rgba(255, 255, 255, 0.15); /* 淡淡的白线 */
-}
-
-/* 按下反馈 */
-.item-hover-lift {
-  opacity: 0.7;
-}
-
-/* 图标反白 */
-.action-icon {
-  width: 52rpx;
-  height: 52rpx;
-  margin-bottom: 12rpx;
-  /* 滤镜：黑转白 */
-  filter: brightness(0) invert(1);
-}
-
-/* 文字：香槟金 / 米白 */
-.action-text {
-  font-size: 24rpx;
-  color: #D1BFA6; /* 香槟金，比纯白更有高级感 */
-  /* 如果喜欢纯白，可以用 color: rgba(255,255,255,0.9); */
-  font-weight: 500;
-  letter-spacing: 1rpx;
-}
-
-
-
-/* =========================
-   资料弹窗 (保持不变)
-   ========================= */
-.spec-mask{ position: fixed; inset: 0; background-color: rgba(0,0,0,0.35); z-index: 500; }
-.spec-popup{ position: fixed; left: 50rpx; right: 50rpx; top: 50%; transform: translateY(-50%); background: #FFFFFF; border-radius: 24rpx; box-shadow: 0 12rpx 40rpx rgba(0,0,0,0.15); z-index: 501; padding: 32rpx; box-sizing: border-box; }
-.spec-top{ display: flex; align-items: center; gap: 24rpx; }
-.profile-avatar-wrap{ width: 120rpx; height: 120rpx; border-radius: 50%; background: #111; overflow: hidden; position: relative; flex: none; }
-.profile-avatar-img{ width: 100%; height: 100%; }
-.profile-avatar-ph{ font-size: 24rpx; color: #fff; text-align: center; }
-.profile-avatar-btn{ position: absolute; inset: 0; opacity: 0; }
-.spec-top-info{ flex: 1; }
-.spec-top-title{ font-size: 32rpx; font-weight: bold; }
-.spec-top-sub{ margin-top: 8rpx; font-size: 24rpx; color: #888; }
-.profile-body{ margin-top: 32rpx; }
-.profile-row{ display: flex; align-items: center; gap: 16rpx; background: #f7f7f7; border-radius: 16rpx; padding: 20rpx; }
-.profile-label{ font-size: 28rpx; }
-.profile-input{ flex: 1; font-size: 28rpx; }
-.profile-bottom{ margin-top: 32rpx; display: flex; gap: 20rpx; }
-.profile-btn{ flex: 1; height: 88rpx; line-height: 88rpx; border-radius: 18rpx; font-size: 30rpx; font-weight: 500; }
-.profile-btn-cancel{ background: #f0f1f4; color: #333; }
-.profile-btn-save{ background: #111; color: #fff; }
-.profile-btn::after{ border: none; }
-/* 页脚背景图 */
-.footer-bg-img {
-  display: block;
-  width: 95%;
-  margin: 50rpx auto 0;
+  .user-avatar {
+    width: 140rpx;
+    height: 140rpx;
+    border-radius: 50%;
+    background: #fff;
+    border: 6rpx solid #fff;
+    box-shadow: var(--shadow-card);
+  }
   
-  margin-top: -80rpx; 
+  /* ===================================
+     2. 会员权益卡 (Expandable Card)
+     =================================== */
+  .vip-card-wrap {
+    padding: 0 32rpx;
+    margin-top: 30rpx;
+    position: relative;
+    z-index: 1;
+  }
   
-  /* 保持您喜欢的视觉效果 */
-  opacity: 0.1;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-}
+  .vip-card {
+    background: linear-gradient(145deg, #2B2B2B 0%, #000000 100%);
+    border-radius: 40rpx;
+    /* 初始高度 */
+    height: 340rpx; 
+    padding: 40rpx;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    box-shadow: 0 24rpx 48rpx -12rpx rgba(0, 0, 0, 0.4);
+    
+    /* 动画核心 */
+    transition: height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  
+  /* 展开状态 */
+  .vip-card.expanded {
+    height: 600rpx; /* 展开后的高度 */
+  }
+  
+  /* 纹理 */
+  .vip-texture {
+    position: absolute;
+    right: -60rpx;
+    top: -80rpx;
+    width: 300rpx;
+    height: 300rpx;
+    background: radial-gradient(circle, rgba(191, 161, 95, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  
+  /* 卡片主体内容 */
+  .vip-main-content {
+    position: relative;
+    z-index: 2;
+    height: 260rpx; /* 固定高度，确保布局稳定 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .vip-top { display: flex; justify-content: space-between; align-items: center; }
+  
+  .vip-title {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: var(--gold);
+    display: flex; align-items: center; gap: 12rpx;
+  }
+  
+  .vip-icon { width: 36rpx; height: 36rpx; }
+  
+  .vip-level {
+    font-family: 'DIN Alternate', sans-serif;
+    font-size: 48rpx;
+    font-weight: bold;
+    color: rgba(255,255,255,0.15);
+    font-style: italic;
+  }
+  
+  .vip-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+  .vip-desc { font-size: 24rpx; color: rgba(255,255,255,0.6); margin-bottom: 8rpx; }
+  
+  .vip-btn {
+    padding: 10rpx 28rpx;
+    background: var(--gold);
+    color: #000;
+    font-weight: 600;
+    border-radius: 999rpx;
+    font-size: 24rpx;
+  }
+  
+  /* 展开区域 (二维码) */
+  .qrcode-area {
+    margin-top: 20rpx;
+    opacity: 0;
+    transform: translateY(20rpx);
+    transition: all 0.3s ease 0.1s; /* 延迟一点显示 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .vip-card.expanded .qrcode-area {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .qr-divider {
+    width: 100%; height: 2rpx; background: rgba(255,255,255,0.1); margin-bottom: 30rpx;
+  }
+  
+  .qr-box {
+    background: #fff;
+    padding: 10rpx;
+    border-radius: 12rpx;
+    width: 140rpx; height: 140rpx;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center;
+  }
+  
+  .qr-img { width: 100%; height: 100%; }
+  .qr-text { color: rgba(255,255,255,0.5); font-size: 20rpx; margin-top: 16rpx; }
+  
+  /* 展开指示小箭头 */
+  .expand-indicator {
+    position: absolute;
+    bottom: 10rpx; left: 0; right: 0;
+    text-align: center;
+    color: rgba(255,255,255,0.2);
+    font-size: 32rpx;
+    transition: transform 0.3s;
+  }
+  .expand-indicator.rotate { transform: rotate(180deg); }
+  
+  
+  /* ===================================
+     3. 悬浮数据舱
+     =================================== */
+  .dashboard-section {
+    padding: 0 32rpx;
+    margin-top: -60rpx; /* 向上插入会员卡 */
+    position: relative;
+    z-index: 10;
+    /* 如果会员卡展开，数据板会被顶下去，通过 transition 实现平滑 */
+    transition: margin-top 0.4s;
+  }
+  
+  /* 配合会员卡展开，如需让数据板也跟着动，通常不需要额外写，DOM流会自动推挤 */
+  
+  .data-board {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 32rpx;
+    box-shadow: var(--shadow-float);
+    padding: 32rpx 0;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+  
+  .data-item { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .item-hover { opacity: 0.6; }
+  
+  .data-divider { width: 2rpx; height: 50rpx; background: rgba(0,0,0,0.06); }
+  
+  .data-num {
+    font-family: 'DIN Alternate', sans-serif;
+    font-size: 44rpx;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.1;
+  }
+  
+  .data-label {
+    font-size: 24rpx;
+    color: var(--text-sub);
+    margin-top: 8rpx;
+    font-weight: 500;
+  }
+  
+  /* ===================================
+     4. 功能宫格 (Clean Icons)
+     =================================== */
+  .menu-section { padding: 40rpx 32rpx; }
+  
+  .menu-grid {
+    background: #FFFFFF;
+    border-radius: 32rpx;
+    box-shadow: var(--shadow-card);
+    padding: 40rpx 20rpx;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 40rpx;
+  }
+  
+  .menu-item { display: flex; flex-direction: column; align-items: center; }
+  .item-hover-scale { transform: scale(0.96); transition: transform 0.1s; }
+  
+  /* 图标容器：去掉背景色，保留尺寸占位 */
+  .icon-wrap {
+    width: 96rpx;
+    height: 96rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8rpx;
+    /* 之前有 background 和 border-radius，现在去掉 */
+  }
+  
+  .menu-icon {
+    width: 56rpx; /* 稍微放大图标，因为没有背景衬托了 */
+    height: 56rpx;
+  }
+  
+  .menu-text {
+    font-size: 24rpx;
+    color: #333;
+    font-weight: 500;
+  }
+  
+  /* ===================================
+     5. 弹窗样式 (复用保持不变)
+     =================================== */
+  .spec-mask { position: fixed; inset: 0; background-color: rgba(0,0,0,0.4); z-index: 500; backdrop-filter: blur(4px); }
+  .spec-popup {
+    position: fixed; left: 50rpx; right: 50rpx; top: 50%; transform: translateY(-50%);
+    background: #FFFFFF; border-radius: 32rpx;
+    box-shadow: 0 20rpx 60rpx rgba(0,0,0,0.15); z-index: 501;
+    padding: 40rpx; box-sizing: border-box;
+  }
+  .spec-top { display: flex; align-items: center; gap: 24rpx; margin-bottom: 40rpx; }
+  .profile-avatar-wrap { 
+    width: 140rpx; height: 140rpx; border-radius: 50%; 
+    background: #111; overflow: hidden; position: relative; 
+    flex: none; box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.2);
+  }
+  .profile-avatar-img { width: 100%; height: 100%; }
+  .profile-avatar-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28rpx; color: #fff; background: #333; }
+  .profile-avatar-btn { position: absolute; inset: 0; opacity: 0; }
+  .spec-top-info { flex: 1; }
+  .spec-top-title { font-size: 36rpx; font-weight: 700; color: #111; }
+  .spec-top-sub { margin-top: 8rpx; font-size: 24rpx; color: #888; }
+  .profile-body { margin-bottom: 40rpx; }
+  .profile-row { display: flex; align-items: center; gap: 20rpx; background: #F7F8FA; border-radius: 20rpx; padding: 24rpx 30rpx; }
+  .profile-label { font-size: 28rpx; font-weight: 600; color: #333; }
+  .profile-input { flex: 1; font-size: 28rpx; color: #111; }
+  .profile-bottom { display: flex; gap: 24rpx; }
+  .profile-btn { flex: 1; height: 88rpx; line-height: 88rpx; border-radius: 20rpx; font-size: 30rpx; font-weight: 600; margin: 0; }
+  .profile-btn::after { border: none; }
+  .profile-btn-cancel { background: #F2F2F2; color: #666; }
+  .profile-btn-save { background: #111; color: #fff; box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.15); }
