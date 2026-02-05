@@ -3,11 +3,47 @@ const { ensureLogin, isLoginOK, refreshUserToStorage } = require('../../utils/au
 const { callUser } = require('../../utils/cloud');
 const { USER: KEY_USER } = require('../../utils/storageKeys');
 
+const LEVELS = [
+  { level: 1, threshold: 100 },
+  { level: 2, threshold: 300 },
+  { level: 3, threshold: 500 },
+  { level: 4, threshold: 1000 },
+];
+
 function getMemberTag(memberLevel, totalRecharge) {
   const lv = Number(memberLevel || 0);
   if (lv >= 4) return 'Lv4 - 永久95折';
   if (lv > 0) return `Lv${lv} - 累计充值${Number(totalRecharge || 0)}元`;
   return '';
+}
+
+function fmtYuan(v) {
+  const n = Number(v || 0);
+  return Number.isFinite(n) ? n.toFixed(0) : '0';
+}
+
+function getMemberProgress(memberLevel, totalRecharge) {
+  const total = Number(totalRecharge || 0);
+  let progress = 0;
+  let nextLevelText = '尊享会员 顶级权益生效中';
+
+  const nextTarget = LEVELS.find(l => l.threshold > total);
+  if (nextTarget) {
+    if (nextTarget.threshold > 0) {
+      progress = (total / nextTarget.threshold) * 100;
+    }
+    progress = Math.min(Math.max(progress, 0), 100);
+    const diff = nextTarget.threshold - total;
+    nextLevelText = `再充值 ${fmtYuan(diff)}元 升级至 Lv.${nextTarget.level} 尊享会员`;
+  } else {
+    progress = 100;
+  }
+
+  return {
+    totalRecharge: fmtYuan(total),
+    progressStyle: `width: ${progress.toFixed(1)}%;`,
+    nextLevelText,
+  };
 }
 
 Page({
@@ -75,14 +111,19 @@ Page({
     const memberLevel = Number(user.memberLevel || 0);
     const totalRecharge = Number(user.totalRecharge || 0);
     const memberActive = memberLevel > 0;
+    const progressInfo = getMemberProgress(memberLevel, totalRecharge);
     return {
       nickName: user.nickName || '未设置昵称',
       avatarUrl: user.avatarUrl || '',
       balance: Number(user.balance || 0).toFixed(2),
       points: Number(user.points || 0),
+      coupons: Array.isArray(user.coupons) ? user.coupons.length : Number(user.coupons || 0),
       memberActive: memberActive,
       memberLevel,
       memberTag: getMemberTag(memberLevel, totalRecharge),
+      totalRecharge: progressInfo.totalRecharge,
+      progressStyle: progressInfo.progressStyle,
+      nextLevelText: progressInfo.nextLevelText,
       userSub: '欢迎回来'
     };
   },

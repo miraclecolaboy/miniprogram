@@ -8,11 +8,12 @@
     --card-bg: #FFFFFF;
     --text-main: #1D1D1F;
     --text-sub: #86909C;
+    --text-light: #C5C6CB;
     --gold: #BFA15F;
     --black: #1A1A1A;
     
-    --shadow-float: 0 20rpx 60rpx rgba(0, 0, 0, 0.05);
-    --shadow-card: 0 8rpx 24rpx rgba(0, 0, 0, 0.02);
+    --shadow-float: 0 20rpx 60rpx rgba(0, 0, 0, 0.06);
+    --shadow-card: 0 8rpx 24rpx rgba(0, 0, 0, 0.03);
   
     background-color: var(--bg-page);
     font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
@@ -31,31 +32,39 @@
     align-items: center;
     justify-content: space-between;
   }
+
+  .user-header.center {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16rpx;
+    text-align: center;
+  }
   
   .user-info {
     display: flex;
     flex-direction: column;
+    align-items: center;
   }
   
   .user-name {
-    font-size: 52rpx;
+    font-size: 48rpx;
     font-weight: 800;
     color: var(--text-main);
     margin-bottom: 12rpx;
   }
   
   .user-sub {
-    font-size: 26rpx;
+    font-size: 24rpx;
     color: var(--text-sub);
     display: flex;
     align-items: center;
     background: rgba(0,0,0,0.04);
     padding: 6rpx 16rpx;
     border-radius: 999rpx;
-    align-self: flex-start;
   }
   
-  .user-sub .arrow { margin-left: 6rpx; font-size: 24rpx; margin-top: -2rpx; }
+  .user-sub .arrow { margin-left: 6rpx; font-size: 20rpx; margin-top: -2rpx; }
   
   .user-avatar {
     width: 140rpx;
@@ -77,16 +86,19 @@
   }
   
   .vip-card {
-    background: linear-gradient(145deg, #2B2B2B 0%, #000000 100%);
+    background: linear-gradient(145deg, #323232 0%, #1A1A1A 100%);
     border-radius: 40rpx;
     /* 初始高度 */
-    height: 340rpx; 
-    padding: 40rpx;
+    height: 240rpx; 
+    padding: 48rpx 44rpx;
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
-    color: #fff;
-    box-shadow: 0 24rpx 48rpx -12rpx rgba(0, 0, 0, 0.4);
+    color: #E3BF87;
+    box-shadow: 0 32rpx 72rpx -24rpx rgba(0, 0, 0, 0.4);
+    border: 1rpx solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
     
     /* 动画核心 */
     transition: height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -94,93 +106,119 @@
   
   /* 展开状态 */
   .vip-card.expanded {
-    height: 600rpx; /* 展开后的高度 */
+    height: 360rpx; /* 展开后的高度 */
   }
   
   /* 纹理 */
   .vip-texture {
     position: absolute;
-    right: -60rpx;
-    top: -80rpx;
-    width: 300rpx;
-    height: 300rpx;
-    background: radial-gradient(circle, rgba(191, 161, 95, 0.15) 0%, transparent 70%);
+    top: -60%;
+    right: -30%;
+    width: 520rpx;
+    height: 520rpx;
+    background: radial-gradient(circle, rgba(227, 191, 135, 0.12) 0%, transparent 65%);
     border-radius: 50%;
     pointer-events: none;
   }
   
-  /* 卡片主体内容 */
-  .vip-main-content {
+  .vip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     position: relative;
     z-index: 2;
-    height: 260rpx; /* 固定高度，确保布局稳定 */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
   }
-  
-  .vip-top { display: flex; justify-content: space-between; align-items: center; }
-  
-  .vip-title {
-    font-size: 32rpx;
+
+  .vip-info { display: flex; flex-direction: column; }
+
+  .vip-name {
+    font-size: 30rpx;
     font-weight: 700;
-    color: var(--gold);
-    display: flex; align-items: center; gap: 12rpx;
+    color: #fff;
+    margin-bottom: 12rpx;
+    letter-spacing: 0.5rpx;
   }
-  
-  .vip-icon { width: 36rpx; height: 36rpx; }
-  
-  .vip-level {
-    font-family: 'DIN Alternate', sans-serif;
+
+  .vip-tag {
+    display: inline-block;
+    background: linear-gradient(90deg, #E3BF87, #C69C6D);
+    color: #1A1A1A;
+    font-size: 20rpx;
+    padding: 6rpx 20rpx;
+    border-radius: 24rpx;
+    font-weight: 700;
+  }
+
+  .vip-logo {
     font-size: 48rpx;
-    font-weight: bold;
-    color: rgba(255,255,255,0.15);
+    opacity: 0.15;
     font-style: italic;
+    font-weight: 900;
+    color: #fff;
   }
-  
-  .vip-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
-  .vip-desc { font-size: 24rpx; color: rgba(255,255,255,0.6); margin-bottom: 8rpx; }
-  
-  .vip-btn {
-    padding: 10rpx 28rpx;
-    background: var(--gold);
-    color: #000;
-    font-weight: 600;
-    border-radius: 999rpx;
-    font-size: 24rpx;
-  }
-  
-  /* 展开区域 (二维码) */
-  .qrcode-area {
-    margin-top: 20rpx;
+
+  /* 展开区域 (成长值) */
+  .vip-expand {
+    margin-top: auto;
     opacity: 0;
-    transform: translateY(20rpx);
+    transform: translateY(12rpx);
+    max-height: 0;
+    overflow: hidden;
     transition: all 0.3s ease 0.1s; /* 延迟一点显示 */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    position: relative;
+    z-index: 2;
   }
   
-  .vip-card.expanded .qrcode-area {
+  .vip-card.expanded .vip-expand {
     opacity: 1;
     transform: translateY(0);
+    margin-top: auto;
+    max-height: 220rpx;
   }
-  
-  .qr-divider {
-    width: 100%; height: 2rpx; background: rgba(255,255,255,0.1); margin-bottom: 30rpx;
+
+  .vip-progress-meta {
+    font-size: 20rpx;
+    color: rgba(255,255,255,0.8);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 14rpx;
+    font-weight: 500;
   }
-  
-  .qr-box {
-    background: #fff;
-    padding: 10rpx;
-    border-radius: 12rpx;
-    width: 140rpx; height: 140rpx;
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center;
+
+  .vip-progress-track {
+    height: 10rpx;
+    background: rgba(255,255,255,0.18);
+    border-radius: 6rpx;
+    overflow: hidden;
+    margin-bottom: 14rpx;
   }
-  
-  .qr-img { width: 100%; height: 100%; }
-  .qr-text { color: rgba(255,255,255,0.5); font-size: 20rpx; margin-top: 16rpx; }
+
+  .vip-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #E3BF87, #F2E3C9);
+    box-shadow: 0 0 20rpx rgba(227, 191, 135, 0.5);
+    transition: width 0.3s ease;
+  }
+
+  .vip-next-tip {
+    font-size: 18rpx;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .vip-actions {
+    margin-top: 16rpx;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .vip-action-btn {
+    padding: 8rpx 22rpx;
+    background: linear-gradient(90deg, #E3BF87, #C69C6D);
+    color: #1A1A1A;
+    font-weight: 700;
+    border-radius: 999rpx;
+    font-size: 20rpx;
+  }
   
   /* 展开指示小箭头 */
   .expand-indicator {
@@ -188,9 +226,9 @@
     bottom: 10rpx; left: 0; right: 0;
     text-align: center;
     color: rgba(255,255,255,0.2);
-    font-size: 32rpx;
-    transition: transform 0.3s;
   }
+
+  .expand-indicator text { font-size: 28rpx; }
   .expand-indicator.rotate { transform: rotate(180deg); }
   
   
@@ -199,41 +237,46 @@
      =================================== */
   .dashboard-section {
     padding: 0 32rpx;
-    margin-top: -60rpx; /* 向上插入会员卡 */
+    margin-top: -30rpx; /* 向上插入会员卡 */
     position: relative;
     z-index: 10;
     /* 如果会员卡展开，数据板会被顶下去，通过 transition 实现平滑 */
     transition: margin-top 0.4s;
   }
+
+  .dashboard-section.card-expanded {
+    margin-top: 24rpx;
+  }
   
   /* 配合会员卡展开，如需让数据板也跟着动，通常不需要额外写，DOM流会自动推挤 */
   
   .data-board {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
+    background: linear-gradient(160deg, #FFFFFF 0%, #FDFDFD 100%);
     border-radius: 32rpx;
-    box-shadow: var(--shadow-float);
-    padding: 32rpx 0;
+    box-shadow: var(--shadow-card);
+    padding: 28rpx 0;
     display: flex;
     align-items: center;
-    border: 1px solid rgba(255,255,255,0.6);
+    border: 1rpx solid #EFF1F5;
   }
+
   
   .data-item { flex: 1; display: flex; flex-direction: column; align-items: center; }
   .item-hover { opacity: 0.6; }
   
   .data-divider { width: 2rpx; height: 50rpx; background: rgba(0,0,0,0.06); }
+
   
   .data-num {
     font-family: 'DIN Alternate', sans-serif;
-    font-size: 44rpx;
+    font-size: 42rpx;
     font-weight: 800;
     color: var(--text-main);
     line-height: 1.1;
   }
   
   .data-label {
-    font-size: 24rpx;
+    font-size: 22rpx;
     color: var(--text-sub);
     margin-top: 8rpx;
     font-weight: 500;
@@ -244,37 +287,59 @@
      =================================== */
   .menu-section { padding: 40rpx 32rpx; }
   
-  .menu-grid {
-    background: #FFFFFF;
+  .menu-list {
+    background: linear-gradient(160deg, #FFFFFF 0%, #FDFDFD 100%);
     border-radius: 32rpx;
     box-shadow: var(--shadow-card);
-    padding: 40rpx 20rpx;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    row-gap: 40rpx;
+    padding: 8rpx 0;
   }
-  
-  .menu-item { display: flex; flex-direction: column; align-items: center; }
-  .item-hover-scale { transform: scale(0.96); transition: transform 0.1s; }
+
+  .menu-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22rpx 28rpx;
+  }
+
+  .menu-left {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+  }
+
+  .menu-divider {
+    height: 2rpx;
+    width: 86%;
+    background: rgba(0,0,0,0.06);
+    margin: 0 auto;
+  }
+
+  .menu-arrow {
+    font-size: 26rpx;
+    color: var(--text-light);
+    margin-top: -2rpx;
+  }
+
+  .item-hover-scale { transform: scale(0.98); transition: transform 0.1s; }
   
   /* 图标容器：去掉背景色，保留尺寸占位 */
   .icon-wrap {
-    width: 96rpx;
-    height: 96rpx;
+    width: 64rpx;
+    height: 64rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8rpx;
+    margin-bottom: 0;
     /* 之前有 background 和 border-radius，现在去掉 */
   }
   
   .menu-icon {
-    width: 56rpx; /* 稍微放大图标，因为没有背景衬托了 */
-    height: 56rpx;
+    width: 36rpx;
+    height: 36rpx;
   }
   
   .menu-text {
-    font-size: 24rpx;
+    font-size: 22rpx;
     color: #333;
     font-weight: 500;
   }
