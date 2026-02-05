@@ -1,201 +1,195 @@
-.page{
-  min-height:100vh;
-  background:#F6F7F9;
-  padding:24rpx;
-  box-sizing:border-box;
+/* pages/mine/member/member.wxss */
+page {
+  background-color: #F8F9FB;
+  min-height: 100vh;
 }
 
-.card{
-  background:#fff;
-  border-radius:20rpx;
+.page-container {
+  padding-bottom: 200rpx; /* 防止底部按钮遮挡 */
 }
 
-/* ================================= */
-/* 会员卡片  */
-/* ================================= */
-
-.vip-swiper{
-  margin-top: 8rpx;
-  margin-bottom: 18rpx;
+/* === 核心会员卡区域 === */
+.card-wrap {
+  padding: 40rpx 48rpx 50rpx; /* 30rpx -> rpx转换 */
 }
 
-.vip-swiper-item{
-  height: 100%;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-}
-
-.vip-card {
+.member-card {
+  /* 黑金渐变背景 */
+  background: linear-gradient(145deg, #323232 0%, #1A1A1A 100%);
+  border-radius: 40rpx;
+  aspect-ratio: 1.8 / 1;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 56rpx 48rpx;
+  color: #E3BF87; /* 金色 */
+  box-shadow: 0 40rpx 80rpx -20rpx rgba(0,0,0,0.35);
   position: relative;
-  z-index: 10;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-sizing: border-box;
-  
-  padding: 32rpx;
-
-  border-radius: 28rpx;
-  width: 100%;
-  transform: scale(0.94);
-  transition: transform 220ms ease, opacity 220ms ease;
 }
 
-.vip-bg { position: absolute; inset: 0; pointer-events: none; }
-
-.vip-circle{
-  position:absolute;
-  border-radius:999rpx;
-  background:#fff;
-  opacity:0.14;
+/* 卡片纹理 */
+.card-texture {
+  position: absolute;
+  top: -60%;
+  right: -30%;
+  width: 600rpx;
+  height: 600rpx;
+  background: radial-gradient(circle, rgba(227, 191, 135, 0.12) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
-.c1 { width: 220rpx; height: 240rpx; right: -70rpx; top: -100rpx; }
-.c2 { width: 160rpx; height: 140rpx; left: -65rpx; bottom: -65rpx; }
-
-.vip-header { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
-
-.vip-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40rpx; position: relative; z-index: 2; }
-
-.vip-status { font-size: 30rpx; font-weight: bold; }
-
-.vip-entry { display: flex; align-items: center; opacity: 0.8; font-size: 24rpx; }
-
-.vip-lv{ font-size: 30rpx; font-weight: 900; letter-spacing: 0.5rpx; }
-
-.vip-benefit { font-size: 24rpx; font-weight: 500; opacity: 0.9; }
-
-.vip-expire { font-size: 22rpx; opacity: 0.7; }
-
-
-.vip-card.active{ transform: scale(1); }
-.vip-card.locked{ opacity: 0.95; }
-.vip-card.unlocked{ opacity: 1; }
-
-
-.vip-card.locked{
-  background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
-  color: #111;
-  box-shadow: 0 10rpx 24rpx rgba(0,0,0,0.08);
-}
-
-.vip-card.unlocked{
-  background: #000000;
-  color: #f9fafb;
-  border: 1rpx solid rgba(255, 255, 255, 0.15);
-  box-shadow:
-    0 30rpx 60rpx -12rpx rgba(0, 0, 0, 0.5),
-    inset 0 2rpx 2rpx rgba(255, 255, 255, 0.2);
-}
-
-.vip-card.unlocked .vip-status,
-.vip-card.unlocked .vip-benefit { color: #D1BFA6; }
-
-.vip-card.active.unlocked{
-  border: 1rpx solid rgba(209, 191, 166, 0.55);
-}
-
-
-/* ================================= */
-/* 权益详情（含经验条） */
-/* ================================= */
-
-.detail-card{
-  margin-top: 0;
-  padding: 24rpx;
-}
-
-.detail-header{
+.card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14rpx;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
 }
 
-.detail-title{ font-size: 30rpx; font-weight: 900; color: #111; }
+.user-info .name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 16rpx;
+  letter-spacing: 1rpx;
+}
 
-.detail-pill{
-  padding: 10rpx 16rpx;
-  border-radius: 999rpx;
+/* 权益标签 - 金色激活态 */
+.level-tag.active {
+  display: inline-block;
+  background: linear-gradient(90deg, #E3BF87, #C69C6D);
+  color: #1A1A1A;
   font-size: 22rpx;
+  padding: 6rpx 20rpx;
+  border-radius: 24rpx;
   font-weight: 700;
 }
-.pill-on{
-  color: #111;
-  background: rgba(209, 191, 166, 0.35);
-}
-.pill-off{
-  color: #6B7280;
-  background: rgba(0,0,0,0.06);
-}
 
-.detail-exp{ margin-top: 10rpx; }
-
-.exp-bar{
-  height: 16rpx;
-  background: rgba(0,0,0,0.08);
-  border-radius: 999rpx;
-  overflow: hidden;
+.card-logo {
+  font-size: 56rpx;
+  opacity: 0.15;
+  font-style: italic;
+  font-weight: 900;
+  color: #fff;
 }
 
-.exp-bar-inner{
-  height: 100%;
-  background: linear-gradient(90deg, #D1BFA6 0%, #BFA15F 100%);
-  border-radius: 999rpx;
+.card-footer {
+  position: relative;
+  z-index: 2;
 }
 
-.exp-row{
-  margin-top: 12rpx;
-  display:flex;
-  flex-direction: column;
-  gap: 6rpx;
+.balance-label {
+  font-size: 26rpx;
+  opacity: 0.9;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
 }
 
-.exp-text{ font-size: 24rpx; color: #111; }
-.exp-sub{ font-size: 22rpx; color: #666; }
-
-.benefits{
-  margin-top: 18rpx;
-}
-
-.benefit-row{
-  display:flex;
-  align-items:flex-start;
-  gap: 12rpx;
-  margin-top: 10rpx;
-}
-
-.dot{
-  width: 10rpx;
+/* 进度条 */
+.progress-track {
   height: 10rpx;
-  background: #BFA15F;
-  border-radius: 999rpx;
-  margin-top: 14rpx;
-  flex: 0 0 auto;
+  background: rgba(255,255,255,0.15);
+  border-radius: 6rpx;
+  overflow: hidden;
+  margin-bottom: 20rpx;
 }
 
-.benefit-txt{
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #E3BF87, #F2E3C9);
+  box-shadow: 0 0 20rpx rgba(227, 191, 135, 0.6);
+  transition: width 0.3s ease;
+}
+
+.next-tip {
   font-size: 24rpx;
+  color: rgba(255,255,255,0.7);
+}
+
+/* === 升级规则说明 === */
+.section-title {
+  padding: 0 48rpx 30rpx;
+  font-size: 34rpx;
+  font-weight: 700;
   color: #333;
-  line-height: 1.8;
-  flex: 1 1 auto;
 }
 
-/* ===== 底部按钮 ===== */
-.footer{
-  margin-top:32rpx;
+.rules-card {
+  margin: 0 48rpx;
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 40rpx;
+  border: 1rpx solid #EFF1F5;
 }
 
-.primary-btn{
-  height:96rpx;
-  background:#111;
-  color:#fff;
-  border-radius:20rpx;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:30rpx;
-  font-weight:700;
+.rule-item {
+  display: flex;
+  margin-bottom: 36rpx;
+  font-size: 28rpx;
+  color: #444;
+  line-height: 1.5;
+}
+
+.rule-item:last-child {
+  margin-bottom: 0;
+}
+
+.rule-dot {
+  min-width: 12rpx;
+  height: 12rpx;
+  background: #E3BF87;
+  border-radius: 50%;
+  margin-top: 14rpx;
+  margin-right: 24rpx;
+  box-shadow: 0 0 10rpx rgba(227, 191, 135, 0.4);
+}
+
+.gift-highlight {
+  color: #C69C6D;
+  font-size: 26rpx;
+  font-weight: 500;
+  margin-top: 8rpx;
+}
+
+.note-text {
+  color: #999;
+  font-size: 24rpx;
+  margin-top: 40rpx;
+  padding-left: 36rpx;
+}
+
+/* === 底部按钮 === */
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30rpx 48rpx 60rpx; /* 适配全面屏底部 */
+  background: #fff;
+  border-top: 1rpx solid #f0f0f0;
+  z-index: 100;
+}
+
+.primary-btn {
+  background: #1A1A1A;
+  color: #E3BF87;
+  height: 96rpx;
+  border-radius: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 32rpx;
+  box-shadow: 0 20rpx 40rpx rgba(0,0,0,0.15);
+  letter-spacing: 2rpx;
+}
+
+.primary-btn:active {
+  transform: scale(0.98);
 }

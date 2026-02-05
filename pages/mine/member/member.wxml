@@ -1,79 +1,74 @@
-<view class="page">
-
-<!-- 不同等级会员卡片：左右滑动 -->
-<swiper
-  class="vip-swiper"
-  current="{{currentIndex}}"
-  bindchange="onSwiperChange"
-  previous-margin="56rpx"
-  next-margin="56rpx"
-  style="height: {{vipCardHeight}}px;"
->
-  <swiper-item wx:for="{{levelCards}}" wx:key="level">
-    <view class="vip-swiper-item">
-      <view
-        class="card vip-card {{memberLevel >= item.level ? 'unlocked' : 'locked'}} {{index === currentIndex ? 'active' : ''}}"
-        style="height: {{vipCardHeight}}px;"
-        data-index="{{index}}"
-        bindtap="onTapCard"
-      >
-        <!-- 半圆形背景装饰 -->
-        <view class="vip-bg">
-          <view class="vip-circle c1"></view>
-          <view class="vip-circle c2"></view>
+<view class="page-container">
+  <view class="card-wrap">
+    <view class="member-card">
+      <view class="card-texture"></view>
+      
+      <view class="card-header">
+        <view class="user-info">
+          <view class="name">Lv.{{memberLevel}} 尊享会员</view>
+          
+          <view class="level-tag active" wx:if="{{memberLevel >= 4}}">下单95折</view>
         </view>
+        <view class="card-logo">VIP</view>
+      </view>
 
-        <!-- 顶部信息 -->
-        <view class="vip-header">
-          <view class="vip-status">{{item.level === 0 ? '普通会员' : '等级会员'}}</view>
-          <view class="vip-entry">
-            <text class="vip-lv">Lv{{item.level}}</text>
-          </view>
+      <view class="card-footer">
+        <view class="balance-label">
+          <text>当前成长值 {{totalRecharge}}</text>
+          <text wx:if="{{memberLevel < 4}}">Lv.{{memberLevel + 1}}</text>
         </view>
-
-        <!-- 底部信息 -->
-        <view class="vip-footer">
-          <view class="vip-benefit">{{item.brief}}</view>
-          <view class="vip-expire">{{item.hint}}</view>
+        
+        <view class="progress-track">
+          <view class="progress-fill" style="{{progressStyle}}"></view>
         </view>
+        
+        <view class="next-tip">{{nextLevelText}}</view>
       </view>
     </view>
-  </swiper-item>
-</swiper>
+  </view>
 
-<!-- 权益详情 + 经验条（信息集中，减少碎片化卡片） -->
-<view class="card detail-card">
-  <view class="detail-header">
-    <view class="detail-title">{{currentCard.title}}</view>
-    <view class="detail-pill {{memberLevel >= currentCard.level ? 'pill-on' : 'pill-off'}}">
-      <text wx:if="{{memberLevel >= currentCard.level}}">已解锁</text>
-      <text wx:else>解锁需 ￥{{currentCard.thresholdText}}</text>
+  <view class="section-title">会员等级规则</view>
+  <view class="rules-card">
+    <view class="rule-item">
+      <view class="rule-dot"></view>
+      <view>
+        <text>累计充值 100元 升级 Lv1</text>
+        <view class="gift-highlight">赠送 5元券 x2</view>
+      </view>
+    </view>
+
+    <view class="rule-item">
+      <view class="rule-dot"></view>
+      <view>
+        <text>累计充值 300元 升级 Lv2</text>
+        <view class="gift-highlight">赠送 5元券 x3 + 10元券 x1</view>
+      </view>
+    </view>
+
+    <view class="rule-item">
+      <view class="rule-dot"></view>
+      <view>
+        <text>累计充值 500元 升级 Lv3</text>
+        <view class="gift-highlight">赠送 5元券 x5 + 20元券 x1</view>
+      </view>
+    </view>
+
+    <view class="rule-item">
+      <view class="rule-dot"></view>
+      <view>
+        <text>累计充值 1000元 升级 Lv4</text>
+        <view class="gift-highlight">下单95折 + 10元券 x5 + 20元券 x2</view>
+      </view>
+    </view>
+    
+    <view class="note-text">
+      * 单次充值跨级将自动补发所有中间等级礼包
     </view>
   </view>
 
-  <view class="detail-exp">
-    <view class="exp-bar">
-      <view class="exp-bar-inner" style="width: {{expPercent}}%;"></view>
-    </view>
-    <view class="exp-row">
-      <text class="exp-text">{{expText}}</text>
-      <text class="exp-sub">{{expSub}}</text>
+  <view class="fixed-footer">
+    <view class="primary-btn" bindtap="onTapRecharge">
+      立即充值升级
     </view>
   </view>
-
-  <view class="benefits">
-    <view class="benefit-row" wx:for="{{currentCard.benefits}}" wx:key="*this">
-      <view class="dot"></view>
-      <text class="benefit-txt">{{item}}</text>
-    </view>
-  </view>
-</view>
-
-<!-- 底部操作 -->
-<view class="footer">
-  <view class="primary-btn" bindtap="onTapRecharge">
-    去充值
-  </view>
-</view>
-
 </view>
