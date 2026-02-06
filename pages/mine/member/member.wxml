@@ -6,7 +6,6 @@
       <view class="card-header">
         <view class="user-info">
           <view class="name">Lv.{{memberLevel}} 尊享会员</view>
-          
           <view class="level-tag active" wx:if="{{memberLevel >= 4}}">下单95折</view>
         </view>
         <view class="card-logo">VIP</view>
@@ -29,35 +28,45 @@
 
   <view class="section-title">会员等级规则</view>
   <view class="rules-card">
+    
     <view class="rule-item">
       <view class="rule-dot"></view>
-      <view>
-        <text>累计充值 100元 升级 Lv1</text>
-        <view class="gift-highlight">赠送 5元券 x2</view>
+      <view class="rule-content">
+        <text class="rule-title">累计充值 100元 升级 Lv1</text>
+        <view class="gift-highlight">赠送 5元无门槛券 x2</view>
       </view>
     </view>
 
     <view class="rule-item">
       <view class="rule-dot"></view>
-      <view>
-        <text>累计充值 300元 升级 Lv2</text>
-        <view class="gift-highlight">赠送 5元券 x3 + 10元券 x1</view>
+      <view class="rule-content">
+        <text class="rule-title">累计充值 300元 升级 Lv2</text>
+        <view class="gift-highlight">赠送 5元无门槛券 x3 + 10元无门槛券 x1</view>
       </view>
     </view>
 
     <view class="rule-item">
       <view class="rule-dot"></view>
-      <view>
-        <text>累计充值 500元 升级 Lv3</text>
-        <view class="gift-highlight">赠送 5元券 x5 + 20元券 x1</view>
+      <view class="rule-content">
+        <text class="rule-title">累计充值 500元 升级 Lv3</text>
+        <view class="gift-highlight">赠送 5元无门槛券 x5 + 20元无门槛券 x1</view>
       </view>
     </view>
 
     <view class="rule-item">
-      <view class="rule-dot"></view>
-      <view>
-        <text>累计充值 1000元 升级 Lv4</text>
-        <view class="gift-highlight">下单95折 + 10元券 x5 + 20元券 x2</view>
+      <view class="rule-dot dot-lv4"></view>
+      <view class="rule-content">
+        <text class="rule-title">累计充值 1000元 升级 Lv4</text>
+        
+        <view class="gift-row special">
+          <text class="tag">永久权益</text>
+          <text class="val">全场下单享 95折</text>
+        </view>
+        
+        <view class="gift-row">
+          <text class="tag">升级礼包</text>
+          <text>10元无门槛券 x5 + 20元无门槛券 x2</text>
+        </view>
       </view>
     </view>
     

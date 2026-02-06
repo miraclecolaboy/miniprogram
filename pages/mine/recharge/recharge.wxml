@@ -1,78 +1,106 @@
 <view class="page">
-  <!-- 当前余额 -->
-  <view class="card balance-card">
-    <text class="balance-label">当前余额</text>
-    <text class="balance-value">￥{{balanceText}}</text>
+  <view class="asset-card">
+    <view class="asset-top">
+      <view class="asset-label">当前账户余额</view>
+      <view class="log-btn" bindtap="openLogPopup">
+        <text>明细</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+    <view class="asset-main">
+      <text class="currency">￥</text>
+      <text class="balance-num">{{balanceText}}</text>
+    </view>
   </view>
 
-  <!-- 选择充值金额 -->
-  <view class="card amount-card">
-    <view class="amount-header">
-  <view class="amount-header-row">
-    <text class="amount-title">选择充值金额</text>
-    <text class="amount-query" bindtap="openLogPopup">查询明细></text>
-  </view>
-  <text class="amount-tip">等级会员：累计满100送2张5元；满300送3张5元+1张10元；满500送5张5元+1张20元；满1000送5张10元+2张20元；Lv4 永久95折</text>
-</view>
-
-
+  <view class="amount-section">
+    <view class="section-title">选择充值金额</view>
+    
     <view class="amount-grid">
-      <view class="amount-item {{amount===100?'active':''}}" bindtap="selectAmount" data-amount="100">100</view>
-      <view class="amount-item {{amount===300?'active':''}}" bindtap="selectAmount" data-amount="300">300</view>
-      <view class="amount-item {{amount===500?'active':''}}" bindtap="selectAmount" data-amount="500">500</view>
-      <view class="amount-item {{amount===1000?'active':''}}" bindtap="selectAmount" data-amount="1000">1000</view>
+      <view 
+        class="amount-item {{amount === 100 ? 'active' : ''}}" 
+        bindtap="selectAmount" 
+        data-amount="{{100}}"
+      >
+        <text class="num">100</text>
+      </view>
 
-      <view class="amount-item custom">
+      <view 
+        class="amount-item {{amount === 300 ? 'active' : ''}}" 
+        bindtap="selectAmount" 
+        data-amount="{{300}}"
+      >
+        <text class="num">300</text>
+      </view>
+
+      <view 
+        class="amount-item {{amount === 500 ? 'active' : ''}}" 
+        bindtap="selectAmount" 
+        data-amount="{{500}}"
+      >
+        <text class="num">500</text>
+      </view>
+
+      <view 
+        class="amount-item {{amount === 1000 ? 'active' : ''}}" 
+        bindtap="selectAmount" 
+        data-amount="{{1000}}"
+      >
+        <text class="num">1000</text>
+      </view>
+    </view>
+
+    <view class="custom-row {{amount !== 100 && amount !== 300 && amount !== 500 && amount !== 1000 && amount ? 'active' : ''}}">
+      <view class="custom-label">自定义金额</view>
+      <view class="custom-input-box">
         <input
           class="custom-input"
           type="number"
-          placeholder="自定义"
+          placeholder="请输入" 
+          placeholder-class="ph-style"
           bindinput="onCustomInput"
+          value="{{customAmount}}"
         />
+        <text class="custom-unit" wx:if="{{customAmount}}">元</text>
       </view>
     </view>
   </view>
 
-  <!-- 主操作按钮 -->
-  <view class="footer">
-    <view class="primary-btn" bindtap="onPay">
-      确认充值 ￥{{amount || 0}}
+  <view class="fixed-footer">
+    <view class="pay-btn" bindtap="onPay">
+      立即充值 {{amount ? '￥' + amount : ''}}
     </view>
+    <view class="safe-area-patch"></view>
   </view>
 
-  <!-- 流水查询弹窗遮罩 -->
-<view
-  wx:if="{{showLogPopup}}"
-  class="spec-mask"
-  bindtap="closeLogPopup"
-></view>
-
-<!-- 流水查询弹窗 -->
-<view wx:if="{{showLogPopup}}" class="spec-popup" catchtap="noop">
-  <view class="log-header">
-    <view class="log-title">余额明细</view>
-    <view class="log-tabs">
-      <view class="log-tab {{logScene===''?'active':''}}" data-scene="" bindtap="changeLogScene">全部</view>
-      <view class="log-tab {{logScene==='recharge'?'active':''}}" data-scene="recharge" bindtap="changeLogScene">充值</view>
-      <view class="log-tab {{logScene==='order_pay'?'active':''}}" data-scene="order_pay" bindtap="changeLogScene">支付</view>
-      <view class="log-tab {{logScene==='refund_balance'?'active':''}}" data-scene="refund_balance" bindtap="changeLogScene">退款</view>
+  <view wx:if="{{showLogPopup}}" class="spec-mask" bindtap="closeLogPopup"></view>
+  <view wx:if="{{showLogPopup}}" class="spec-popup" catchtap="noop">
+    <view class="log-header">
+      <view class="log-title">余额明细</view>
+      <view class="log-tabs">
+        <view class="log-tab {{logScene===''?'active':''}}" data-scene="" bindtap="changeLogScene">全部</view>
+        <view class="log-tab {{logScene==='recharge'?'active':''}}" data-scene="recharge" bindtap="changeLogScene">充值</view>
+        <view class="log-tab {{logScene==='order_pay'?'active':''}}" data-scene="order_pay" bindtap="changeLogScene">消费</view>
+        <view class="log-tab {{logScene==='refund_balance'?'active':''}}" data-scene="refund_balance" bindtap="changeLogScene">退款</view>
+      </view>
     </view>
-  </view>
 
-  <scroll-view scroll-y="true" class="spec-scroll">
-    <block wx:if="{{logList.length}}">
-      <block wx:for="{{logList}}" wx:key="_id">
-        <view class="record-item">
-          <view class="record-left">
-            <view class="record-type">{{item.sceneText}}</view>
-            <view class="record-time">{{item.timeText}}</view>
+    <scroll-view scroll-y="true" class="spec-scroll" enable-flex="true">
+      <block wx:if="{{logList.length}}">
+        <block wx:for="{{logList}}" wx:key="_id">
+          <view class="record-item">
+            <view class="record-left">
+              <view class="record-type">{{item.sceneText}}</view>
+              <view class="record-time">{{item.timeText}}</view>
+            </view>
+            <view class="record-amount {{item.amount > 0 ? 'plus' : ''}}">
+              {{item.amount > 0 ? '+' : ''}}{{item.amountText}}
+            </view>
           </view>
-          <view class="record-amount {{item.amountClass}}">{{item.amountText}}</view>
-        </view>
+        </block>
+        <view style="height: 40rpx;"></view>
       </block>
-    </block>
-    <view wx:else class="empty">暂无记录</view>
-  </scroll-view>
-</view>
-
+      <view wx:else class="empty-state">暂无交易记录</view>
+    </scroll-view>
+  </view>
 </view>

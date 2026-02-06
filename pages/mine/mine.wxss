@@ -9,7 +9,7 @@
     --text-main: #1D1D1F;
     --text-sub: #86909C;
     --text-light: #C5C6CB;
-    --gold: #BFA15F;
+    --gold: #BFA15F; /* 仅保留用于积分/标签的金色 */
     --black: #1A1A1A;
     
     --shadow-float: 0 20rpx 60rpx rgba(0, 0, 0, 0.06);
@@ -32,7 +32,7 @@
     align-items: center;
     justify-content: space-between;
   }
-
+  
   .user-header.center {
     flex-direction: column;
     align-items: center;
@@ -88,8 +88,7 @@
   .vip-card {
     background: linear-gradient(145deg, #323232 0%, #1A1A1A 100%);
     border-radius: 40rpx;
-    /* 初始高度 */
-    height: 240rpx; 
+    height: 240rpx; /* 初始高度 */
     padding: 48rpx 44rpx;
     box-sizing: border-box;
     position: relative;
@@ -99,17 +98,13 @@
     border: 1rpx solid rgba(255,255,255,0.06);
     display: flex;
     flex-direction: column;
-    
-    /* 动画核心 */
     transition: height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
   
-  /* 展开状态 */
   .vip-card.expanded {
-    height: 360rpx; /* 展开后的高度 */
+    height: 360rpx;
   }
   
-  /* 纹理 */
   .vip-texture {
     position: absolute;
     top: -60%;
@@ -128,9 +123,9 @@
     position: relative;
     z-index: 2;
   }
-
+  
   .vip-info { display: flex; flex-direction: column; }
-
+  
   .vip-name {
     font-size: 30rpx;
     font-weight: 700;
@@ -138,7 +133,7 @@
     margin-bottom: 12rpx;
     letter-spacing: 0.5rpx;
   }
-
+  
   .vip-tag {
     display: inline-block;
     background: linear-gradient(90deg, #E3BF87, #C69C6D);
@@ -148,7 +143,7 @@
     border-radius: 24rpx;
     font-weight: 700;
   }
-
+  
   .vip-logo {
     font-size: 48rpx;
     opacity: 0.15;
@@ -156,15 +151,14 @@
     font-weight: 900;
     color: #fff;
   }
-
-  /* 展开区域 (成长值) */
+  
   .vip-expand {
     margin-top: auto;
     opacity: 0;
     transform: translateY(12rpx);
     max-height: 0;
     overflow: hidden;
-    transition: all 0.3s ease 0.1s; /* 延迟一点显示 */
+    transition: all 0.3s ease 0.1s;
     position: relative;
     z-index: 2;
   }
@@ -175,7 +169,7 @@
     margin-top: auto;
     max-height: 220rpx;
   }
-
+  
   .vip-progress-meta {
     font-size: 20rpx;
     color: rgba(255,255,255,0.8);
@@ -184,7 +178,7 @@
     margin-bottom: 14rpx;
     font-weight: 500;
   }
-
+  
   .vip-progress-track {
     height: 10rpx;
     background: rgba(255,255,255,0.18);
@@ -192,25 +186,25 @@
     overflow: hidden;
     margin-bottom: 14rpx;
   }
-
+  
   .vip-progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #E3BF87, #F2E3C9);
     box-shadow: 0 0 20rpx rgba(227, 191, 135, 0.5);
     transition: width 0.3s ease;
   }
-
+  
   .vip-next-tip {
     font-size: 18rpx;
     color: rgba(255,255,255,0.6);
   }
-
+  
   .vip-actions {
     margin-top: 16rpx;
     display: flex;
     justify-content: flex-end;
   }
-
+  
   .vip-action-btn {
     padding: 8rpx 22rpx;
     background: linear-gradient(90deg, #E3BF87, #C69C6D);
@@ -220,35 +214,33 @@
     font-size: 20rpx;
   }
   
-  /* 展开指示小箭头 */
   .expand-indicator {
     position: absolute;
     bottom: 10rpx; left: 0; right: 0;
     text-align: center;
     color: rgba(255,255,255,0.2);
   }
-
+  
   .expand-indicator text { font-size: 28rpx; }
   .expand-indicator.rotate { transform: rotate(180deg); }
-  
   
   /* ===================================
      3. 悬浮数据舱
      =================================== */
   .dashboard-section {
     padding: 0 32rpx;
-    margin-top: -30rpx; /* 向上插入会员卡 */
+    /* 核心修改：大幅向上遮挡会员卡，营造插槽感 */
+    margin-top: -60rpx; 
     position: relative;
     z-index: 10;
-    /* 如果会员卡展开，数据板会被顶下去，通过 transition 实现平滑 */
-    transition: margin-top 0.4s;
-  }
-
-  .dashboard-section.card-expanded {
-    margin-top: 24rpx;
+    /* 增加弹簧阻尼感 */
+    transition: margin-top 0.5s cubic-bezier(0.19, 1, 0.22, 1);
   }
   
-  /* 配合会员卡展开，如需让数据板也跟着动，通常不需要额外写，DOM流会自动推挤 */
+  .dashboard-section.card-expanded {
+    /* 展开时向下移动，露出完整卡片 */
+    margin-top: 24rpx;
+  }
   
   .data-board {
     background: linear-gradient(160deg, #FFFFFF 0%, #FDFDFD 100%);
@@ -259,13 +251,10 @@
     align-items: center;
     border: 1rpx solid #EFF1F5;
   }
-
   
   .data-item { flex: 1; display: flex; flex-direction: column; align-items: center; }
   .item-hover { opacity: 0.6; }
-  
   .data-divider { width: 2rpx; height: 50rpx; background: rgba(0,0,0,0.06); }
-
   
   .data-num {
     font-family: 'DIN Alternate', sans-serif;
@@ -283,7 +272,7 @@
   }
   
   /* ===================================
-     4. 功能宫格 (Clean Icons)
+     4. 功能宫格
      =================================== */
   .menu-section { padding: 40rpx 32rpx; }
   
@@ -293,85 +282,210 @@
     box-shadow: var(--shadow-card);
     padding: 8rpx 0;
   }
-
+  
   .menu-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 22rpx 28rpx;
   }
-
+  
   .menu-left {
     display: flex;
     align-items: center;
     gap: 12rpx;
   }
-
+  
   .menu-divider {
     height: 2rpx;
     width: 86%;
     background: rgba(0,0,0,0.06);
     margin: 0 auto;
   }
-
+  
   .menu-arrow {
     font-size: 26rpx;
     color: var(--text-light);
     margin-top: -2rpx;
   }
-
+  
   .item-hover-scale { transform: scale(0.98); transition: transform 0.1s; }
   
-  /* 图标容器：去掉背景色，保留尺寸占位 */
   .icon-wrap {
     width: 64rpx;
     height: 64rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0;
-    /* 之前有 background 和 border-radius，现在去掉 */
   }
   
-  .menu-icon {
-    width: 36rpx;
-    height: 36rpx;
-  }
-  
-  .menu-text {
-    font-size: 22rpx;
-    color: #333;
-    font-weight: 500;
-  }
+  .menu-icon { width: 36rpx; height: 36rpx; }
+  .menu-text { font-size: 22rpx; color: #333; font-weight: 500; }
   
   /* ===================================
-     5. 弹窗样式 (复用保持不变)
+     5. 弹窗样式 (新版 - 黑白极简风格)
      =================================== */
-  .spec-mask { position: fixed; inset: 0; background-color: rgba(0,0,0,0.4); z-index: 500; backdrop-filter: blur(4px); }
+  .spec-mask {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* 略微加深遮罩 */
+    z-index: 500;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s;
+  }
+  
   .spec-popup {
-    position: fixed; left: 50rpx; right: 50rpx; top: 50%; transform: translateY(-50%);
-    background: #FFFFFF; border-radius: 32rpx;
-    box-shadow: 0 20rpx 60rpx rgba(0,0,0,0.15); z-index: 501;
-    padding: 40rpx; box-sizing: border-box;
+    position: fixed;
+    left: 60rpx;
+    right: 60rpx;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #FFFFFF;
+    border-radius: 40rpx;
+    box-shadow: 0 24rpx 64rpx rgba(0, 0, 0, 0.15);
+    z-index: 501;
+    padding: 48rpx 40rpx;
+    box-sizing: border-box;
+    animation: popUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
   }
-  .spec-top { display: flex; align-items: center; gap: 24rpx; margin-bottom: 40rpx; }
-  .profile-avatar-wrap { 
-    width: 140rpx; height: 140rpx; border-radius: 50%; 
-    background: #111; overflow: hidden; position: relative; 
-    flex: none; box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.2);
+  
+  @keyframes popUp {
+    from { opacity: 0; transform: translate(0, -45%) scale(0.95); }
+    to { opacity: 1; transform: translate(0, -50%) scale(1); }
   }
-  .profile-avatar-img { width: 100%; height: 100%; }
-  .profile-avatar-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28rpx; color: #fff; background: #333; }
-  .profile-avatar-btn { position: absolute; inset: 0; opacity: 0; }
-  .spec-top-info { flex: 1; }
-  .spec-top-title { font-size: 36rpx; font-weight: 700; color: #111; }
-  .spec-top-sub { margin-top: 8rpx; font-size: 24rpx; color: #888; }
-  .profile-body { margin-bottom: 40rpx; }
-  .profile-row { display: flex; align-items: center; gap: 20rpx; background: #F7F8FA; border-radius: 20rpx; padding: 24rpx 30rpx; }
-  .profile-label { font-size: 28rpx; font-weight: 600; color: #333; }
-  .profile-input { flex: 1; font-size: 28rpx; color: #111; }
-  .profile-bottom { display: flex; gap: 24rpx; }
-  .profile-btn { flex: 1; height: 88rpx; line-height: 88rpx; border-radius: 20rpx; font-size: 30rpx; font-weight: 600; margin: 0; }
-  .profile-btn::after { border: none; }
-  .profile-btn-cancel { background: #F2F2F2; color: #666; }
-  .profile-btn-save { background: #111; color: #fff; box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.15); }
+  
+  .pop-title {
+    font-size: 34rpx;
+    font-weight: 700;
+    color: #1A1A1A;
+    text-align: center;
+    margin-bottom: 48rpx;
+  }
+  
+  /* 头像居中部分 */
+  .pop-avatar-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 48rpx;
+  }
+  
+  .pop-avatar-wrap {
+    position: relative;
+    width: 160rpx;
+    height: 160rpx;
+  }
+  
+  .pop-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 6rpx solid #fff;
+    box-shadow: 0 12rpx 30rpx rgba(0,0,0,0.08);
+    background: #F0F0F0;
+  }
+  
+  /* 相机角标 - 纯黑底白标 */
+  .pop-avatar-badge {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 48rpx;
+    height: 48rpx;
+    background: #1A1A1A; /* 纯黑 */
+    border-radius: 50%;
+    border: 4rpx solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1);
+  }
+  
+  /* 纯白相机形状 */
+  .camera-shape {
+    width: 24rpx;
+    height: 18rpx;
+    background: #FFFFFF;
+    border-radius: 2rpx;
+    position: relative;
+  }
+  .camera-shape::before { /* 镜头 */
+    content: ''; position: absolute; left: 50%; top: 50%;
+    width: 8rpx; height: 8rpx; border-radius: 50%;
+    border: 2rpx solid #1A1A1A; /* 黑色镜头圈，形成对比 */
+    transform: translate(-50%, -50%);
+  }
+  .camera-shape::after { /* 快门 */
+    content: ''; position: absolute; right: 4rpx; top: -2rpx;
+    width: 4rpx; height: 2rpx; background: #FFFFFF;
+  }
+  
+  /* 输入框 */
+  .pop-input-group {
+    margin-bottom: 48rpx;
+  }
+  
+  .pop-label {
+    font-size: 24rpx;
+    color: var(--text-sub);
+    margin-bottom: 16rpx;
+    display: block;
+    margin-left: 8rpx;
+  }
+  
+  .pop-input {
+    width: 100%;
+    height: 96rpx;
+    background: #F7F8FA;
+    border-radius: 24rpx;
+    padding: 0 32rpx;
+    font-size: 30rpx;
+    color: #1A1A1A;
+    box-sizing: border-box;
+    transition: all 0.2s;
+    border: 2rpx solid transparent;
+  }
+  
+  /* 聚焦时变黑 */
+  .pop-input:focus {
+    background: #fff;
+    border-color: #1A1A1A; 
+    box-shadow: 0 0 0 4rpx rgba(0, 0, 0, 0.05);
+  }
+  
+  .pop-input-ph { color: #C5C6CB; }
+  
+  /* 按钮组 */
+  .pop-btn-group {
+    display: flex;
+    gap: 24rpx;
+  }
+  
+  .pop-btn {
+    flex: 1;
+    height: 88rpx;
+    line-height: 88rpx;
+    border-radius: 44rpx; /* 胶囊形 */
+    font-size: 28rpx;
+    font-weight: 600;
+    margin: 0;
+    border: none;
+  }
+  .pop-btn::after { border: none; }
+  
+  .pop-btn-cancel {
+    background: #F2F3F5;
+    color: #666;
+  }
+  
+  .pop-btn-save {
+    background: #1A1A1A; /* 纯黑背景 */
+    color: #FFFFFF;      /* 纯白文字 */
+    box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.2);
+  }
+  .pop-btn-save:active {
+    transform: scale(0.98);
+    background: #000000;
+  }
+  .pop-btn-save[disabled] {
+    opacity: 0.7;
+  }

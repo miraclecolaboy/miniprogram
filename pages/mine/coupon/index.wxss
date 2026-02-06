@@ -1,132 +1,235 @@
-.page {
+/* pages/index/index.wxss */
+
+page {
+  --bg-page: #F7F8FA;
+  --bg-card: #FFFFFF;
+  --text-main: #1D1D1F;
+  --text-sub: #86909C;
+  --gold: #CFAA5E;       
+  --black: #1A1A1A;      
+  --btn-use-border: #E0E0E0; 
+  --shadow-card: 0 8rpx 24rpx rgba(0, 0, 0, 0.03); 
+  
+  background-color: var(--bg-page);
   min-height: 100vh;
-  background: #f7f7f7;
-  padding-bottom: 40rpx;
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
+  color: var(--text-main);
+  box-sizing: border-box;
 }
-.tab-bar {
-  display: flex;
-  background: #fff;
-  border-bottom: 1rpx solid #eee;
-  position: sticky;
+
+/* === 顶部 Tab (极简版) === */
+.tab-header {
+  position: fixed;       
   top: 0;
-  z-index: 10;
+  left: 0;
+  right: 0;
+  height: 88rpx;         /* 标准高度，防止晃动 */
+  display: flex;
+  background: #FFFFFF;   /* 纯白背景 */
+  z-index: 100;
+  border-bottom: 1rpx solid #F0F0F0; /* 仅一条极细分割线 */
 }
+
 .tab-item {
   flex: 1;
-  text-align: center;
-  padding: 24rpx 0;
-  font-size: 28rpx;
-  color: #888;
-}
-.tab-item.active {
-  color: #111;
-  font-weight: 600;
-  position: relative;
-}
-.tab-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40rpx;
-  height: 6rpx;
-  background-color: #111;
-  border-radius: 3rpx;
-}
-.coupon-list {
-  padding: 20rpx;
-}
-.coupon-card {
+  height: 100%;
   display: flex;
-  align-items: stretch;
-  background: #fff;
-  border-radius: 16rpx;
-  margin-bottom: 20rpx;
-  overflow: hidden;
-  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.03);
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;      /* 默认字号 */
+  color: var(--text-sub);
+  transition: all 0.2s;  /* 快速响应 */
 }
-.card-left {
-  width: 180rpx;
-  flex-shrink: 0;
+
+/* 选中态：克制 */
+.tab-item.active {
+  color: var(--text-main);
+  font-weight: 700;      /* 仅加粗 */
+  font-size: 30rpx;      /* 微调字号，不再大幅放大 */
+}
+
+/* === 内容区 === */
+.content-body {
+  padding: 24rpx 32rpx 40rpx;
+  padding-top: 112rpx;   /* 88rpx(Header) + 24rpx(间距) */
+}
+
+/* === 票据卡片 (保持不变) === */
+.coupon-ticket {
+  display: flex;
+  height: 190rpx;
+  background: var(--bg-card);
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  border: 1rpx solid rgba(0,0,0,0.02);
+  transition: transform 0.1s;
+}
+
+.coupon-ticket:active {
+  transform: scale(0.99);
+}
+
+/* 左侧金额 */
+.ticket-left {
+  width: 190rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  padding: 20rpx 10rpx;
+  flex-shrink: 0;
+  color: var(--gold);
 }
-.discount-value {
-  font-size: 56rpx;
-  font-weight: bold;
-  line-height: 1.1;
-}
-.discount-value .unit {
-  font-size: 32rpx;
-}
-.min-spend {
-  font-size: 24rpx;
-  margin-top: 8rpx;
-}
-.card-main {
-  flex: 1;
-  padding: 24rpx 20rpx;
+
+.price-row {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: baseline;
+  line-height: 1;
+  margin-bottom: 10rpx;
 }
-.title {
+
+.symbol {
   font-size: 30rpx;
   font-weight: 600;
+  margin-right: 4rpx;
 }
-.expiry {
-  font-size: 24rpx;
-  color: #888;
-  margin-top: 10rpx;
+
+.amount {
+  font-size: 64rpx;
+  font-weight: 900;
+  font-family: 'DIN Alternate', sans-serif;
+  letter-spacing: -2rpx;
 }
-.card-right {
-  width: 160rpx;
-  flex-shrink: 0;
+
+.condition {
+  font-size: 22rpx;
+  color: var(--text-sub);
+  opacity: 0.8;
+}
+
+/* 中间分割 */
+.ticket-split {
+  width: 2rpx;
+  height: 100%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.action-btn {
-  padding: 12rpx 24rpx;
-  border-radius: 999rpx;
-  font-size: 26rpx;
+
+.split-line {
+  width: 0;
+  height: 70%;
+  border-left: 2rpx dashed #EEEEEE;
+}
+
+.circle-top, .circle-bottom {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32rpx;
+  height: 32rpx;
+  background-color: var(--bg-page); 
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: inset 0 2rpx 4rpx rgba(0,0,0,0.03);
+}
+
+.circle-top { top: -16rpx; }
+.circle-bottom { bottom: -16rpx; }
+
+/* 右侧信息 */
+.ticket-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32rpx 0 40rpx;
+  min-width: 0;
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-right: 20rpx;
+  overflow: hidden;
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 14rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tags-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.tag {
+  font-size: 20rpx;
+  color: var(--text-sub);
+  border: 1rpx solid #F0F0F0;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  background: #FAFAFA;
+}
+
+.count-badge {
+  font-size: 20rpx;
+  background: #F2F3F5;
+  color: #666;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+}
+
+/* 按钮设计 */
+.btn-claim {
+  padding: 0 30rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  background: var(--black);
+  color: var(--gold);
+  font-size: 24rpx;
   font-weight: 600;
+  border-radius: 28rpx;
+  box-shadow: 0 6rpx 16rpx rgba(0,0,0,0.12);
+  white-space: nowrap;
 }
-.action-btn-disabled {
-  opacity: 0.6;
+
+.btn-claim.disabled {
+  background: #F2F3F5;
+  color: #C5C6CB;
+  box-shadow: none;
+  pointer-events: none;
 }
-.action-btn-hollow {
-  padding: 10rpx 22rpx;
-  border-radius: 999rpx;
-  font-size: 26rpx;
+
+.btn-use {
+  padding: 0 30rpx;
+  height: 54rpx;
+  line-height: 52rpx;
+  border: 2rpx solid var(--btn-use-border);
+  color: var(--text-main);
+  font-size: 24rpx;
   font-weight: 600;
+  border-radius: 28rpx;
+  background: transparent;
+  white-space: nowrap;
 }
-.coupon-card.claimable .card-left {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
-}
-.coupon-card.claimable .action-btn {
-  background: #fff;
-  color: #e67e22;
-}
-.coupon-card.claimable .action-btn.action-btn-disabled {
-  background: #f5f5f5;
-  color: #bbb;
-}
-.coupon-card.usable .card-left {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-}
-.coupon-card.usable .action-btn-hollow {
-  border: 2rpx solid #c0392b;
-  color: #c0392b;
-}
+
 .empty-tip, .loading-tip {
   text-align: center;
   color: #999;
   font-size: 26rpx;
-  padding: 80rpx 0;
+  padding: 100rpx 0;
+  letter-spacing: 1rpx;
 }

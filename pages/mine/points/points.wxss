@@ -1,153 +1,287 @@
-.page{
-  min-height:100vh;
-  background:#F6F7F9;
-  padding:24rpx;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  box-sizing:border-box;
-  display:flex;
-  flex-direction:column;
-  gap:16rpx;
-}
-.card{
-  background:#fff;
-  border-radius:20rpx;
-  box-shadow:0 10rpx 26rpx rgba(0,0,0,0.04);
-}
-.header{ padding:26rpx; }
-.title{ font-size:30rpx; font-weight:800; color:#111; line-height:1.2; }
+/* pages/points/points.wxss */
 
-.sub{ margin-top:10rpx; font-size:24rpx; color:#6B7280; }
-.strong{ font-weight:900; color:#111; }
-
-.list{ padding:22rpx 24rpx; }
-.history{ padding:22rpx 24rpx; }
-
-.section-title{
-  font-size:26rpx;
-  font-weight:800;
-  color:#111;
-  margin-bottom:16rpx;
+page {
+  /* 变量系统 */
+  --bg-page: #F7F8FA;
+  --bg-card: #FFFFFF;
+  --text-main: #1D1D1F;
+  --text-sub: #86909C; 
+  --black: #1A1A1A;
+  
+  background-color: var(--bg-page);
+  min-height: 100vh;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
+  box-sizing: border-box;
 }
 
-.gift{
-  display:flex;
-  justify-content:space-between;
-  gap:0;
-  padding:18rpx 0;
-  border-top:1rpx solid #F0F0F0;
-  align-items:flex-start; 
+/* === 1. 顶部资产面板 (极简纯净版) === */
+.header-board {
+  background: #FFFFFF;
+  margin: 24rpx;
+  /* 上下留白多一点，左右适中 */
+  padding: 48rpx 40rpx; 
+  border-radius: 24rpx;
+  /* 极轻微的阴影，几乎不可见，只为了让它浮起来一点点 */
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.02); 
 }
 
-.gift-left{
-  flex: 1;
-  min-width: 0;
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 左对齐 */
 }
 
-.gift-right{
-  flex-shrink: 0;
+.header-label {
+  font-size: 26rpx;
+  color: var(--text-sub);
+  margin-bottom: 12rpx;
+  font-weight: 500;
+  letter-spacing: 1rpx;
+}
+
+.header-num-box {
+  display: flex;
+  align-items: baseline;
+  line-height: 1;
+}
+
+/* 纯数字展示，去除所有装饰 */
+.header-num {
+  font-family: 'DIN Alternate', sans-serif;
+  font-size: 72rpx; 
+  font-weight: 900;
+  color: var(--black);
+  letter-spacing: -2rpx;
+}
+
+/* === 通用容器 === */
+.section-container {
+  padding: 10rpx 24rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 24rpx;
+  padding-left: 8rpx;
+}
+
+/* === 2. 礼品卡片 === */
+.gift-card {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
   display: flex;
   align-items: center;
-  align-self: center; 
+  /* 几乎无边框，靠极淡的阴影 */
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.02);
 }
 
-.gift:first-of-type{ border-top:none; }
-.gift-left{
-  flex: 1;
-  min-width: 0;
-}
-
-.gift-name{ font-size:28rpx; font-weight:800; color:#111; }
-.gift-need{ margin-top:8rpx; font-size:24rpx; color:#444; }
-.gift-stock{
-  margin-top: 4rpx;
-  font-size: 24rpx;
-  color: #444;
-}
-.gift-desc{ margin-top:4rpx; font-size:22rpx; color:#6B7280; line-height:1.5; }
-
-.btn{
-  min-width:160rpx;
-  height:64rpx;
-  border-radius:14rpx;
-  background:#111;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:24rpx;
-  font-weight:700;
-}
-.btn-disabled{
-  background:#E5E7EB;
-  color:#9CA3AF;
-}
-
-.empty{ padding:18rpx 0; font-size:24rpx; color:#9CA3AF; }
-
-.record{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:18rpx 0;
-  border-top:1rpx solid #F0F0F0;
-}
-.record:first-of-type{ border-top:none; }
-
-.r-name{ font-size:26rpx; font-weight:700; color:#111; }
-.r-time{ margin-top:8rpx; font-size:22rpx; color:#9CA3AF; }
-.r-right{ font-size:24rpx; color:#111; font-weight:800; }
-
-.gift-img{
-  width: 114rpx;
-  height: 114rpx;
-  border-radius: 16rpx;
-  background: #F3F4F6;
+.gift-img {
+  width: 130rpx;
+  height: 130rpx;
+  border-radius: 12rpx;
+  background: #F7F8FA;
+  margin-right: 24rpx;
   flex-shrink: 0;
-  margin-right: 32rpx;
-}
-/* ===== 兑换说明 ===== */
-.notice-text{
-  margin-top: 10rpx;
-  font-size:24rpx;
-  color:#374151;
-  line-height:1.6;
-  white-space:pre-wrap;
 }
 
-/* ===== 我的兑换码（补齐 points.wxml 使用的 voucher-* 样式）===== */
-.voucher{
-  display:flex;
-  justify-content:space-between;
-  gap:16rpx;
-  padding:18rpx 0;
-  border-top:1rpx solid #F0F0F0;
-  align-items: center; 
+.gift-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 130rpx;
 }
-.voucher:first-of-type{ border-top:none; }
 
-.voucher-left{
-  flex:1;
-  min-width:0;
+.gift-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.voucher-name{ font-size:26rpx; font-weight:700; color:#111; }
-.voucher-sub{ margin-top:8rpx; font-size:22rpx; color:#9CA3AF; }
-.voucher-code{ margin-top:10rpx; font-size:24rpx; color:#111; font-weight:800; }
 
-.voucher-right{
-  display:flex;
-  align-items:center;
+.gift-desc {
+  font-size: 22rpx;
+  color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 380rpx;
 }
-.voucher-status{
-  font-size:22rpx;
-  padding:10rpx 16rpx;
-  border-radius:12rpx;
 
-  background:#F7F7F7;
-  border:1rpx solid #F0F0F0;
-  /* color:#111; */
-  /* font-weight:700; */
+.gift-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 }
-.voucher-status.used{
-  background:#E5E7EB;
-  color:#9CA3AF;
+
+.gift-price-line {
+  display: flex;
+  align-items: baseline;
+}
+
+.gift-points {
+  font-family: 'DIN Alternate', sans-serif;
+  font-size: 36rpx;
+  font-weight: 800;
+  color: var(--black);
+}
+
+.gift-unit {
+  font-size: 22rpx;
+  color: var(--text-main);
+  margin-left: 4rpx;
+  font-weight: 600;
+  margin-right: 16rpx;
+}
+
+/* 库存：极简灰 */
+.gift-stock {
+  font-size: 22rpx;
+  color: var(--text-sub);
+  font-weight: 400;
+  position: relative;
+  padding-left: 16rpx;
+}
+.gift-stock::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2rpx;
+  height: 16rpx;
+  background: #E5E6EB;
+}
+
+/* 按钮：黑底白字 */
+.btn-redeem {
+  padding: 0 30rpx;
+  height: 52rpx;
+  line-height: 52rpx;
+  background: var(--black);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 26rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+}
+
+.btn-redeem:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+.btn-redeem.disabled {
+  background: #F2F3F5;
+  color: #CCC;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* === 3. 我的兑换码 === */
+.voucher-ticket {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  height: 150rpx;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.02);
+  border: 1rpx solid rgba(0,0,0,0.02);
+}
+
+.voucher-left {
+  flex: 1;
+  padding: 0 32rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.v-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8rpx;
+}
+
+.v-time {
+  font-size: 22rpx;
+  color: var(--text-sub);
+  margin-bottom: 6rpx;
+}
+
+.v-code-row {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+}
+.v-label { color: var(--text-sub); }
+.v-code { 
+  font-family: monospace; 
+  font-weight: 700; 
+  color: var(--text-main); 
+  letter-spacing: 1rpx; 
+}
+
+/* 分割线 */
+.voucher-split {
+  width: 2rpx;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.split-line {
+  width: 0;
+  height: 60%;
+  border-left: 2rpx dashed #F0F0F0;
+}
+.circle-top, .circle-bottom {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24rpx;
+  height: 24rpx;
+  background-color: var(--bg-page);
+  border-radius: 50%;
+  box-shadow: inset 0 1rpx 2rpx rgba(0,0,0,0.03);
+}
+.circle-top { top: -12rpx; }
+.circle-bottom { bottom: -12rpx; }
+
+/* 右侧按钮 */
+.voucher-right {
+  width: 130rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-copy {
+  padding: 0 24rpx;
+  height: 48rpx;
+  line-height: 46rpx;
+  border: 2rpx solid #E0E0E0;
+  border-radius: 24rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60rpx 0;
+  color: #CCC;
+  font-size: 24rpx;
 }

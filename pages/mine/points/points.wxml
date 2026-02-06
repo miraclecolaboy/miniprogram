@@ -1,59 +1,79 @@
 <view class="page">
-  <view class="card header">
-    <view class="title">积分兑换</view>
-    <view class="sub">当前积分：<text class="strong">{{points}}</text></view>
+  <view class="header-board">
+    <view class="header-content">
+      <text class="header-label">当前可用积分</text>
+      <view class="header-num-box">
+        <text class="header-num">{{points}}</text>
+      </view>
+    </view>
   </view>
 
-  <view class="card list">
-    <view class="section-title">可兑换</view>
+  <view class="section-container">
+    <view class="section-title">精选礼品</view>
 
-    <view class="gift" wx:for="{{gifts}}" wx:key="id">
-      <image
-        wx:if="{{item.imageUrl}}"
-        class="gift-img"
-        src="{{item.imageUrl}}"
-        mode="aspectFill"
-        lazy-load="true"
-      ></image>
-
-      <view class="gift-left">
-        <view class="gift-name">{{item.name}}</view>
-        <view class="gift-need">需要 {{item.points}} 积分</view>
-        <view class="gift-stock">库存：{{item.stock}}</view>
-        <view class="gift-desc">{{item.desc}}</view>
-      </view>
-
-      <view class="gift-right">
-        <view class="btn {{points < item.points ? 'btn-disabled' : ''}}" bindtap="onRedeem" data-id="{{item.id}}">
-          {{points < item.points ? '积分不足' : '立即兑换'}}
+    <block wx:if="{{gifts && gifts.length}}">
+      <view class="gift-card" wx:for="{{gifts}}" wx:key="id">
+        <image
+          class="gift-img"
+          src="{{item.imageUrl}}"
+          mode="aspectFill"
+          lazy-load="true"
+        ></image>
+        
+        <view class="gift-content">
+          <view class="gift-main">
+            <view class="gift-name">{{item.name}}</view>
+            <view class="gift-desc">{{item.desc || '暂无简介'}}</view>
+          </view>
+          
+          <view class="gift-bottom">
+            <view class="gift-price-line">
+              <text class="gift-points">{{item.points}}</text>
+              <text class="gift-unit">积分</text>
+              <text class="gift-stock" wx:if="{{item.stock < 100}}">剩余 {{item.stock}}</text>
+            </view>
+            
+            <view 
+              class="btn-redeem {{points < item.points ? 'disabled' : ''}}" 
+              bindtap="onRedeem" 
+              data-id="{{item.id}}"
+            >
+              {{points < item.points ? '不足' : '兑换'}}
+            </view>
+          </view>
         </view>
       </view>
-    </view>
+    </block>
 
-    <view class="empty" wx:if="{{!gifts || !gifts.length}}">
-      暂无可兑换商品
-    </view>
+    <view class="empty-state" wx:if="{{!gifts || !gifts.length}}">暂无可兑换商品</view>
   </view>
 
-  <view class="card list">
+  <view class="section-container">
     <view class="section-title">我的兑换码</view>
 
-    <view class="empty" wx:if="{{!vouchers || !vouchers.length}}">
-      暂无兑换码
-    </view>
+    <block wx:if="{{vouchers && vouchers.length}}">
+      <view class="voucher-ticket" wx:for="{{vouchers}}" wx:key="id" bindtap="onVoucherTap" data-id="{{item.id}}">
+        <view class="voucher-left">
+          <view class="v-name">{{item.giftName}}</view>
+          <view class="v-time">{{item.timeText}} 兑换</view>
+          <view class="v-code-row">
+            <text class="v-label">核销码：</text>
+            <text class="v-code">{{item.code || item.id}}</text>
+          </view>
+        </view>
+        
+        <view class="voucher-split">
+          <view class="split-line"></view>
+          <view class="circle-top"></view>
+          <view class="circle-bottom"></view>
+        </view>
 
-    <view class="voucher" wx:for="{{vouchers}}" wx:key="id" bindtap="onVoucherTap" data-id="{{item.id}}">
-      <view class="voucher-left">
-        <view class="voucher-name">{{item.giftName}}</view>
-        <view class="voucher-sub">消耗 {{item.costPoints}} 积分 · {{item.timeText}}</view>
-        <view class="voucher-code" selectable="true">核销码：{{item.code || item.id}}</view>
-      </view>
-
-      <view class="voucher-right">
-        <view class="voucher-status">
-          点击复制
+        <view class="voucher-right">
+          <view class="btn-copy">复制</view>
         </view>
       </view>
-    </view>
+    </block>
+    
+    <view class="empty-state" wx:if="{{!vouchers || !vouchers.length}}">暂无兑换记录</view>
   </view>
 </view>

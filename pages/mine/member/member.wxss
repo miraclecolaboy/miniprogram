@@ -10,7 +10,7 @@ page {
 
 /* === 核心会员卡区域 === */
 .card-wrap {
-  padding: 40rpx 48rpx 50rpx; /* 30rpx -> rpx转换 */
+  padding: 40rpx 48rpx 50rpx;
 }
 
 .member-card {
@@ -130,10 +130,11 @@ page {
 
 .rule-item {
   display: flex;
-  margin-bottom: 36rpx;
+  margin-bottom: 40rpx; /* 间距拉大 */
   font-size: 28rpx;
   color: #444;
   line-height: 1.5;
+  align-items: flex-start; /* 顶部对齐 */
 }
 
 .rule-item:last-child {
@@ -150,11 +151,65 @@ page {
   box-shadow: 0 0 10rpx rgba(227, 191, 135, 0.4);
 }
 
+.dot-lv4 {
+  /* Lv4 的点稍微大一点，颜色深一点 */
+  background: #C69C6D; 
+  transform: scale(1.2);
+}
+
+.rule-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.rule-title {
+  color: #1A1A1A;
+  font-weight: 500;
+}
+
 .gift-highlight {
   color: #C69C6D;
   font-size: 26rpx;
   font-weight: 500;
   margin-top: 8rpx;
+}
+
+/* 新增：多行礼包布局 */
+.gift-row {
+  display: flex;
+  align-items: center;
+  margin-top: 14rpx;
+  font-size: 26rpx;
+  color: #666;
+  flex-wrap: wrap; /* 防止小屏换行 */
+}
+
+/* 标签样式 (权益/礼包) */
+.gift-row .tag {
+  background: rgba(198, 156, 109, 0.1);
+  color: #C69C6D;
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+/* Lv4 永久权益特殊样式 - 黑金风 */
+.gift-row.special {
+  margin-top: 16rpx;
+}
+
+.gift-row.special .tag {
+  background: #1A1A1A; /* 黑底 */
+  color: #E3BF87;    /* 金字 */
+}
+
+.gift-row.special .val {
+  color: #1A1A1A;
+  font-weight: 800;
+  font-size: 28rpx;
 }
 
 .note-text {

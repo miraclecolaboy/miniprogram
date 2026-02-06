@@ -45,38 +45,30 @@
       <view class="expand-indicator {{memberCardExpanded ? 'rotate' : ''}}">
         <text>⌄</text>
       </view>
-
     </view>
   </view>
 
   <view class="dashboard-section {{memberCardExpanded ? 'card-expanded' : ''}}">
     <view class="data-board">
-      
       <view class="data-item" bindtap="onRecharge" hover-class="item-hover">
         <view class="data-num">{{userInfo.balance || '0.00'}}</view>
         <view class="data-label">余额</view>
       </view>
-      
       <view class="data-divider"></view>
-      
       <view class="data-item" bindtap="onPoints" hover-class="item-hover">
         <view class="data-num">{{userInfo.points || 0}}</view>
         <view class="data-label">积分</view>
       </view>
-      
       <view class="data-divider"></view>
-      
       <view class="data-item" bindtap="onTapCoupon" hover-class="item-hover">
         <view class="data-num" style="color: #BFA15F">{{userInfo.coupons || 0}}</view>
         <view class="data-label">优惠券</view>
       </view>
-
     </view>
   </view>
 
   <view class="menu-section">
     <view class="menu-list">
-      
       <view class="menu-row" bindtap="onTapOrder" hover-class="item-hover-scale">
         <view class="menu-left">
           <view class="icon-wrap">
@@ -110,32 +102,50 @@
         </view>
         <text class="menu-arrow">›</text>
       </view>
-
     </view>
   </view>
 
-  <view wx:if="{{showProfilePopup}}" class="spec-mask" bindtap="closeProfilePopup"></view>
-  <view wx:if="{{showProfilePopup}}" class="spec-popup" catchtap="noop">
-    <view class="spec-top">
-      <view class="profile-avatar-wrap">
-        <image wx:if="{{profileAvatarPreview}}" class="profile-avatar-img" src="{{profileAvatarPreview}}" mode="aspectFill" />
-        <view wx:else class="profile-avatar-ph">头像</view>
-        <button class="profile-avatar-btn" bindtap="onChangeAvatar"></button>
-      </view>
-      <view class="spec-top-info">
-        <view class="spec-top-title">编辑资料</view>
-        <view class="spec-top-sub">点击头像可更换</view>
+  <view wx:if="{{showProfilePopup}}" class="spec-mask" bindtap="closeProfilePopup" catchtouchmove="noop"></view>
+  
+  <view wx:if="{{showProfilePopup}}" class="spec-popup" catchtap="noop" catchtouchmove="noop">
+    <view class="pop-title">编辑个人资料</view>
+
+    <view class="pop-avatar-center" bindtap="onChangeAvatar">
+      <view class="pop-avatar-wrap">
+        <image 
+          class="pop-avatar-img" 
+          src="{{profileAvatarPreview || '/assets/mine.png'}}" 
+          mode="aspectFill" 
+        />
+        <view class="pop-avatar-badge">
+          <view class="camera-shape">
+            <view class="camera-lens"></view>
+          </view>
+        </view>
       </view>
     </view>
-    <view class="profile-body">
-      <view class="profile-row">
-        <text class="profile-label">昵称</text>
-        <input class="profile-input" type="nickname" value="{{profileNickName}}" placeholder="请输入昵称" bindinput="onNickInput" />
-      </view>
+
+    <view class="pop-input-group">
+      <text class="pop-label">昵称</text>
+      <input 
+        class="pop-input" 
+        type="nickname" 
+        value="{{profileNickName}}" 
+        placeholder="请输入昵称" 
+        placeholder-class="pop-input-ph"
+        bindinput="onNickInput" 
+        always-embed="{{true}}"
+      />
     </view>
-    <view class="profile-bottom">
-      <button class="profile-btn profile-btn-cancel" bindtap="closeProfilePopup">取消</button>
-      <button class="profile-btn profile-btn-save" bindtap="onSaveProfile" loading="{{profileSaving}}" disabled="{{profileSaving}}">保存</button>
+
+    <view class="pop-btn-group">
+      <button class="pop-btn pop-btn-cancel" bindtap="closeProfilePopup">取消</button>
+      <button 
+        class="pop-btn pop-btn-save" 
+        bindtap="onSaveProfile" 
+        loading="{{profileSaving}}" 
+        disabled="{{profileSaving}}"
+      >保存</button>
     </view>
   </view>
 
