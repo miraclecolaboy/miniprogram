@@ -22,7 +22,15 @@
         
         <view class="qr-area-large">
           <view class="qr-frame">
-            <image class="real-qr-large" src="{{qrSrc}}" mode="aspectFit" show-menu-by-longpress="{{true}}"></image>
+            <image
+              wx:if="{{qrSrc}}"
+              class="real-qr-large"
+              src="{{qrSrc}}"
+              mode="aspectFit"
+              lazy-load="{{true}}"
+              show-menu-by-longpress="{{true}}"
+              binderror="onQrImgError"
+            ></image>
           </view>
           <view class="qr-tip">长按识别二维码添加客服</view>
         </view>
