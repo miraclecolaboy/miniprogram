@@ -1,15 +1,28 @@
 <view class="page">
-  <view class="header-board">
-    <view class="header-content">
-      <text class="header-label">当前可用积分</text>
-      <view class="header-num-box">
-        <text class="header-num">{{points}}</text>
+  <view class="header-section">
+    <view class="asset-card">
+      <view class="card-decoration">POINTS</view>
+      
+      <view class="card-content">
+        <view class="card-top">
+          <view class="label-group">
+            <view class="card-label-zh">当前积分</view>
+            <view class="card-label-en">CURRENT POINTS</view>
+          </view>
+        </view>
+        
+        <view class="balance-row">
+          <text class="balance-num">{{points}}</text>
+        </view>
       </view>
     </view>
   </view>
 
-  <view class="section-container">
-    <view class="section-title">精选礼品</view>
+  <view class="section-wrap">
+    <view class="section-header">
+      <text class="section-title">精选礼品</text>
+      <view class="section-tag">好物兑换</view>
+    </view>
 
     <block wx:if="{{gifts && gifts.length}}">
       <view class="gift-card" wx:for="{{gifts}}" wx:key="id">
@@ -30,7 +43,6 @@
             <view class="gift-price-line">
               <text class="gift-points">{{item.points}}</text>
               <text class="gift-unit">积分</text>
-              <text class="gift-stock" wx:if="{{item.stock < 100}}">剩余 {{item.stock}}</text>
             </view>
             
             <view 
@@ -48,8 +60,10 @@
     <view class="empty-state" wx:if="{{!gifts || !gifts.length}}">暂无可兑换商品</view>
   </view>
 
-  <view class="section-container">
-    <view class="section-title">我的兑换码</view>
+  <view class="section-wrap">
+    <view class="section-header" style="margin-top: 40rpx;">
+      <text class="section-title">我的兑换码</text>
+    </view>
 
     <block wx:if="{{vouchers && vouchers.length}}">
       <view class="voucher-ticket" wx:for="{{vouchers}}" wx:key="id" bindtap="onVoucherTap" data-id="{{item.id}}">

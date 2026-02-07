@@ -1,89 +1,142 @@
 /* pages/points/points.wxss */
 
 page {
-  /* 变量系统 */
-  --bg-page: #F7F8FA;
-  --bg-card: #FFFFFF;
-  --text-main: #1D1D1F;
-  --text-sub: #86909C; 
-  --black: #1A1A1A;
+  /* === 全局变量 (保持与 recharge.wxss 一致) === */
+  --bg-page: #F9FAFC;   
+  --text-main: #1D1D1F; 
+  --text-sub: #8C8883;  
+  --gold-main: #C7AB85; 
+  --gold-light: #FFF4E3;
+  --black: #1A1A1A;     
   
   background-color: var(--bg-page);
-  min-height: 100vh;
-  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
-  font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
   box-sizing: border-box;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  color: var(--text-main);
 }
 
-/* === 1. 顶部资产面板 (极简纯净版) === */
-.header-board {
-  background: #FFFFFF;
-  margin: 24rpx;
-  /* 上下留白多一点，左右适中 */
-  padding: 48rpx 40rpx; 
-  border-radius: 24rpx;
-  /* 极轻微的阴影，几乎不可见，只为了让它浮起来一点点 */
-  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.02); 
+/* ============================
+   1. 头部资产区域 (复用 Recharge 样式)
+   ============================ */
+.header-section {
+  padding: 40rpx 40rpx 10rpx;
+  margin-bottom: 30rpx;
 }
 
-.header-content {
+.asset-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FBF7F2 100%);
+  border-radius: 40rpx;
+  padding: 56rpx 48rpx;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 30rpx 60rpx rgba(199, 171, 133, 0.15);
+  border: 2rpx solid rgba(255, 255, 255, 0.8);
+}
+
+/* 核心修改：POINTS 水印偏右，填充右侧留白（清晰但极淡） */
+.card-decoration {
+  position: absolute;
+  top: 30%; 
+  left: 75%;
+  /* 居中偏移 + 轻微旋转 */
+  transform: translate(-50%, -50%) rotate(-10deg);
+  font-family: 'Didot', 'Times New Roman', serif; 
+  font-size: 150rpx; 
+  color: rgba(199, 171, 133, 0.05); 
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 0;
+  letter-spacing: 12rpx; 
+  white-space: nowrap;   
+}
+
+.card-content { position: relative; z-index: 1; }
+
+.card-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 36rpx;
+}
+
+/* 双语标签组 */
+.label-group {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* 左对齐 */
 }
 
-.header-label {
-  font-size: 26rpx;
-  color: var(--text-sub);
-  margin-bottom: 12rpx;
-  font-weight: 500;
+.card-label-zh {
+  font-size: 30rpx;
+  color: var(--text-main);
+  font-weight: 700;
+  margin-bottom: 6rpx;
   letter-spacing: 1rpx;
 }
 
-.header-num-box {
-  display: flex;
-  align-items: baseline;
-  line-height: 1;
+.card-label-en {
+  font-size: 18rpx;
+  color: #B08D55; /* 深金色 */
+  font-weight: 600;
+  letter-spacing: 3rpx; 
+  text-transform: uppercase;
+  opacity: 0.9;
 }
 
-/* 纯数字展示，去除所有装饰 */
-.header-num {
+.balance-row { 
+  display: flex; 
+  align-items: baseline; 
+}
+
+.balance-num {
   font-family: 'DIN Alternate', sans-serif;
-  font-size: 72rpx; 
-  font-weight: 900;
-  color: var(--black);
-  letter-spacing: -2rpx;
+  font-size: 88rpx; font-weight: 800; color: var(--text-main);
+  letter-spacing: -2rpx; line-height: 1;
+  background: linear-gradient(180deg, #1D1D1F 20%, #4A4A4A 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
 }
 
-/* === 通用容器 === */
-.section-container {
-  padding: 10rpx 24rpx;
+.symbol-unit {
+  font-size: 32rpx; font-weight: 700; color: #B08D55;
+  margin-left: 16rpx; font-family: 'DIN Alternate', sans-serif;
+  transform: translateY(-8rpx); /* 微调对齐 */
+}
+
+/* ============================
+   2. 内容区域 (列表)
+   ============================ */
+.section-wrap { padding: 0 40rpx; }
+
+.section-header {
+  display: flex; align-items: center;
+  margin-bottom: 32rpx; padding-left: 8rpx;
 }
 
 .section-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 24rpx;
-  padding-left: 8rpx;
+  font-size: 32rpx; font-weight: 700; color: var(--text-main);
+  margin-right: 16rpx;
 }
 
-/* === 2. 礼品卡片 === */
+.section-tag {
+  font-size: 20rpx; background: var(--gold-light); color: #B08D55;
+  padding: 4rpx 12rpx; border-radius: 8rpx; font-weight: 700; letter-spacing: 1rpx;
+}
+
+/* === 礼品卡片 (升级圆角和阴影) === */
 .gift-card {
   background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
+  border-radius: 32rpx; /* 与充值页一致 */
+  padding: 24rpx;
+  margin-bottom: 24rpx;
   display: flex;
   align-items: center;
-  /* 几乎无边框，靠极淡的阴影 */
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.02);
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.02); /* 空气阴影 */
+  border: 2rpx solid transparent;
+  transition: transform 0.1s;
 }
+.gift-card:active { transform: scale(0.99); }
 
 .gift-img {
-  width: 130rpx;
-  height: 130rpx;
-  border-radius: 12rpx;
+  width: 140rpx; height: 140rpx;
+  border-radius: 20rpx;
   background: #F7F8FA;
   margin-right: 24rpx;
   flex-shrink: 0;
@@ -94,194 +147,118 @@ page {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 130rpx;
+  height: 140rpx;
 }
 
 .gift-name {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 4rpx;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin-bottom: 6rpx;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 400rpx;
 }
 
 .gift-desc {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: var(--text-sub);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 380rpx;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 400rpx;
 }
 
 .gift-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  display: flex; justify-content: space-between; align-items: flex-end;
 }
 
-.gift-price-line {
-  display: flex;
-  align-items: baseline;
-}
+.gift-price-line { display: flex; align-items: baseline; }
 
 .gift-points {
   font-family: 'DIN Alternate', sans-serif;
-  font-size: 36rpx;
-  font-weight: 800;
-  color: var(--black);
+  font-size: 40rpx; font-weight: 800; color: var(--text-main);
+  line-height: 1;
 }
 
 .gift-unit {
-  font-size: 22rpx;
-  color: var(--text-main);
-  margin-left: 4rpx;
-  font-weight: 600;
-  margin-right: 16rpx;
+  font-size: 22rpx; color: var(--text-sub);
+  margin-left: 8rpx; font-weight: 600;
 }
 
-/* 库存：极简灰 */
-.gift-stock {
-  font-size: 22rpx;
-  color: var(--text-sub);
-  font-weight: 400;
-  position: relative;
-  padding-left: 16rpx;
-}
-.gift-stock::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2rpx;
-  height: 16rpx;
-  background: #E5E6EB;
-}
-
-/* 按钮：黑底白字 */
+/* 兑换按钮：保持黑色药丸形状 */
 .btn-redeem {
-  padding: 0 30rpx;
-  height: 52rpx;
-  line-height: 52rpx;
-  background: var(--black);
+  padding: 0 32rpx;
+  height: 60rpx; line-height: 60rpx;
+  background: var(--text-main);
   color: #FFFFFF;
-  font-size: 24rpx;
-  font-weight: 600;
-  border-radius: 26rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+  font-size: 24rpx; font-weight: 600;
+  border-radius: 30rpx;
+  box-shadow: 0 8rpx 16rpx rgba(0,0,0,0.1);
 }
-
-.btn-redeem:active {
-  transform: scale(0.96);
-  opacity: 0.9;
-}
-
 .btn-redeem.disabled {
-  background: #F2F3F5;
-  color: #CCC;
-  box-shadow: none;
-  pointer-events: none;
+  background: #F0F2F5; color: #CCC; box-shadow: none;
 }
 
-/* === 3. 我的兑换码 === */
+/* === 兑换券卡片 (升级风格) === */
 .voucher-ticket {
   background: #FFFFFF;
-  border-radius: 20rpx;
-  margin-bottom: 20rpx;
+  border-radius: 32rpx;
+  margin-bottom: 24rpx;
   display: flex;
-  height: 150rpx;
+  height: 160rpx;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.02);
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.02);
   border: 1rpx solid rgba(0,0,0,0.02);
 }
 
 .voucher-left {
-  flex: 1;
-  padding: 0 32rpx;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex: 1; padding: 0 32rpx;
+  display: flex; flex-direction: column; justify-content: center;
 }
 
 .v-name {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: var(--text-main);
+  font-size: 30rpx; font-weight: 700; color: var(--text-main);
   margin-bottom: 8rpx;
 }
 
-.v-time {
-  font-size: 22rpx;
-  color: var(--text-sub);
-  margin-bottom: 6rpx;
-}
+.v-time { font-size: 22rpx; color: var(--text-sub); margin-bottom: 8rpx; }
 
-.v-code-row {
-  display: flex;
-  align-items: center;
-  font-size: 24rpx;
-}
+.v-code-row { display: flex; align-items: center; font-size: 24rpx; }
 .v-label { color: var(--text-sub); }
 .v-code { 
-  font-family: monospace; 
-  font-weight: 700; 
-  color: var(--text-main); 
-  letter-spacing: 1rpx; 
+  font-family: 'DIN Alternate', monospace; 
+  font-weight: 700; color: var(--black); 
+  letter-spacing: 1rpx; font-size: 28rpx;
 }
 
-/* 分割线 */
+/* 分割线优化 */
 .voucher-split {
-  width: 2rpx;
-  height: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 2rpx; height: 100%; position: relative;
+  display: flex; align-items: center; justify-content: center;
 }
 .split-line {
-  width: 0;
-  height: 60%;
-  border-left: 2rpx dashed #F0F0F0;
+  width: 0; height: 60%;
+  border-left: 4rpx dotted #F0F0F0;
 }
 .circle-top, .circle-bottom {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24rpx;
-  height: 24rpx;
+  position: absolute; left: 50%; transform: translateX(-50%);
+  width: 30rpx; height: 30rpx;
   background-color: var(--bg-page);
   border-radius: 50%;
-  box-shadow: inset 0 1rpx 2rpx rgba(0,0,0,0.03);
 }
-.circle-top { top: -12rpx; }
-.circle-bottom { bottom: -12rpx; }
+.circle-top { top: -15rpx; }
+.circle-bottom { bottom: -15rpx; }
 
-/* 右侧按钮 */
+/* 复制按钮 */
 .voucher-right {
-  width: 130rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 140rpx;
+  display: flex; align-items: center; justify-content: center;
 }
-
 .btn-copy {
-  padding: 0 24rpx;
-  height: 48rpx;
-  line-height: 46rpx;
-  border: 2rpx solid #E0E0E0;
-  border-radius: 24rpx;
-  font-size: 22rpx;
-  font-weight: 600;
-  color: var(--text-main);
+  padding: 0 24rpx; height: 52rpx; line-height: 50rpx;
+  border: 2rpx solid #E0E0E0; border-radius: 26rpx;
+  font-size: 22rpx; font-weight: 600; color: var(--text-main);
 }
 
 .empty-state {
-  text-align: center;
-  padding: 60rpx 0;
-  color: #CCC;
-  font-size: 24rpx;
+  text-align: center; padding: 100rpx 0; color: #CCC; font-size: 26rpx;
 }

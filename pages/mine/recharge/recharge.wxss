@@ -278,7 +278,7 @@ page {
   font-size: 32rpx; font-weight: 700; color: var(--black);
 }
 /* 适配金色 */
-.record-amount.plus { color: #C7AB85; }
+.record-amount.plus { color: #000000; }
 
 .empty-state {
   text-align: center; padding: 100rpx 0; color: #CCC; font-size: 26rpx;
