@@ -4,14 +4,35 @@ const CF_ACTION = 'getShopConfig';
 const { SHOP_CONTACT_CACHE_MAIN: CACHE_KEY } = require('../../../utils/storageKeys');
 const { safeStr, isCloudFileId } = require('../../../utils/common');
 const { getTempFileUrl } = require('../../../utils/cloudFile');
+const { parseServiceHoursRanges, fmtMinOfDay } = require('../../../utils/serviceHours');
 const CACHE_TTL = 6 * 60 * 60 * 1000; 
 
 function now() { return Date.now(); }
+
+const DEFAULT_SERVICE_HOURS = '10:00-22:00';
+
+function buildServiceHoursLines(text) {
+  const raw = safeStr(text);
+  if (!raw) return [DEFAULT_SERVICE_HOURS];
+
+  const parsed = parseServiceHoursRanges(raw);
+  if (parsed && parsed.length) {
+    return parsed.map(r => `${fmtMinOfDay(r.start)}-${fmtMinOfDay(r.end)}`);
+  }
+
+  // Fallback: split by common separators. (Config is normally normalized as space-delimited ranges.)
+  const parts = raw
+    .split(/[\s,，;；、/]+/)
+    .map(s => safeStr(s).trim())
+    .filter(Boolean);
+  return parts.length ? parts : [raw];
+}
 
 Page({
   data: {
     phone: '',
     serviceHours: '',
+    serviceHoursLines: [],
     // 默认空：空则 WXML 中 wx:if 不展示二维码卡片
     qrSrc: '',
   },
@@ -36,19 +57,6 @@ Page({
       urls: [url],
       current: url,
       fail: () => wx.showToast({ title: '预览失败', icon: 'none' }),
-    });
-  },
-
-  copyPhone() {
-    const phone = safeStr(this.data.phone);
-    if (!phone) {
-      wx.showToast({ title: '商家未配置电话', icon: 'none' });
-      return;
-    }
-    wx.setClipboardData({
-      data: phone,
-      success: () => wx.showToast({ title: '已复制', icon: 'success' }),
-      fail: () => wx.showToast({ title: '复制失败', icon: 'none' }),
     });
   },
 
@@ -132,11 +140,23 @@ Page({
 
   _setDataIfChanged(next) {
     if (!next) return;
-    const changed =
-      next.phone !== this.data.phone ||
-      next.serviceHours !== this.data.serviceHours ||
-      next.qrSrc !== this.data.qrSrc;
 
-    if (changed) this.setData(next);
+    const viewModel = {
+      phone: safeStr(next.phone),
+      serviceHours: safeStr(next.serviceHours),
+      qrSrc: safeStr(next.qrSrc),
+    };
+    viewModel.serviceHoursLines = buildServiceHoursLines(viewModel.serviceHours);
+
+    const prevLinesKey = Array.isArray(this.data.serviceHoursLines) ? this.data.serviceHoursLines.join('|') : '';
+    const nextLinesKey = viewModel.serviceHoursLines.join('|');
+
+    const changed =
+      viewModel.phone !== this.data.phone ||
+      viewModel.serviceHours !== this.data.serviceHours ||
+      viewModel.qrSrc !== this.data.qrSrc ||
+      nextLinesKey !== prevLinesKey;
+
+    if (changed) this.setData(viewModel);
   },
 });

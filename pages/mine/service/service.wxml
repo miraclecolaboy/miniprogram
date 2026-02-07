@@ -1,35 +1,138 @@
 <view class="page">
-  <view class="card header">
-    <view class="title">联系客服</view>
-    <view class="sub">如遇订单/配送/售后问题，可优先联系门店客服</view>
-  </view>
-
-  <!-- 客服二维码 -->
-  <view class="card qr-card" wx:if="{{qrSrc}}">
-    <view class="section-title">客服微信</view>
-    <view class="qr-wrap" bindtap="previewQr">
-      <image class="qr-img" src="{{qrSrc}}" mode="aspectFit"></image>
+  <view class="header-area">
+    <view class="title-group">
+      <view class="title-en">SERVICE CENTER</view>
+      <view class="title-cn">服务中心</view>
     </view>
-    <view class="qr-tip">点击预览，可长按识别二维码</view>
+    <view class="header-glow"></view>
   </view>
 
-  <view class="card phone-card">
-    <view class="section-title">商家电话</view>
-    <view class="phone-row">
-      <view class="phone-left">
-        <view class="phone">{{phone}}</view>
-        <view class="phone-sub">工作时间：{{serviceHours}}</view>
+  <view class="dashboard-grid">
+    
+    <view class="grid-col-left card-hover" bindtap="previewQr">
+      <view class="card-inner wx-bg-gradient">
+        <view class="card-top">
+          <view class="icon-halo bg-green-light">
+            <image class="card-icon" src="/assets/wechat.png" mode="aspectFit" />
+          </view>
+          <view class="live-tag">
+            <view class="live-dot"></view> Online
+          </view>
+        </view>
+        
+        <view class="qr-area-large">
+          <view class="qr-frame">
+            <image class="real-qr-large" src="{{qrSrc}}" mode="aspectFit" show-menu-by-longpress="{{true}}"></image>
+          </view>
+          <view class="qr-tip">长按识别二维码添加客服</view>
+        </view>
+
+        <view class="card-bottom-area">
+          <view class="wx-label">在线专属客服</view>
+          <view class="wx-sub">一对一极速响应</view>
+        </view>
       </view>
-      <view class="phone-actions">
-        <view class="btn ghost" bindtap="copyPhone">复制</view>
-        <view class="btn" bindtap="callPhone">拨打</view>
+    </view>
+
+    <view class="grid-col-right">
+      
+      <view class="small-card phone-card-small card-hover">
+        <view class="row-between">
+          <view class="info-col">
+            <text class="card-label">电话客服</text>
+            <text class="card-sub">Phone Support</text>
+          </view>
+          <view class="icon-halo bg-gold-light scale-sm">
+             <image class="card-icon" src="/assets/service.png" mode="aspectFit" />
+          </view>
+        </view>
+        
+        <view class="phone-bottom">
+          <view class="phone-num-sm din-font">{{phone}}</view>
+          <view class="btn-call" catchtap="callPhone" hover-class="btn-call--hover" hover-stay-time="80">拨打</view>
+        </view>
       </view>
+
+      <view class="small-card time-card">
+        <view class="row-between">
+          <view class="info-col">
+            <text class="card-label">服务时间</text>
+            <text class="card-sub">Service Hours</text>
+          </view>
+          <view class="icon-halo bg-blue-light scale-sm">
+             <image class="card-icon" src="/assets/store.png" mode="aspectFit" />
+          </view>
+        </view>
+        <view class="time-txt">
+          <view wx:for="{{serviceHoursLines}}" wx:key="index" class="time-line din-font">{{item}}</view>
+        </view>
+      </view>
+
     </view>
   </view>
 
-  <view class="card note">
-    <view class="section-title">温馨提示</view>
-    <view class="note-line">• 订单问题：请提供下单手机号、订单号与问题描述</view>
-    <view class="note-line">• 配送问题：请提供地址与联系方式，便于快速处理</view>
+  <view class="faq-section">
+    <view class="section-header">常见问题 FAQ</view>
+    
+    <view class="faq-card">
+      <view class="faq-item">
+        <view class="q-row">
+          <view class="q-icon">Q</view>
+          <text class="q-text">配送费如何计算？怎么免配送费？</text>
+        </view>
+        <view class="a-row">
+          <text class="a-text">外卖/快递可能收取配送费，达到门槛可免配送费；结算页会显示配送费及“还差￥xx免配送费”的提示（以商家配置为准）。</text>
+        </view>
+      </view>
+
+
+      <view class="divider"></view>
+
+      <view class="faq-item">
+        <view class="q-row">
+          <view class="q-icon">Q</view>
+          <text class="q-text">优惠券怎么领/怎么用？为什么不可用？</text>
+        </view>
+        <view class="a-row">
+          <text class="a-text">进入【我的-优惠券】在“领券中心”领取；结算页选择优惠券即可抵扣。未满足“满xx可用”门槛或订单金额变化时会提示不可用。</text>
+        </view>
+      </view>
+
+      <view class="divider"></view>
+
+      <view class="faq-item">
+        <view class="q-row">
+          <view class="q-icon">Q</view>
+          <text class="q-text">会员等级如何升级？95折什么时候生效？</text>
+        </view>
+        <view class="a-row">
+          <text class="a-text">会员等级按累计充值自动升级（Lv1/2/3/4），升级礼包优惠券会自动发放到【我的-优惠券】；达到 Lv4 后下单自动享受【95折】（结算页会显示会员折扣）。</text>
+        </view>
+      </view>
+
+      <view class="divider"></view>
+
+      <view class="faq-item">
+        <view class="q-row">
+          <view class="q-icon">Q</view>
+          <text class="q-text">积分怎么获得？积分礼品怎么兑换/核销？</text>
+        </view>
+        <view class="a-row">
+          <text class="a-text">订单支付成功后按实付金额获得积分（向下取整）；在【我的-积分】兑换礼品后会生成核销码，到店出示核销码即可核销。</text>
+        </view>
+      </view>
+
+      <view class="divider"></view>
+
+      <view class="faq-item">
+        <view class="q-row">
+          <view class="q-icon">Q</view>
+          <text class="q-text">如何申请售后/退款？退款退到哪里？</text>
+        </view>
+        <view class="a-row">
+          <text class="a-text">在【订单详情】点击【申请售后】提交原因（订单完成后3天内可申请）；可在【售后详情】查看进度或在审核中取消。余额支付会退回余额；微信支付按微信退款流程原路退回，到账时间以微信为准。</text>
+        </view>
+      </view>
+    </view>
   </view>
 </view>
