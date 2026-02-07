@@ -1,76 +1,98 @@
 <view class="page">
-  <view class="asset-card">
-    <view class="asset-top">
-      <view class="asset-label">当前账户余额</view>
-      <view class="log-btn" bindtap="openLogPopup">
-        <text>明细</text>
-        <text class="arrow">›</text>
+  <view class="header-section">
+    <view class="asset-card">
+      <view class="card-decoration">BALANCE</view>
+      
+      <view class="card-content">
+        <view class="card-top">
+          <view class="label-group">
+            <view class="card-label-zh">当前余额</view>
+            <view class="card-label-en">CURRENT BALANCE</view>
+          </view>
+          
+          <view class="log-btn" bindtap="openLogPopup">
+            <text>明细</text>
+            <text class="arrow">›</text>
+          </view>
+        </view>
+        
+        <view class="balance-row">
+          <text class="symbol">¥</text>
+          <text class="balance-num">{{balanceText}}</text>
+        </view>
       </view>
-    </view>
-    <view class="asset-main">
-      <text class="currency">￥</text>
-      <text class="balance-num">{{balanceText}}</text>
     </view>
   </view>
 
-  <view class="amount-section">
-    <view class="section-title">选择充值金额</view>
+  <view class="section-wrap">
+    <view class="section-header">
+      <text class="section-title">充值金额</text>
+      <view class="section-tag">极速到账</view>
+    </view>
     
-    <view class="amount-grid">
+    <view class="grid-box">
       <view 
-        class="amount-item {{amount === 100 ? 'active' : ''}}" 
+        class="option-btn {{amount === 100 ? 'active' : ''}}" 
         bindtap="selectAmount" 
         data-amount="{{100}}"
       >
-        <text class="num">100</text>
+        <text class="option-num">100</text>
       </view>
 
       <view 
-        class="amount-item {{amount === 300 ? 'active' : ''}}" 
+        class="option-btn {{amount === 300 ? 'active' : ''}}" 
         bindtap="selectAmount" 
         data-amount="{{300}}"
       >
-        <text class="num">300</text>
+        <view class="badge">推荐</view>
+        <text class="option-num">300</text>
       </view>
 
       <view 
-        class="amount-item {{amount === 500 ? 'active' : ''}}" 
+        class="option-btn {{amount === 500 ? 'active' : ''}}" 
         bindtap="selectAmount" 
         data-amount="{{500}}"
       >
-        <text class="num">500</text>
+        <text class="option-num">500</text>
       </view>
 
       <view 
-        class="amount-item {{amount === 1000 ? 'active' : ''}}" 
+        class="option-btn {{amount === 1000 ? 'active' : ''}}" 
         bindtap="selectAmount" 
         data-amount="{{1000}}"
       >
-        <text class="num">1000</text>
+        <text class="option-num">1000</text>
       </view>
     </view>
 
-    <view class="custom-row {{amount !== 100 && amount !== 300 && amount !== 500 && amount !== 1000 && amount ? 'active' : ''}}">
-      <view class="custom-label">自定义金额</view>
-      <view class="custom-input-box">
+    <view class="custom-row {{!amount && customAmount ? 'active' : ''}}">
+      <text class="custom-label">自定义金额</text>
+      <view class="input-wrapper">
         <input
           class="custom-input"
-          type="number"
+          type="digit"
           placeholder="请输入" 
           placeholder-class="ph-style"
           bindinput="onCustomInput"
+          bindfocus="onCustomFocus"
           value="{{customAmount}}"
         />
-        <text class="custom-unit" wx:if="{{customAmount}}">元</text>
+        <text class="custom-unit">元</text>
       </view>
     </view>
   </view>
 
   <view class="fixed-footer">
-    <view class="pay-btn" bindtap="onPay">
-      立即充值 {{amount ? '￥' + amount : ''}}
+    <view class="footer-info">
+      <text class="footer-label">充值金额</text>
+      <view class="footer-total-row">
+        <text class="footer-symbol">¥</text>
+        <text class="footer-total">{{amount || customAmount || '0'}}</text>
+      </view>
     </view>
-    <view class="safe-area-patch"></view>
+    <view class="pay-btn" bindtap="onPay" hover-class="btn-hover">
+      <text>立即充值</text>
+    </view>
   </view>
 
   <view wx:if="{{showLogPopup}}" class="spec-mask" bindtap="closeLogPopup"></view>
