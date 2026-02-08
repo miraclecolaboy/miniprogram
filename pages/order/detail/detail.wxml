@@ -41,11 +41,6 @@
 
   <view class="detail-price-line">
     <view class="detail-price">￥{{finalPrice || product.price}}</view>
-    <view class="detail-meta">
-
-      <!-- <text>销量 {{product.sales || 0}}</text> -->
-      <text>库存 {{currentStock}}</text>
-    </view>
   </view>
 </view>
 

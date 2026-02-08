@@ -34,12 +34,12 @@ page {
   border: 2rpx solid rgba(255, 255, 255, 0.8);
 }
 
-/* 核心修改：POINTS 水印偏右，填充右侧留白（清晰但极淡） */
+/* POINTS 水印：居中更均匀（清晰但极淡） */
 .card-decoration {
   position: absolute;
-  top: 30%; 
-  left: 75%;
-  /* 居中偏移 + 轻微旋转 */
+  top: 50%;
+  left: 50%;
+  /* 居中 + 轻微旋转 */
   transform: translate(-50%, -50%) rotate(-10deg);
   font-family: 'Didot', 'Times New Roman', serif; 
   font-size: 150rpx; 
@@ -54,7 +54,7 @@ page {
 .card-content { position: relative; z-index: 1; }
 
 .card-top {
-  display: flex; justify-content: space-between; align-items: flex-start;
+  display: flex; justify-content: center; align-items: center;
   margin-bottom: 36rpx;
 }
 
@@ -62,6 +62,8 @@ page {
 .label-group {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .card-label-zh {
@@ -84,6 +86,7 @@ page {
 .balance-row { 
   display: flex; 
   align-items: baseline; 
+  justify-content: center;
 }
 
 .balance-num {

@@ -40,10 +40,16 @@ module.exports = {
       }, {});
 
       const firstCategoryId = categories.length ? categories[0].id : '';
-      this.setData({ categories, selectedCategoryId: firstCategoryId }, () => this._filterAndRenderProducts());
+      const firstCategoryName = categories.length ? (categories[0].name || '') : '';
+      this.setData({ categories, selectedCategoryId: firstCategoryId, selectedCategoryName: firstCategoryName }, () => this._filterAndRenderProducts());
     } catch (e) {
       console.error('[order] loadCatalog error', e);
-      this.setData({ categories: [{ id: 'error', name: '加载异常' }], filteredProducts: [] });
+      this.setData({
+        categories: [{ id: 'error', name: '加载异常' }],
+        selectedCategoryId: 'error',
+        selectedCategoryName: '加载异常',
+        filteredProducts: [],
+      });
     }
   },
 
@@ -71,7 +77,8 @@ module.exports = {
   selectCategory(e) {
     const id = e.currentTarget.dataset.id;
     if (id !== this.data.selectedCategoryId) {
-      this.setData({ selectedCategoryId: id }, () => this._filterAndRenderProducts());
+      const name = (this.data.categories || []).find(c => c.id === id)?.name || '';
+      this.setData({ selectedCategoryId: id, selectedCategoryName: name }, () => this._filterAndRenderProducts());
     }
   },
 
@@ -101,4 +108,3 @@ module.exports = {
     this.setData({ filteredProducts: [...this.data.filteredProducts, ...nextItems] });
   },
 };
-

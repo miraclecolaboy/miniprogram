@@ -21,6 +21,7 @@ Page(Object.assign({
     needMoreFreeDelivery: 0,
     categories: [],
     selectedCategoryId: '',
+    selectedCategoryName: '',
     filteredProducts: [],
     totalCount: 0,
     totalPrice: '0.00',
