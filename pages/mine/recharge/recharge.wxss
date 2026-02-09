@@ -117,7 +117,7 @@ page {
 .balance-row { display: flex; align-items: baseline; }
 
 .symbol {
-  font-size: 40rpx; font-weight: 700; color: var(--text-main);
+  font-size: 32rpx; font-weight: 700; color: var(--text-main);
   margin-right: 12rpx; font-family: 'DIN Alternate', sans-serif;
 }
 
@@ -140,7 +140,7 @@ page {
 }
 
 .section-title {
-  font-size: 32rpx; font-weight: 700; color: var(--text-main);
+  font-size: 30rpx; font-weight: 700; color: var(--text-main);
   margin-right: 16rpx;
 }
 
@@ -166,7 +166,7 @@ page {
 
 .option-num {
   font-family: 'DIN Alternate', sans-serif;
-  font-size: 52rpx; font-weight: 700; color: var(--text-main);
+  font-size: 48rpx; font-weight: 700; color: var(--text-main);
   line-height: 1; margin-bottom: 12rpx;
 }
 

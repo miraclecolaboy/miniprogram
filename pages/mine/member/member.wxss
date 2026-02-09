@@ -253,7 +253,7 @@ page {
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 32rpx;
+  font-size: 30rpx;
   box-shadow: 0 20rpx 40rpx rgba(0,0,0,0.15);
   letter-spacing: 2rpx;
 }

@@ -112,7 +112,7 @@ page {
   align-items: center;
   transition: margin-bottom 0.2s; 
 }
-.card-title { font-size: 30rpx; font-weight: 700; color: #111; letter-spacing: 1rpx; }
+.card-title { font-size: 28rpx; font-weight: 700; color: #111; letter-spacing: 1rpx; }
 
 
 /* A. 商品列表 */

@@ -62,7 +62,7 @@
 }
 
 .store-name {
-  font-size: 44rpx;
+  font-size: 40rpx;
   font-weight: 800;
   letter-spacing: 4rpx;
   line-height: 1.1;
@@ -615,7 +615,7 @@
 }
 
 .cart-sheet-title {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 900;
   color: var(--text-main);
 }

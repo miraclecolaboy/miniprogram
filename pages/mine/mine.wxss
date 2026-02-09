@@ -65,7 +65,7 @@
   }
   
   .user-name {
-    font-size: 48rpx;
+    font-size: 44rpx;
     font-weight: 800;
     color: var(--text-main);
     margin-bottom: 12rpx;
