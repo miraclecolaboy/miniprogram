@@ -12,7 +12,6 @@
       <view class="user-name">{{isLogin ? userInfo.nickName : '点击登录/注册'}}</view>
       <view class="user-sub">
         <text>{{isLogin ? userInfo.userSub : '登录同步订单与权益'}}</text>
-        <text class="arrow">›</text>
       </view>
     </view>
   </view>
@@ -23,7 +22,7 @@
       
       <view class="vip-header">
         <view class="vip-info">
-          <view class="vip-name">Lv.{{userInfo.memberLevel || 0}} 尊享会员</view>
+          <view class="vip-name">{{userInfo.memberTitle || 'Lv.0会员'}}</view>
           <view class="vip-tag" wx:if="{{(userInfo.memberLevel || 0) >= 4}}">下单95折</view>
         </view>
         <view class="vip-logo">VIP</view>
@@ -153,5 +152,5 @@
     </view>
   </view>
 
-  <canvas canvas-id="avatar-cropper" style="position: fixed; left: -9999px; top: -9999px; width: 300px; height: 300px;"></canvas>
+  <canvas canvas-id="image-cropper" style="position: fixed; left: -9999px; top: -9999px; width: 300px; height: 300px;"></canvas>
 </view>

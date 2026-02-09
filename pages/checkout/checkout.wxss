@@ -136,7 +136,7 @@ page {
 .addr-placeholder { font-size: 32rpx; font-weight: 700; color: var(--text-main); }
 .arrow-right { position: absolute; right: 0; top: 50%; transform: translateY(-50%); color: #ccc; }
 .product-item { display: flex; margin-bottom: 30rpx; }
-.p-img { width: 130rpx; height: 130rpx; border-radius: 16rpx; background: #F7F8FA; margin-right: 24rpx; flex-shrink: 0; }
+.p-img { width: 130rpx; height: 130rpx; border-radius: 16rpx; background: #eee; box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.06); margin-right: 24rpx; flex-shrink: 0; }
 .p-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 4rpx 0; }
 .p-row-top, .p-row-bottom { display: flex; justify-content: space-between; align-items: flex-start; }
 .p-name { font-size: 28rpx; font-weight: 600; color: var(--text-main); width: 70%; line-height: 1.4; }

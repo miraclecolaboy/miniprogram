@@ -37,7 +37,7 @@
       <view class="goods-list">
         <block wx:for="{{order.items}}" wx:key="productId" wx:for-item="g">
           <view class="goods-item">
-            <image wx:if="{{g.image}}" class="goods-img" src="{{g.image}}" mode="aspectFill" lazy-load />
+            <image class="goods-img" src="{{g.image || ''}}" mode="aspectFill" lazy-load />
             <view class="goods-content">
               <view class="goods-row-top">
                 <view class="goods-name">{{g.productName}}</view>

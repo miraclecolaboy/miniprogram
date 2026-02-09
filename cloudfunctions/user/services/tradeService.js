@@ -399,10 +399,8 @@ async function cancelRefund(orderId, openid) {
   const nowTs = now();
   await db.collection(COL_ORDERS).doc(orderId).update({
     data: {
-      'refund.status': 'cancelled',
-      'refund.statusText': '用户已取消售后',
-      'refund.cancelledAt': nowTs,
-      'refund.logs': _.push({ ts: nowTs, text: '用户取消售后申请' }),
+      // Remove after-sale info so the order returns to normal "doing/done" tabs.
+      refund: _.remove(),
       updatedAt: nowTs
     }
   });

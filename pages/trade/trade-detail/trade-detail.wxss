@@ -32,7 +32,7 @@ page {
 }
 
 .status-big-title {
-  font-size: 42rpx;
+  font-size: 38rpx;
   font-weight: 800;
   color: #111;
   /* [修正] 改为正间距，不再挤 */

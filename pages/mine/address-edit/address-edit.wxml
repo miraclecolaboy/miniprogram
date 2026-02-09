@@ -45,7 +45,7 @@
     <view class="form-label">详细地址</view>
     <input
       class="form-input"
-      placeholder="街道、门牌号等"
+      placeholder="单元楼、门牌号等"
       value="{{form.detail}}"
       bindinput="onInputDetail"
     />

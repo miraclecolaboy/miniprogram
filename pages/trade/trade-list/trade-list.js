@@ -1,5 +1,6 @@
 const { ensureLogin } = require('../../../utils/auth');
 const { callUser } = require('../../../utils/cloud');
+const { TRADE_TAB: KEY_TRADE_TAB } = require('../../../utils/storageKeys');
 
 const PAGE_SIZE = 10;
 
@@ -13,6 +14,14 @@ Page({
   },
 
   onShow() {
+    const targetTab = wx.getStorageSync(KEY_TRADE_TAB);
+    if (targetTab && ['doing', 'done', 'refund'].includes(targetTab)) {
+      wx.removeStorageSync(KEY_TRADE_TAB);
+      if (targetTab !== this.data.activeTab) {
+        return this.setData({ activeTab: targetTab }, () => this.refreshList());
+      }
+    }
+
     this.refreshList();
   },
 

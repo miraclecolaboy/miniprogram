@@ -78,6 +78,11 @@ async function _mapOrderForView(order) {
   
   const canCancelPayment = status === 'pending_payment';
 
+  const payMethod = String(order.payment?.method || '').trim();
+  const payMethodText = payMethod === 'balance'
+    ? '余额支付'
+    : (payMethod === 'free' ? '无需支付' : '微信支付');
+
   const refundView = order.refund
     ? {
         ...order.refund,
@@ -103,6 +108,8 @@ async function _mapOrderForView(order) {
     totalCount: (order.items || []).reduce((sum, item) => sum + item.count, 0),
     canApplyRefund,
     canCancelPayment,
+    payMethod,
+    payMethodText,
     isVip: !!order.isVip,
     refund: refundView,
     pickupInfo: order.pickupInfo || {},

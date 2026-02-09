@@ -1,6 +1,7 @@
 // pages/trade/trade-refund-detail/trade-refund-detail.js
 const { callUser } = require('../../../utils/cloud');
 const { fmtTime } = require('../../../utils/common');
+const { TRADE_TAB: KEY_TRADE_TAB } = require('../../../utils/storageKeys');
 
 const AFTER_SALE_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
 
@@ -175,7 +176,14 @@ Page({
         if (!res?.result?.ok) throw new Error(res?.result?.message || '取消失败');
 
         wx.showToast({ title: '已取消', icon: 'none' });
-        this.refreshFromCloud(true);
+
+        // Cancelled after-sale should return the order back to "doing" list.
+        const status = String(order.status || '').trim();
+        const targetTab = ['done', 'cancelled'].includes(status) ? 'done' : 'doing';
+        wx.setStorageSync(KEY_TRADE_TAB, targetTab);
+        setTimeout(() => {
+          wx.switchTab({ url: '/pages/trade/trade-list/trade-list' });
+        }, 200);
     } catch (e) {
         wx.showToast({ title: e.message || '取消失败', icon: 'none' });
     } finally {

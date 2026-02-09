@@ -156,7 +156,8 @@ page {
 .gift-img {
   width: 140rpx; height: 140rpx;
   border-radius: 20rpx;
-  background: #F7F8FA;
+  background: #eee;
+  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.06);
   margin-right: 24rpx;
   flex-shrink: 0;
 }

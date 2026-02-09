@@ -6,12 +6,10 @@
   <!-- 顶部信息区（黑白极简） -->
   <view class="top-card">
 
-    <!-- 新增：第一行容器，保持原左右布局 -->
     <view class="top-card-main">
       <view class="top-card-left">
         <view class="store-name">{{storeName}}</view>
       </view>
-
       <view class="top-card-right">
         <view
           class="mode-pill {{mode=='ziti'?'active':''}}"

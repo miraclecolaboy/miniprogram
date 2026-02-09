@@ -66,4 +66,3 @@ module.exports = {
     return { title: this.data.storeName, path: '/pages/home/home', imageUrl: '/assets/logo.jpg' };
   },
 };
-

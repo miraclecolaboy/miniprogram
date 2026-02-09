@@ -51,7 +51,7 @@
           </view>
         </view>
         <view class="card-bottom">
-          <text class="card-value-txt text-gold">{{memberStats.levelName}}</text>
+          <text class="card-value-txt text-gold">{{memberStats.memberName}}</text>
           <text class="card-action">查看权益 ></text>
         </view>
       </view>

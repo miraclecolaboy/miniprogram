@@ -23,6 +23,7 @@ function fmtYuan(v) {
 Page({
   data: {
     memberLevel: 0,
+    memberTitle: '',
     totalRecharge: 0,
     progressStyle: 'width: 0%;', // 预设样式避免渲染闪烁
     nextLevelText: '',
@@ -63,6 +64,7 @@ Page({
   setMemberState(memberLevel, totalRecharge) {
     const lv = Number(memberLevel || 0);
     const total = Number(totalRecharge || 0);
+    const memberTitle = lv >= 4 ? 'Lv.4尊享会员' : `Lv.${Math.max(0, lv)}会员`;
     
     let progress = 0;
     let nextLevelText = '尊享会员 顶级权益生效中';
@@ -90,6 +92,7 @@ Page({
 
     this.setData({
       memberLevel: lv,
+      memberTitle,
       totalRecharge: total,
       progressStyle,
       nextLevelText

@@ -117,7 +117,8 @@
   width: 132rpx;
   height: 132rpx;
   border-radius: 18rpx;
-  background: transparent;
+  background: #eee;
+  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.06);
   display: block;
 }
 .order-footer {

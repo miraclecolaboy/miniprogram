@@ -2,6 +2,7 @@
 const { ensureLogin, isLoginOK, refreshUserToStorage } = require('../../utils/auth');
 const { callUser } = require('../../utils/cloud');
 const { USER: KEY_USER } = require('../../utils/storageKeys');
+const { compressImage, generateThumbnail } = require('../../utils/uploader');
 
 const LEVELS = [
   { level: 1, threshold: 100 },
@@ -44,6 +45,12 @@ function getMemberProgress(memberLevel, totalRecharge) {
     progressStyle: `width: ${progress.toFixed(1)}%;`,
     nextLevelText,
   };
+}
+
+function getMemberTitle(memberLevel) {
+  const lv = Math.max(0, Number(memberLevel || 0));
+  if (lv >= 4) return 'Lv.4尊享会员';
+  return `Lv.${lv}会员`;
 }
 
 Page({
@@ -128,6 +135,7 @@ Page({
       coupons: Array.isArray(user.coupons) ? user.coupons.length : Number(user.coupons || 0),
       memberActive: memberActive,
       memberLevel,
+      memberTitle: getMemberTitle(memberLevel),
       memberTag: getMemberTag(memberLevel, totalRecharge),
       totalRecharge: progressInfo.totalRecharge,
       progressStyle: progressInfo.progressStyle,
@@ -191,6 +199,7 @@ Page({
   },
 
   async onChangeAvatar() {
+    let loadingShown = false;
     try {
       const res = await wx.chooseMedia({
         count: 1,
@@ -200,19 +209,40 @@ Page({
       });
       const tempFilePath = res.tempFiles[0].tempFilePath;
       if (tempFilePath) {
+        wx.showLoading({ title: '处理头像...', mask: true });
+        loadingShown = true;
+        const processedPath = await this._cropAndCompressAvatar(tempFilePath);
         this.setData({
-          profileAvatarTmp: tempFilePath,
-          profileAvatarPreview: tempFilePath,
+          profileAvatarTmp: processedPath || tempFilePath,
+          profileAvatarPreview: processedPath || tempFilePath,
         });
       }
     } catch (error) {
        // ignore cancel
+    } finally {
+      if (loadingShown) wx.hideLoading();
     }
   },
 
   async _cropAndCompressAvatar(filePath) {
-    // 简化版：直接返回路径，如需裁剪逻辑可保留原代码
-    return filePath; 
+    if (!filePath) return '';
+
+    // Make it consistent with product thumbnails: square 300x300 + gentle compression.
+    let outPath = filePath;
+    try {
+      outPath = await generateThumbnail(filePath);
+    } catch (e) {
+      console.error('[mine] generateThumbnail error', e);
+      outPath = filePath;
+    }
+
+    try {
+      outPath = await compressImage(outPath, 200);
+    } catch (e) {
+      console.error('[mine] compressImage error', e);
+    }
+
+    return outPath || filePath;
   },
 
   async onSaveProfile() {

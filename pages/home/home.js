@@ -13,7 +13,8 @@ Page({
 
     // 会员权益数据
     memberStats: {
-      levelName: '普通会员',
+      memberLevel: 0,
+      memberName: '普通会员',
       balance: '0.00',
       points: 0,
       coupons: 0
@@ -69,9 +70,12 @@ Page({
       const res = await callUser('getMe');
       const me = res?.result?.data;
       if (me) {
+        const memberLevelNum = Number(me.memberLevel || 0);
+        const memberLevel = Number.isFinite(memberLevelNum) ? memberLevelNum : 0;
         this.setData({
           memberStats: { 
-            levelName: me.levelName || '普通会员', 
+            memberLevel,
+            memberName: memberLevel >= 4 ? '尊享会员' : '普通会员',
             balance: (typeof me.balance === 'number' ? me.balance : 0).toFixed(2), 
             points: me.points || 0, 
             coupons: Array.isArray(me.coupons) ? me.coupons.length : 0 

@@ -65,14 +65,14 @@
   }
   
   .user-name {
-    font-size: 44rpx;
+    font-size: 38rpx;
     font-weight: 800;
     color: var(--text-main);
     margin-bottom: 12rpx;
   }
   
   .user-sub {
-    font-size: 24rpx;
+    font-size: 22rpx;
     color: var(--text-sub);
     display: flex;
     align-items: center;
@@ -80,8 +80,6 @@
     padding: 6rpx 16rpx;
     border-radius: 999rpx;
   }
-  
-  .user-sub .arrow { margin-left: 6rpx; font-size: 20rpx; margin-top: -2rpx; }
   
   .user-avatar {
     width: 140rpx;
@@ -337,7 +335,7 @@
   }
   
   .menu-icon { width: 36rpx; height: 36rpx; }
-  .menu-text { font-size: 22rpx; color: #333; font-weight: 500; }
+  .menu-text { font-size: 28rpx; color: #333; font-weight: 600; }
   
   /* ===================================
      5. 弹窗样式 (新版 - 黑白极简风格)
@@ -372,7 +370,7 @@
   }
   
   .pop-title {
-    font-size: 34rpx;
+    font-size: 32rpx;
     font-weight: 700;
     color: #1A1A1A;
     text-align: center;
@@ -455,7 +453,7 @@
     background: #F7F8FA;
     border-radius: 24rpx;
     padding: 0 32rpx;
-    font-size: 30rpx;
+    font-size: 28rpx;
     color: #1A1A1A;
     box-sizing: border-box;
     transition: all 0.2s;
