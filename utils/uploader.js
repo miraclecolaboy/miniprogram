@@ -125,8 +125,69 @@ const generateThumbnail = async (filePath) => {
   });
 };
 
+/**
+ * Generate a centered-crop 4:3 thumbnail (300x225) for product images.
+ * Requires WXML to include: <canvas canvas-id="image-cropper" ... />
+ */
+const generateThumbnail43 = async (filePath) => {
+  if (!filePath) return '';
+  const TARGET_W = 300;
+  const TARGET_H = 225; // 4:3
+  const TARGET_RATIO = 4 / 3;
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      const ctx = wx.createCanvasContext('image-cropper');
+      if (!ctx) {
+        return reject(new Error('Canvas context "image-cropper" not found.'));
+      }
+
+      const info = await wx.getImageInfo({ src: filePath });
+      const { width, height } = info;
+      if (!width || !height) return reject(new Error('Invalid image size.'));
+
+      // Center crop to 4:3.
+      let cropW = width;
+      let cropH = height;
+      if (width / height > TARGET_RATIO) {
+        cropH = height;
+        cropW = height * TARGET_RATIO;
+      } else {
+        cropW = width;
+        cropH = width / TARGET_RATIO;
+      }
+
+      const x = (width - cropW) / 2;
+      const y = (height - cropH) / 2;
+
+      ctx.drawImage(filePath, x, y, cropW, cropH, 0, 0, TARGET_W, TARGET_H);
+      ctx.draw(false, () => {
+        setTimeout(async () => {
+          try {
+            const res = await wx.canvasToTempFilePath({
+              canvasId: 'image-cropper',
+              width: TARGET_W,
+              height: TARGET_H,
+              destWidth: TARGET_W,
+              destHeight: TARGET_H,
+              fileType: 'jpg',
+              quality: 0.85
+            });
+            resolve(res.tempFilePath);
+          } catch (err) {
+            reject(err);
+          }
+        }, 100);
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
   uploadAndReplace,
   compressImage,
-  generateThumbnail
+  generateThumbnail,
+  generateThumbnail43
 };

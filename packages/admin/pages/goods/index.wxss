@@ -201,12 +201,12 @@ page {
 
 .img-box {
   width: 160rpx;
-  height: 160rpx;
+  height: 120rpx;
   border-radius: 16rpx;
   overflow: hidden;
   background: #f5f5f5;
 }
-.img { width: 160rpx; height: 160rpx; }
+.img { width: 160rpx; height: 120rpx; }
 .img-actions { display: flex; flex-direction: column; gap: 12rpx; }
 
 .item-left { flex: 1; padding-right: 18rpx; }

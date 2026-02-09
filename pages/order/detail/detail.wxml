@@ -1,103 +1,110 @@
 <view class="detail-page">
   <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
 
-<!-- 商品大图 -->
-<view class="detail-img detail-img-ratio16x9">
-  <swiper
-  wx:if="{{imgList.length > 1}}"
-  class="detail-img detail-img-swiper detail-img-layer"
-  bindchange="onSwiperChange"
-  circular="true"
-  current="{{swiperCurrent}}"
+    <!-- Poster -->
+    <view class="poster-wrapper llj-enter llj-delay-1">
+      <view class="img-container">
+        <swiper
+          wx:if="{{imgList.length > 1}}"
+          class="img-layer img-swiper"
+          bindchange="onSwiperChange"
+          circular="true"
+          current="{{swiperCurrent}}"
+          indicator-dots="{{true}}"
+          indicator-color="rgba(255,255,255,0.45)"
+          indicator-active-color="rgba(255,255,255,0.9)"
+          autoplay="{{swiperAutoplay}}"
+          interval="3000"
+          duration="300"
+        >
+          <block wx:for="{{imgList}}" wx:key="*this">
+            <swiper-item class="img-swiper-item">
+              <image class="img-media" src="{{item}}" mode="aspectFill" lazy-load="true" />
+            </swiper-item>
+          </block>
+        </swiper>
 
-  indicator-dots="{{true}}"
-  indicator-color="rgba(255,255,255,0.45)"
-  indicator-active-color="rgba(255,255,255,0.9)"
+        <image
+          wx:else
+          class="img-layer img-media"
+          src="{{imgList[0] || product.img}}"
+          mode="aspectFill"
+          lazy-load="true"
+        />
+      </view>
+    </view>
 
-  autoplay="{{swiperAutoplay}}"
-  interval="3000"
-  duration="300"
->
-  <block wx:for="{{imgList}}" wx:key="*this">
-    <swiper-item class="detail-img-swiper-item">
-      <image class="detail-img detail-img-media" src="{{item}}" mode="aspectFill" lazy-load="true" />
-    </swiper-item>
-  </block>
-</swiper>
+    <!-- Content Flow -->
+    <view class="content-flow">
+      <view class="header-section llj-enter llj-delay-2">
+        <view class="product-meta-row">
+          <view class="title">{{product.name}}</view>
+          <view class="price-block">
+            <view class="price">
+              <text class="currency">￥</text>
+              <text>{{finalPrice || product.price}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="desc" wx:if="{{product.desc}}">{{product.desc}}</view>
+      </view>
 
-
-  <image
-    wx:else
-    class="detail-img detail-img-layer"
-    src="{{imgList[0] || product.img}}"
-    mode="aspectFill"
-    lazy-load="true"
-  />
-</view>
-
-
-<!-- 商品基础信息 -->
-<view class="detail-info-card">
-  <view class="detail-title">{{product.name}}</view>
-
-  <view class="detail-price-line">
-    <view class="detail-price">￥{{finalPrice || product.price}}</view>
-  </view>
-</view>
-
-<!-- 规格选择（只有有规格的商品才显示） -->
-<view wx:if="{{product.hasSpecs}}" class="detail-spec-card">
-  <block wx:for="{{product.specs}}" wx:key="name">
-    <view class="spec-group">
-      <view class="spec-group-title">{{item.name}}</view>
-
-      <view class="spec-options">
-        <block wx:for="{{item.options}}" wx:for-item="opt" wx:key="label">
-          <view
-            class="spec-option {{ specSelected[item.name] === opt.label ? 'active' : '' }}"
-            data-group="{{item.name}}"
-            data-option="{{opt.label}}"
-            bindtap="selectSpec"
-          >
-            {{opt.label}}
+      <view wx:if="{{product.hasSpecs}}" class="spec-section llj-enter llj-delay-3">
+        <block wx:for="{{product.specs}}" wx:key="name">
+          <view class="spec-group">
+            <view class="section-title">{{item.name}}</view>
+            <view class="spec-list">
+              <block wx:for="{{item.options}}" wx:for-item="opt" wx:key="label">
+                <view
+                  class="spec-pill {{ specSelected[item.name] === opt.label ? 'active' : '' }}"
+                  data-group="{{item.name}}"
+                  data-option="{{opt.label}}"
+                  bindtap="selectSpec"
+                  hover-class="pill-hover"
+                  hover-stay-time="80"
+                >
+                  {{opt.label}}
+                </view>
+              </block>
+            </view>
           </view>
         </block>
       </view>
+
+      <view class="qty-section llj-enter llj-delay-4">
+        <view class="qty-label">数量</view>
+        <view class="qty-wrapper">
+          <view class="qty-btn minus" bindtap="decreaseQty" hover-class="qty-hover" hover-stay-time="80">
+            <view class="icon-bar h"></view>
+          </view>
+          <view class="qty-num">{{quantity}}</view>
+          <view class="qty-btn plus" bindtap="increaseQty" hover-class="qty-hover-dark" hover-stay-time="80">
+            <view class="icon-bar h"></view>
+            <view class="icon-bar v"></view>
+          </view>
+        </view>
+      </view>
+
+      <view class="detail-article llj-enter llj-delay-4">
+        <view class="article-title">商品详情</view>
+        <view class="article-text">{{product.detail || "暂无商品详情。"}}</view>
+      </view>
+
+      <view class="page-scroll-spacer"></view>
     </view>
-  </block>
-</view>
-
-<!-- 数量选择 -->
-<view class="detail-qty-card">
-  <view class="qty-label">数量</view>
-  <view class="qty-control">
-    <view class="qty-btn qty-btn-plain" bindtap="decreaseQty">-</view>
-    <text class="qty-count">{{quantity}}</text>
-    <view class="qty-btn qty-btn-solid" bindtap="increaseQty">+</view>
-  </view>
-</view>
-
-<!-- 商品详情文本 -->
-<view class="detail-desc-card">
-  <view class="detail-desc-title">商品详情</view>
-  <view class="detail-desc-text">
-    {{product.detail || "暂无商品详情。"}}
-  </view>
-</view>
-
-<!-- 底部加入购物车 -->
-  <view class="page-scroll-spacer"></view>
   </scroll-view>
 
-<view class="detail-bottom-bar">
-  <view class="detail-bottom-left">
-    <text class="detail-bottom-label">合计</text>
-    <text class="detail-bottom-price">￥{{totalPrice}}</text>
+  <!-- Floating Action Bar -->
+  <view class="float-bar-container llj-enter llj-delay-4">
+    <view class="float-bar">
+      <view class="total-info">
+        <view class="total-label">合计</view>
+        <view class="total-price">
+          <text class="currency currency-sm">￥</text>
+          <text>{{totalPrice}}</text>
+        </view>
+      </view>
+      <button class="action-btn" bindtap="confirmAdd" hover-class="action-btn--hover" hover-stay-time="80">加入购物车</button>
+    </view>
   </view>
-
-  <button class="detail-add-btn" bindtap="confirmAdd">
-    加入购物车
-  </button>
-</view>
-
 </view>
