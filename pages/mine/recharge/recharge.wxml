@@ -33,7 +33,7 @@
     
     <view class="grid-box">
       <view 
-        class="option-btn {{amount === 100 ? 'active' : ''}}" 
+        class="option-btn {{presetAmount === 100 ? 'active' : ''}}" 
         bindtap="selectAmount" 
         data-amount="{{100}}"
       >
@@ -41,7 +41,15 @@
       </view>
 
       <view 
-        class="option-btn {{amount === 300 ? 'active' : ''}}" 
+        class="option-btn {{presetAmount === 200 ? 'active' : ''}}" 
+        bindtap="selectAmount" 
+        data-amount="{{200}}"
+      >
+        <text class="option-num">200</text>
+      </view>
+
+      <view 
+        class="option-btn {{presetAmount === 300 ? 'active' : ''}}" 
         bindtap="selectAmount" 
         data-amount="{{300}}"
       >
@@ -50,7 +58,7 @@
       </view>
 
       <view 
-        class="option-btn {{amount === 500 ? 'active' : ''}}" 
+        class="option-btn {{presetAmount === 500 ? 'active' : ''}}" 
         bindtap="selectAmount" 
         data-amount="{{500}}"
       >
@@ -58,27 +66,23 @@
       </view>
 
       <view 
-        class="option-btn {{amount === 1000 ? 'active' : ''}}" 
+        class="option-btn {{presetAmount === 1000 ? 'active' : ''}}" 
         bindtap="selectAmount" 
         data-amount="{{1000}}"
       >
         <text class="option-num">1000</text>
       </view>
-    </view>
 
-    <view class="custom-row {{!amount && customAmount ? 'active' : ''}}">
-      <text class="custom-label">自定义金额</text>
-      <view class="input-wrapper">
+      <view class="option-btn custom-option {{!presetAmount && customAmount ? 'active' : ''}}">
         <input
           class="custom-input"
           type="digit"
-          placeholder="请输入" 
+          placeholder="自定义"
           placeholder-class="ph-style"
           bindinput="onCustomInput"
           bindfocus="onCustomFocus"
           value="{{customAmount}}"
         />
-        <text class="custom-unit">元</text>
       </view>
     </view>
   </view>
@@ -91,7 +95,7 @@
       <text class="footer-label">充值金额</text>
       <view class="footer-total-row">
         <text class="footer-symbol">¥</text>
-        <text class="footer-total">{{amount || customAmount || '0'}}</text>
+        <text class="footer-total">{{amount || '0'}}</text>
       </view>
     </view>
     <view class="pay-btn" bindtap="onPay" hover-class="btn-hover">

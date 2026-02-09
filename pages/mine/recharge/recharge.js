@@ -17,6 +17,8 @@ function sceneText(scene) {
 Page({
   data: {
     amount: 0,
+    presetAmount: 0, // 预设金额（用于高亮）
+    customAmount: '', // 自定义输入（字符串，保证 input 可控）
     balanceText: '0.00', // 当前余额展示用
 
     // 流水弹窗
@@ -104,11 +106,21 @@ Page({
 
   // ===== 充值金额选择 =====
   selectAmount(e) {
-    this.setData({ amount: Number(e.currentTarget.dataset.amount) });
+    const amt = Number(e.currentTarget.dataset.amount || 0);
+    this.setData({ presetAmount: amt, amount: amt, customAmount: '' });
   },
 
   onCustomInput(e) {
-    this.setData({ amount: Number(e.detail.value || 0) });
+    const raw = String(e.detail.value || '');
+    const amt = Number(raw || 0);
+    this.setData({ presetAmount: 0, customAmount: raw, amount: amt });
+  },
+
+  onCustomFocus() {
+    if (this.data.presetAmount) {
+      const amt = Number(this.data.customAmount || 0);
+      this.setData({ presetAmount: 0, amount: amt });
+    }
   },
 
   // ===== 发起充值 =====
@@ -186,7 +198,7 @@ Page({
       } else {
         wx.showToast({ title: '充值成功', icon: 'success' });
       }
-      this.setData({ amount: 0 });
+      this.setData({ amount: 0, presetAmount: 0, customAmount: '' });
 
       // ④ 同步最新余额/会员信息（写 storage + 更新 UI）
       await refreshUserToStorage();

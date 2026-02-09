@@ -23,17 +23,17 @@ page {
 
 /* === 核心会员卡区域 === */
 .card-wrap {
-  padding: 40rpx 48rpx 50rpx;
+  padding: 32rpx 32rpx 36rpx;
 }
 
 .member-card {
   /* 黑金渐变背景 */
   background: linear-gradient(145deg, #323232 0%, #1A1A1A 100%);
-  border-radius: 40rpx;
-  aspect-ratio: 1.8 / 1;
+  border-radius: 32rpx;
+  aspect-ratio: 1.95 / 1;
   width: 100%;
   box-sizing: border-box;
-  padding: 56rpx 48rpx;
+  padding: 44rpx 40rpx;
   color: #E3BF87; /* 金色 */
   box-shadow: 0 40rpx 80rpx -20rpx rgba(0,0,0,0.35);
   position: relative;
@@ -64,10 +64,10 @@ page {
 }
 
 .user-info .name {
-  font-size: 40rpx;
+  font-size: 32rpx;
   font-weight: bold;
   color: #fff;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
   letter-spacing: 1rpx;
 }
 
@@ -76,14 +76,14 @@ page {
   display: inline-block;
   background: linear-gradient(90deg, #E3BF87, #C69C6D);
   color: #1A1A1A;
-  font-size: 22rpx;
+  font-size: 20rpx;
   padding: 6rpx 20rpx;
   border-radius: 24rpx;
   font-weight: 700;
 }
 
 .card-logo {
-  font-size: 56rpx;
+  font-size: 44rpx;
   opacity: 0.15;
   font-style: italic;
   font-weight: 900;
@@ -96,9 +96,9 @@ page {
 }
 
 .balance-label {
-  font-size: 26rpx;
+  font-size: 22rpx;
   opacity: 0.9;
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
   display: flex;
   justify-content: space-between;
   font-weight: 500;
@@ -110,7 +110,7 @@ page {
   background: rgba(255,255,255,0.15);
   border-radius: 6rpx;
   overflow: hidden;
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
 }
 
 .progress-fill {
@@ -121,30 +121,30 @@ page {
 }
 
 .next-tip {
-  font-size: 24rpx;
+  font-size: 20rpx;
   color: rgba(255,255,255,0.7);
 }
 
 /* === 升级规则说明 === */
 .section-title {
-  padding: 0 48rpx 30rpx;
-  font-size: 34rpx;
+  padding: 0 32rpx 20rpx;
+  font-size: 30rpx;
   font-weight: 700;
-  color: #333;
+  color: #1D1D1F;
 }
 
 .rules-card {
-  margin: 0 48rpx;
+  margin: 0 32rpx;
   background: #fff;
   border-radius: 32rpx;
-  padding: 40rpx;
+  padding: 32rpx;
   border: 1rpx solid #EFF1F5;
 }
 
 .rule-item {
   display: flex;
-  margin-bottom: 40rpx; /* 间距拉大 */
-  font-size: 28rpx;
+  margin-bottom: 32rpx; /* 间距拉大 */
+  font-size: 26rpx;
   color: #444;
   line-height: 1.5;
   align-items: flex-start; /* 顶部对齐 */
@@ -159,8 +159,8 @@ page {
   height: 12rpx;
   background: #E3BF87;
   border-radius: 50%;
-  margin-top: 14rpx;
-  margin-right: 24rpx;
+  margin-top: 12rpx;
+  margin-right: 20rpx;
   box-shadow: 0 0 10rpx rgba(227, 191, 135, 0.4);
 }
 
@@ -183,7 +183,7 @@ page {
 
 .gift-highlight {
   color: #C69C6D;
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 500;
   margin-top: 8rpx;
 }
@@ -192,8 +192,8 @@ page {
 .gift-row {
   display: flex;
   align-items: center;
-  margin-top: 14rpx;
-  font-size: 26rpx;
+  margin-top: 12rpx;
+  font-size: 24rpx;
   color: #666;
   flex-wrap: wrap; /* 防止小屏换行 */
 }
@@ -202,7 +202,7 @@ page {
 .gift-row .tag {
   background: rgba(198, 156, 109, 0.1);
   color: #C69C6D;
-  font-size: 20rpx;
+  font-size: 18rpx;
   padding: 2rpx 10rpx;
   border-radius: 8rpx;
   margin-right: 12rpx;
@@ -222,14 +222,14 @@ page {
 .gift-row.special .val {
   color: #1A1A1A;
   font-weight: 800;
-  font-size: 28rpx;
+  font-size: 26rpx;
 }
 
 .note-text {
   color: #999;
-  font-size: 24rpx;
-  margin-top: 40rpx;
-  padding-left: 36rpx;
+  font-size: 22rpx;
+  margin-top: 32rpx;
+  padding-left: 32rpx;
 }
 
 /* === 底部按钮 === */
