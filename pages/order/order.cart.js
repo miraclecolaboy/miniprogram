@@ -41,8 +41,8 @@ module.exports = {
       checkoutDisabled = true;
     }
 
-    const updatedProducts = (this.data.filteredProducts || []).map(p =>
-      this._productById[p.id] ? this._mapProductToView(this._productById[p.id]) : p
+    const updatedProducts = (this.data.filteredProducts || []).map((p, idx) =>
+      this._productById[p.id] ? this._mapProductToView(this._productById[p.id], idx, p) : p
     );
 
     this.setData({
@@ -66,7 +66,7 @@ module.exports = {
     this._render();
   },
 
-  _mapProductToView(product) {
+  _mapProductToView(product, indexInList, prevView) {
     if (!product) return null;
 
     let count = 0;
@@ -80,6 +80,10 @@ module.exports = {
       count = cartItem ? cartItem.count : 0;
     }
 
+    const seed = Number(this.data.productAnimSeed) || 0;
+    const idx = Number.isFinite(Number(indexInList)) ? Number(indexInList) : 0;
+    const clamped = Math.min(Math.max(0, idx), 7);
+
     return {
       id: product.id,
       name: product.name,
@@ -91,6 +95,8 @@ module.exports = {
       hasSpecs: product.hasSpecs,
       modes: product.modes,
       count,
+      animKey: (prevView && prevView.animKey) ? prevView.animKey : `${product.id}__${seed}`,
+      animDelay: (prevView && prevView.animDelay) ? prevView.animDelay : `${(clamped * 0.04).toFixed(2)}s`,
     };
   },
 

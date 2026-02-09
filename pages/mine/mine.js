@@ -58,6 +58,7 @@ Page({
     userInfo: null,
     isLogin: false,
     refresherTriggered: false,
+    showUI: true,
     
     // UI状态
     memberCardExpanded: false, // 会员卡是否展开

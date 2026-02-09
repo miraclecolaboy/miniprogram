@@ -1,12 +1,12 @@
 <view class="page">
-  <view class="tab-bar">
+  <view class="tab-bar llj-enter llj-delay-1">
     <view class="tab-item {{activeTab==='doing'?'active':''}}" data-tab="doing" bindtap="switchTab">进行中</view>
     <view class="tab-item {{activeTab==='done'?'active':''}}" data-tab="done" bindtap="switchTab">已完成</view>
     <view class="tab-item {{activeTab==='refund'?'active':''}}" data-tab="refund" bindtap="switchTab">退款/售后</view>
   </view>
 
   <block wx:for="{{['doing', 'done', 'refund']}}" wx:key="item" wx:for-item="tab">
-    <scroll-view class="order-list" scroll-y="true" enhanced="true" bindscrolltolower="loadMore" lower-threshold="150" show-scrollbar="{{false}}" wx:if="{{activeTab === tab}}">
+    <scroll-view class="order-list llj-enter llj-delay-2" scroll-y="true" enhanced="true" bindscrolltolower="loadMore" lower-threshold="150" show-scrollbar="{{false}}" wx:if="{{activeTab === tab}}">
       <block wx:if="{{orders[tab] && orders[tab].length > 0}}">
         <view class="order-card" wx:for="{{orders[tab]}}" wx:key="_id" wx:for-item="order" bindtap="goDetail" data-id="{{order._id}}">
           <view class="order-header">
@@ -41,7 +41,6 @@
       <view class="empty-tip" wx:else>
         <text wx:if="{{!loading[tab]}}">暂无相关订单</text>
       </view>
-      <view class="loading-tip" wx:if="{{loading[tab]}}">加载中...</view>
       <view class="loading-tip" wx:if="{{!hasMore[tab] && orders[tab] && orders[tab].length > 0}}">没有更多了</view>
     </scroll-view>
   </block>

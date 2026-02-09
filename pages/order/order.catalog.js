@@ -8,6 +8,7 @@ const PAGE_SIZE = 20;
 
 module.exports = {
   async loadCatalog() {
+    this.setData({ catalogLoading: true });
     try {
       const [catRes, prodRes] = await Promise.all([
         callUser('listCategories'),
@@ -49,6 +50,8 @@ module.exports = {
         selectedCategoryName: '加载异常',
         filteredProducts: [],
       });
+    } finally {
+      this.setData({ catalogLoading: false });
     }
   },
 
@@ -66,7 +69,8 @@ module.exports = {
     const id = e.currentTarget.dataset.id;
     if (id !== this.data.selectedCategoryId) {
       const name = (this.data.categories || []).find(c => c.id === id)?.name || '';
-      this.setData({ selectedCategoryId: id, selectedCategoryName: name }, () => this._filterAndRenderProducts());
+      const nextSeed = (Number(this.data.productAnimSeed) || 0) + 1;
+      this.setData({ selectedCategoryId: id, selectedCategoryName: name, productAnimSeed: nextSeed }, () => this._filterAndRenderProducts());
     }
   },
 
@@ -80,7 +84,7 @@ module.exports = {
 
     const initialView = this._filteredIds
       .slice(0, PAGE_SIZE)
-      .map((id) => this._mapProductToView(this._productById[id]));
+      .map((id, idx) => this._mapProductToView(this._productById[id], idx));
 
     this.setData({ filteredProducts: initialView });
   },
@@ -91,7 +95,7 @@ module.exports = {
 
     const nextItems = this._filteredIds
       .slice(currentCount, currentCount + PAGE_SIZE)
-      .map((id) => this._mapProductToView(this._productById[id]));
+      .map((id, idx) => this._mapProductToView(this._productById[id], currentCount + idx));
 
     this.setData({ filteredProducts: [...this.data.filteredProducts, ...nextItems] });
   },

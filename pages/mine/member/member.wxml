@@ -1,6 +1,6 @@
 <view class="page-container">
   <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
-  <view class="card-wrap">
+  <view class="card-wrap llj-enter llj-delay-1">
     <view class="member-card">
       <view class="card-texture"></view>
       
@@ -27,8 +27,8 @@
     </view>
   </view>
 
-  <view class="section-title">会员等级规则</view>
-  <view class="rules-card">
+  <view class="section-title llj-enter llj-delay-2">会员等级规则</view>
+  <view class="rules-card llj-enter llj-delay-3">
     
     <view class="rule-item">
       <view class="rule-dot"></view>
@@ -79,7 +79,7 @@
   <view class="page-scroll-spacer"></view>
   </scroll-view>
 
-  <view class="fixed-footer">
+  <view class="fixed-footer llj-enter llj-delay-4">
     <view class="primary-btn" bindtap="onTapRecharge">
       立即充值升级
     </view>

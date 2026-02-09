@@ -4,7 +4,7 @@
 <view class="page-header">
 
   <!-- 顶部信息区（黑白极简） -->
-  <view class="top-card">
+  <view class="top-card llj-enter llj-delay-1">
 
     <view class="top-card-main">
       <view class="top-card-left">
@@ -44,7 +44,7 @@
 </view>
 
 <!-- 主体点单区域 -->
-<view class="page-body">
+<view class="page-body llj-enter llj-delay-2">
   <view class="order-container">
 
     <!-- 左侧分类栏 -->
@@ -63,69 +63,87 @@
 
     <!-- 右侧商品列表 -->
     <scroll-view class="products" scroll-y bindscrolltolower="onProductsReachBottom" lower-threshold="200" enhanced="true" show-scrollbar="{{false}}">
-      <view class="category-title" wx:if="{{selectedCategoryName}}">{{selectedCategoryName}}</view>
-      <block wx:for="{{filteredProducts}}" wx:key="id">
-        <view
-          class="product-card"
-          data-id="{{item.id}}"
-          bindtap="goDetail"
-          hover-class="product-hover"
-        >
-          <image class="product-img" src="{{item.img}}" mode="aspectFill" lazy-load="true" />
-
-            <view class="product-content">
-              <view class="product-title">{{item.name}}</view>
-              <view class="product-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
-
-              <view class="product-bottom">
-                <view class="product-price"><text class="currency">￥</text>{{item.priceWithSpec || item.price}}</view>
-
-              <!-- 右侧数量 / 选规格 -->
-              <view class="product-qty">
-
-                <!-- 有规格：显示“选规格”按钮 -->
-                <view wx:if="{{item.hasSpecs}}" class="qty-control">
-                  <view
-                    class="spec-choose-btn"
-                    catchtap="openSpecPopup"
-                    data-id="{{item.id}}"
-                    hover-class="btn-hover"
-                    hover-stop-propagation="true"
-                  >
-                    选择
-                  </view>
-                </view>
-
-                <!-- 无规格：显示 + - 数量 -->
-                <view wx:else class="qty-control">
-                  <view wx:if="{{item.count > 0}}" class="qty-control">
-                    <view class="qty-btn qty-btn-plain" catchtap="decreaseCount" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
-                      <view class="qty-icon qty-icon-minus">
-                        <view class="qty-bar h"></view>
-                      </view>
-                    </view>
-                    <text class="qty-count">{{item.count}}</text>
-                    <view class="qty-btn qty-btn-solid" catchtap="addToCart" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
-                      <view class="qty-icon qty-icon-plus">
-                        <view class="qty-bar h"></view>
-                        <view class="qty-bar v"></view>
-                      </view>
-                    </view>
-                  </view>
-                  <view wx:else class="qty-control">
-                    <view class="qty-btn qty-btn-solid" catchtap="addToCart" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
-                      <view class="qty-icon qty-icon-plus">
-                        <view class="qty-bar h"></view>
-                        <view class="qty-bar v"></view>
-                      </view>
-                    </view>
-                  </view>
-                </view>
-
-              </view>
+      <view wx:if="{{catalogLoading}}" class="sk-list">
+        <view class="sk-title llj-shimmer"></view>
+        <view class="sk-card" wx:for="{{skeletonList}}" wx:key="*this">
+          <view class="sk-img llj-shimmer"></view>
+          <view class="sk-content">
+            <view class="sk-line sk-line-lg llj-shimmer"></view>
+            <view class="sk-line sk-line-sm llj-shimmer"></view>
+            <view class="sk-row">
+              <view class="sk-price llj-shimmer"></view>
+              <view class="sk-btn llj-shimmer"></view>
             </view>
           </view>
         </view>
+      </view>
+
+      <block wx:else>
+        <view class="category-title" wx:if="{{selectedCategoryName}}">{{selectedCategoryName}}</view>
+        <block wx:for="{{filteredProducts}}" wx:key="animKey">
+          <view
+            class="product-card llj-enter"
+            style="animation-delay: {{item.animDelay}};"
+            data-id="{{item.id}}"
+            bindtap="goDetail"
+            hover-class="product-hover"
+          >
+            <image class="product-img" src="{{item.img}}" mode="aspectFill" lazy-load="true" />
+
+              <view class="product-content">
+                <view class="product-title">{{item.name}}</view>
+                <view class="product-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
+
+                <view class="product-bottom">
+                  <view class="product-price"><text class="currency">￥</text>{{item.priceWithSpec || item.price}}</view>
+
+                <!-- 右侧数量 / 选规格 -->
+                <view class="product-qty">
+
+                  <!-- 有规格：显示“选规格”按钮 -->
+                  <view wx:if="{{item.hasSpecs}}" class="qty-control">
+                    <view
+                      class="spec-choose-btn"
+                      catchtap="openSpecPopup"
+                      data-id="{{item.id}}"
+                      hover-class="btn-hover"
+                      hover-stop-propagation="true"
+                    >
+                      选择
+                    </view>
+                  </view>
+
+                  <!-- 无规格：显示 + - 数量 -->
+                  <view wx:else class="qty-control">
+                    <view wx:if="{{item.count > 0}}" class="qty-control">
+                      <view class="qty-btn qty-btn-plain" catchtap="decreaseCount" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
+                        <view class="qty-icon qty-icon-minus">
+                          <view class="qty-bar h"></view>
+                        </view>
+                      </view>
+                      <text class="qty-count">{{item.count}}</text>
+                      <view class="qty-btn qty-btn-solid" catchtap="addToCart" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
+                        <view class="qty-icon qty-icon-plus">
+                          <view class="qty-bar h"></view>
+                          <view class="qty-bar v"></view>
+                        </view>
+                      </view>
+                    </view>
+                    <view wx:else class="qty-control">
+                      <view class="qty-btn qty-btn-solid" catchtap="addToCart" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
+                        <view class="qty-icon qty-icon-plus">
+                          <view class="qty-bar h"></view>
+                          <view class="qty-bar v"></view>
+                        </view>
+                      </view>
+                    </view>
+                  </view>
+
+                </view>
+              </view>
+            </view>
+          </view>
+        </block>
       </block>
     </scroll-view>
 
@@ -263,7 +281,7 @@
 </view>
 
 <!-- 底部悬浮结算条 -->
-<view class="cart-float">
+<view class="cart-float llj-enter llj-delay-3">
   <view class="cart-bar">
     <view class="cart-bar-left" bindtap="showCartDetail" hover-class="hover-opacity">
       <view class="cart-bar-text">

@@ -33,7 +33,7 @@ page {
   aspect-ratio: 1.95 / 1;
   width: 100%;
   box-sizing: border-box;
-  padding: 44rpx 40rpx;
+  padding: 40rpx 36rpx;
   color: #E3BF87; /* 金色 */
   box-shadow: 0 40rpx 80rpx -20rpx rgba(0,0,0,0.35);
   position: relative;
@@ -64,7 +64,7 @@ page {
 }
 
 .user-info .name {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: bold;
   color: #fff;
   margin-bottom: 12rpx;
@@ -128,7 +128,7 @@ page {
 /* === 升级规则说明 === */
 .section-title {
   padding: 0 32rpx 20rpx;
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 700;
   color: #1D1D1F;
 }
@@ -144,7 +144,7 @@ page {
 .rule-item {
   display: flex;
   margin-bottom: 32rpx; /* 间距拉大 */
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #444;
   line-height: 1.5;
   align-items: flex-start; /* 顶部对齐 */
@@ -183,7 +183,7 @@ page {
 
 .gift-highlight {
   color: #C69C6D;
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 500;
   margin-top: 8rpx;
 }
@@ -193,7 +193,7 @@ page {
   display: flex;
   align-items: center;
   margin-top: 12rpx;
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #666;
   flex-wrap: wrap; /* 防止小屏换行 */
 }
@@ -222,12 +222,12 @@ page {
 .gift-row.special .val {
   color: #1A1A1A;
   font-weight: 800;
-  font-size: 26rpx;
+  font-size: 24rpx;
 }
 
 .note-text {
   color: #999;
-  font-size: 22rpx;
+  font-size: 20rpx;
   margin-top: 32rpx;
   padding-left: 32rpx;
 }

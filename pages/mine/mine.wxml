@@ -1,6 +1,7 @@
 <view class="page">
   <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}" refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" bindrefresherrefresh="onRefresherRefresh">
-  <view class="user-header center" bindtap="onTapUserCard">
+  <view wx:if="{{showUI}}">
+  <view class="user-header center llj-enter llj-delay-1" bindtap="onTapUserCard">
     <view class="avatar-wrap">
       <image 
         class="user-avatar" 
@@ -16,7 +17,7 @@
     </view>
   </view>
 
-  <view class="vip-card-wrap">
+  <view class="vip-card-wrap llj-enter llj-delay-2">
     <view class="vip-card {{memberCardExpanded ? 'expanded' : ''}}" bindtap="toggleMemberCard">
       <view class="vip-texture"></view>
       
@@ -48,7 +49,7 @@
     </view>
   </view>
 
-  <view class="dashboard-section {{memberCardExpanded ? 'card-expanded' : ''}}">
+  <view class="dashboard-section {{memberCardExpanded ? 'card-expanded' : ''}} llj-enter llj-delay-3">
     <view class="data-board">
       <view class="data-item" bindtap="onRecharge" hover-class="item-hover">
         <view class="data-num">{{userInfo.balance || '0.00'}}</view>
@@ -67,7 +68,7 @@
     </view>
   </view>
 
-  <view class="menu-section">
+  <view class="menu-section llj-enter llj-delay-4">
     <view class="menu-list">
       <view class="menu-row" bindtap="onTapOrder" hover-class="item-hover-scale">
         <view class="menu-left">
@@ -106,6 +107,7 @@
   </view>
 
   <view class="page-scroll-spacer"></view>
+  </view>
   </scroll-view>
 
   <view wx:if="{{showProfilePopup}}" class="spec-mask" bindtap="closeProfilePopup" catchtouchmove="noop"></view>

@@ -103,8 +103,8 @@
   .vip-card {
     background: linear-gradient(145deg, #323232 0%, #1A1A1A 100%);
     border-radius: 32rpx;
-    height: 236rpx; /* 初始高度 */
-    padding: 40rpx 36rpx;
+    height: 228rpx; /* 初始高度 */
+    padding: 38rpx 34rpx;
     box-sizing: border-box;
     position: relative;
     overflow: hidden;

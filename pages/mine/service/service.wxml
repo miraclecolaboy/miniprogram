@@ -1,6 +1,6 @@
 <view class="page">
   <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}" refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" bindrefresherrefresh="onRefresherRefresh">
-  <view class="header-area">
+  <view class="header-area llj-enter llj-delay-1">
     <view class="title-group">
       <view class="title-en">SERVICE CENTER</view>
       <view class="title-cn">服务中心</view>
@@ -8,7 +8,7 @@
     <view class="header-glow"></view>
   </view>
 
-  <view class="dashboard-grid">
+  <view class="dashboard-grid llj-enter llj-delay-2">
     
     <view class="grid-col-left card-hover" bindtap="previewQr">
       <view class="card-inner wx-bg-gradient">
@@ -80,7 +80,7 @@
     </view>
   </view>
 
-  <view class="faq-section">
+  <view class="faq-section llj-enter llj-delay-3">
     <view class="section-header">常见问题 FAQ</view>
     
     <view class="faq-card">

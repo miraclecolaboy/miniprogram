@@ -107,7 +107,7 @@ page {
 
 .balance-num {
   font-family: 'DIN Alternate', sans-serif;
-  font-size: 72rpx; font-weight: 800; color: var(--text-main);
+  font-size: 62rpx; font-weight: 800; color: var(--text-main);
   letter-spacing: -2rpx; line-height: 1;
   background: linear-gradient(180deg, #1D1D1F 20%, #4A4A4A 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
@@ -130,7 +130,7 @@ page {
 }
 
 .section-title {
-  font-size: 30rpx; font-weight: 700; color: var(--text-main);
+  font-size: 28rpx; font-weight: 700; color: var(--text-main);
   margin-right: 16rpx;
 }
 

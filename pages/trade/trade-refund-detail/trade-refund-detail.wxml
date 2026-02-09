@@ -1,7 +1,7 @@
 <view class="page" wx:if="{{order}}">
   <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
 
-  <view class="header-area">
+  <view class="header-area llj-enter llj-delay-1">
     <view class="status-big-title">
       <text>{{order.refund.statusText || '售后处理中'}}</text>
     </view>
@@ -31,7 +31,7 @@
     </view>
   </view>
 
-  <view class="main-content">
+  <view class="main-content llj-enter llj-delay-2">
     
     <view class="card goods-card">
       <view class="goods-list">
@@ -122,7 +122,7 @@
         
         <view class="info-row">
           <text class="info-label">支付方式</text>
-          <text class="info-val">微信支付</text>
+          <text class="info-val">{{order.payMethodText || '微信支付'}}</text>
         </view>
 
         <view class="info-row" wx:if="{{order.expressNoText}}">
@@ -142,7 +142,7 @@
   <view class="footer-spacer"></view>
   </scroll-view>
 
-  <view class="footer-bar safe-area-bottom">
+  <view class="footer-bar safe-area-bottom llj-enter llj-delay-3">
     <button class="btn btn-outline" bindtap="contactShop">联系客服</button>
     <button class="btn btn-black" disabled="{{order.refund.actionDisabled}}" bindtap="handleRefundAction">
       {{order.refund.actionText || '处理售后'}}
