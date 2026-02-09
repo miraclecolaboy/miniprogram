@@ -4,6 +4,8 @@
 const { toNum } = require('../../utils/common');
 const { getCartKey } = require('./order.helpers');
 
+const MAX_ITEM_QTY = 99;
+
 module.exports = {
   _render() {
     const { mode, minOrderMap } = this.data;
@@ -67,18 +69,15 @@ module.exports = {
   _mapProductToView(product) {
     if (!product) return null;
 
-    let stock = 0;
     let count = 0;
 
     if (product.hasSpecs) {
-      stock = toNum(product.stock, 0);
       for (const key of this._cart.keys()) {
         if (key.startsWith(product.id + '::')) count += (this._cart.get(key).count || 0);
       }
     } else {
       const cartItem = this._cart.get(product.id);
       count = cartItem ? cartItem.count : 0;
-      stock = toNum(product.stock, 0);
     }
 
     return {
@@ -91,7 +90,6 @@ module.exports = {
       priceWithSpec: product.price,
       hasSpecs: product.hasSpecs,
       modes: product.modes,
-      stock,
       count,
     };
   },
@@ -106,11 +104,10 @@ module.exports = {
       return;
     }
 
-    const stock = toNum(product.stock, 0);
     const cartItem = this._cart.get(id) || { ...product, count: 0, createdAt: Date.now() };
     const nextCount = cartItem.count + 1;
-    if (nextCount > stock) {
-      wx.showToast({ title: '库存不足', icon: 'none' });
+    if (nextCount > MAX_ITEM_QTY) {
+      wx.showToast({ title: `最多购买${MAX_ITEM_QTY}件`, icon: 'none' });
       return;
     }
 
@@ -129,17 +126,8 @@ module.exports = {
     const cartItem = this._cart.get(key);
     if (!cartItem) return;
 
-    let stock = 0;
-    if (cartItem.hasSpecs) {
-      const skuInfo = this._skuStockMap.get(cartItem.skuKey);
-      stock = skuInfo ? skuInfo.stock : 0;
-    } else {
-      const product = this._productById[cartItem.id];
-      stock = product ? toNum(product.stock, 0) : 0;
-    }
-
-    if (cartItem.count + 1 > stock) {
-      wx.showToast({ title: '库存不足', icon: 'none' });
+    if (cartItem.count + 1 > MAX_ITEM_QTY) {
+      wx.showToast({ title: `最多购买${MAX_ITEM_QTY}件`, icon: 'none' });
       return;
     }
 
@@ -177,4 +165,3 @@ module.exports = {
     });
   },
 };
-

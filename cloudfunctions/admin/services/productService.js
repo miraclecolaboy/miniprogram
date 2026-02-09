@@ -32,27 +32,28 @@ function normalizeProductInput(data) {
   
   const hasSpecs = !!input.hasSpecs;
   let price = 0;
-  let stock = 0;
   let skuList = [];
 
   if (hasSpecs) {
     skuList = Array.isArray(input.skuList) ? input.skuList : [];
     if (skuList.length === 0) throw new Error('规格商品必须至少有一个SKU');
     
+    skuList = skuList.map((sku) => ({
+      skuKey: safeStr(sku.skuKey),
+      specText: safeStr(sku.specText),
+      price: toNum(sku.price, NaN),
+    }));
+
     skuList.forEach(sku => {
+      if (!sku.skuKey) throw new Error('SKU 缺少 skuKey');
       if (toNum(sku.price, -1) < 0) throw new Error(`SKU "${sku.specText}" 的价格不合法`);
-      const skuStock = parseInt(sku.stock, 10);
-      if (!Number.isFinite(skuStock) || skuStock < 0) throw new Error(`SKU "${sku.specText}" 的库存不合法`);
     });
 
-    stock = skuList.reduce((sum, sku) => sum + toInt(sku.stock, 0), 0);
     const minPrice = Math.min(...skuList.map(sku => toNum(sku.price, Infinity)));
     price = isFinite(minPrice) ? minPrice : 0;
   } else {
     price = toNum(input.price, NaN);
-    stock = toInt(input.stock, NaN);
     if (!Number.isFinite(price) || price < 0) throw new Error('价格不合法');
-    if (!Number.isFinite(stock) || stock < 0) throw new Error('库存不合法');
   }
 
   return {
@@ -67,7 +68,6 @@ function normalizeProductInput(data) {
     detail: safeStr(input.detail),
     hasSpecs,
     price: Number(price.toFixed(2)),
-    stock,
     specs: hasSpecs ? sanitizeSpecs(input.specs) : [],
     skuList: hasSpecs ? skuList : _.remove()
   };
@@ -130,7 +130,7 @@ async function listProducts(event) {
         as: 'category'
       })
       .project({
-        _id: 1, name: 1, price: 1, stock: 1, status: 1, modes: 1, hasSpecs: 1,
+        _id: 1, name: 1, price: 1, status: 1, modes: 1, hasSpecs: 1,
         thumbFileID: 1, // [新增]
         categoryName: $.arrayElemAt([$.ifNull(['$category.name', '']), 0])
       })
@@ -237,6 +237,8 @@ async function updateProduct(id, data, deletedFileIDs, username) {
   await db.collection(COL_PRODUCTS).doc(id).update({
     data: {
       ...input,
+      // Inventory is no longer used; remove legacy fields to avoid confusion.
+      stock: _.remove(),
       updatedAt: now(),
       updatedBy: username,
     }
@@ -283,13 +285,22 @@ async function updateSkus(productId, skus, username) {
   if (!productId) return { ok: false, message: '缺少商品ID' };
   const skuList = Array.isArray(skus) ? skus : [];
   if (skuList.length === 0) return { ok: false, message: 'SKU列表不能为空' };
-  const stock = skuList.reduce((sum, sku) => sum + (parseInt(sku.stock, 10) || 0), 0);
-  const minPrice = Math.min(...skuList.map(sku => toNum(sku.price, Infinity)));
+  const normalized = skuList.map((sku) => ({
+    skuKey: safeStr(sku.skuKey),
+    specText: safeStr(sku.specText),
+    price: toNum(sku.price, NaN),
+  }));
+  normalized.forEach((sku) => {
+    if (!sku.skuKey) throw new Error('SKU 缺少 skuKey');
+    if (!Number.isFinite(sku.price) || sku.price < 0) throw new Error(`SKU "${sku.specText}" 的价格不合法`);
+  });
+
+  const minPrice = Math.min(...normalized.map(sku => toNum(sku.price, Infinity)));
   const price = isFinite(minPrice) ? minPrice : 0;
   await db.collection(COL_PRODUCTS).doc(productId).update({
     data: {
-      skuList,
-      stock,
+      skuList: normalized,
+      stock: _.remove(),
       price: Number(price.toFixed(2)),
       updatedAt: now(),
       updatedBy: username

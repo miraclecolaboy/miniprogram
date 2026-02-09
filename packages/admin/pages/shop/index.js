@@ -52,7 +52,7 @@ Page(Object.assign({
     cloudPrintChanged: false,
 
     // 礼品
-    giftForm: { name: '', points: '', stock: '', desc: '', thumbFileId: '', thumbPreview: '' },
+    giftForm: { name: '', points: '', desc: '', thumbFileId: '', thumbPreview: '' },
     gifts: [],
     editingGiftId: '',
     editingGiftName: '',

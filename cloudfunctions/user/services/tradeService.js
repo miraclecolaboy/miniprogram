@@ -99,7 +99,6 @@ async function createOrder(event, openid) {
 
       let goodsTotal = 0;
       const orderItems = [];
-      const stockUpdates = new Map();
 
       for (const item of items) {
         const product = productMap.get(item.productId);
@@ -109,23 +108,12 @@ async function createOrder(event, openid) {
         if (item.skuId) {
           const sku = skuMap.get(item.skuId);
           if (!sku) throw { error: 'sku_unavailable', message: `商品「${product.name}」的规格已失效` };
-          if (sku.stock < item.count) throw { error: 'stock_insufficient', message: `「${product.name} - ${sku.specText}」库存不足` };
           price = sku.price;
           specText = sku.specText;
 
-          const update = stockUpdates.get(product._id) || { totalDecrement: 0, skuDecrements: {} };
-          update.totalDecrement += item.count;
-          update.skuDecrements[item.skuId] = (update.skuDecrements[item.skuId] || 0) + item.count;
-          stockUpdates.set(product._id, update);
-
         } else {
           if (product.hasSpecs) throw { error: 'missing_sku', message: `「${product.name}」是多规格商品` };
-          if (product.stock < item.count) throw { error: 'stock_insufficient', message: `「${product.name}」库存不足` };
           price = product.price;
-
-          const update = stockUpdates.get(product._id) || { totalDecrement: 0 };
-          update.totalDecrement += item.count;
-          stockUpdates.set(product._id, update);
         }
 
         goodsTotal += price * item.count;
@@ -163,28 +151,6 @@ async function createOrder(event, openid) {
       finalPayAmount = Math.max(0, goodsTotal + deliveryFee - vipDiscount - couponDiscount);
       const paidImmediately = payMethod === 'balance' || finalPayAmount <= 0;
       const paymentMethodFinal = finalPayAmount <= 0 ? 'free' : payMethod;
-
-      for (const [productId, update] of stockUpdates.entries()) {
-        const productToUpdate = productMap.get(productId);
-        if (!productToUpdate) continue;
-        
-        const newSkuList = productToUpdate.hasSpecs ? (productToUpdate.skuList || []).map(sku => {
-          const decrement = update.skuDecrements[sku.skuKey];
-          if (decrement) {
-            return { ...sku, stock: sku.stock - decrement };
-          }
-          return sku;
-        }) : [];
-
-        const updateData = {
-          stock: _.inc(-update.totalDecrement)
-        };
-        if (productToUpdate.hasSpecs) {
-          updateData.skuList = newSkuList;
-        }
-
-        await tx.collection(COL_PRODUCTS).doc(productId).update({ data: updateData });
-      }
 
       if (payMethod === 'balance') {
         if (user.balance < finalPayAmount) throw { error: 'insufficient_balance', message: '余额不足' };

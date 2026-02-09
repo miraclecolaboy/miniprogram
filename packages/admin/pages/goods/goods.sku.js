@@ -4,7 +4,7 @@ const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
 const { toNum } = require('../../../../utils/common');
 const { buildSkuKey, buildSpecText } = require('../../../../utils/sku');
-const { toInt, buildSkuCombos } = require('./goods.helpers');
+const { buildSkuCombos } = require('./goods.helpers');
 
 module.exports = {
   openSkuModal() {
@@ -24,7 +24,6 @@ module.exports = {
         skuKey,
         specText: buildSpecText(this.data.form.specs, sel),
         price: old ? String(old.price) : '',
-        stock: old ? String(old.stock) : '',
       };
     });
 
@@ -39,7 +38,8 @@ module.exports = {
 
   applySkuBulk(e) {
     const field = e.currentTarget.dataset.field.toLowerCase();
-    const value = this.data[`skuBulk${field === 'price' ? 'Price' : 'Stock'}`];
+    if (field !== 'price') return;
+    const value = this.data.skuBulkPrice;
     if (value === '') return;
 
     const updates = {};
@@ -50,26 +50,23 @@ module.exports = {
   },
 
   onSkuPriceInput(e) { this.setData({ [`skuItems[${e.currentTarget.dataset.index}].price`]: e.detail.value }); },
-  onSkuStockInput(e) { this.setData({ [`skuItems[${e.currentTarget.dataset.index}].stock`]: e.detail.value }); },
 
-  async saveSkuStocks() {
+  async saveSkus() {
     const skus = [];
     for (const it of this.data.skuItems) {
       const price = toNum(it.price, -1);
-      const stock = toInt(it.stock, -1);
-      if (price < 0 || stock < 0) {
-        return wx.showToast({ title: `“${it.specText}”的价格或库存不合法`, icon: 'none' });
+      if (price < 0) {
+        return wx.showToast({ title: `“${it.specText}”的价格不合法`, icon: 'none' });
       }
-      skus.push({ skuKey: it.skuKey, specText: it.specText, price, stock });
+      skus.push({ skuKey: it.skuKey, specText: it.specText, price });
     }
 
     const editingId = this.data.editingId;
     const isNewTemp = typeof editingId === 'string' && editingId.startsWith('temp_');
     if (isNewTemp) {
-      const stock = skus.reduce((sum, sku) => sum + toInt(sku.stock, 0), 0);
       const minPrice = Math.min(...skus.map((sku) => toNum(sku.price, Infinity)));
       const price = isFinite(minPrice) ? minPrice : 0;
-      this.setData({ 'form.skuList': skus, 'form.price': Number(price.toFixed(2)), 'form.stock': stock });
+      this.setData({ 'form.skuList': skus, 'form.price': Number(price.toFixed(2)) });
       wx.showToast({ title: 'SKU已暂存', icon: 'none' });
       this.closeSkuModal();
       return;
@@ -82,7 +79,6 @@ module.exports = {
       const p = res.data || {};
       this.setData({
         'form.price': p.price,
-        'form.stock': p.stock,
         'form.skuList': Array.isArray(p.skuList) ? p.skuList : [],
       });
       wx.showToast({ title: 'SKU已保存', icon: 'success' });
@@ -95,4 +91,3 @@ module.exports = {
     }
   },
 };
-

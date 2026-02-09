@@ -19,18 +19,17 @@ module.exports = {
         name: c.name,
       }));
 
-      // 重建 SKU 库存表，避免旧数据残留
-      if (this._skuStockMap && typeof this._skuStockMap.clear === 'function') this._skuStockMap.clear();
-      else this._skuStockMap = new Map();
+      // 重建 SKU 价格表，避免旧数据残留
+      if (this._skuPriceMap && typeof this._skuPriceMap.clear === 'function') this._skuPriceMap.clear();
+      else this._skuPriceMap = new Map();
 
       const rawProducts = (prodRes?.result?.data || []);
       this._products = rawProducts.map((p) => {
-        const stock = this._processSkuData(p);
+        this._indexSkuPrices(p);
         return {
           ...p,
           id: p._id || p.id,
           modes: (Array.isArray(p.modes) && p.modes.length) ? p.modes : ['ziti', 'waimai', 'kuaidi'],
-          stock,
         };
       });
 
@@ -53,25 +52,14 @@ module.exports = {
     }
   },
 
-  _processSkuData(product) {
-    if (!product?.hasSpecs || !Array.isArray(product.skuList) || product.skuList.length === 0) {
-      return toNum(product?.stock, 0);
-    }
+  _indexSkuPrices(product) {
+    if (!product?.hasSpecs || !Array.isArray(product.skuList) || product.skuList.length === 0) return;
 
-    let totalStock = 0;
     product.skuList.forEach((sku) => {
       const key = sku.skuKey || sku._id;
       if (!key) return;
-
-      const stock = toNum(sku.stock, 0);
-      this._skuStockMap.set(key, {
-        stock,
-        price: toNum(sku.price, 0),
-      });
-      totalStock += stock;
+      this._skuPriceMap.set(key, toNum(sku.price, 0));
     });
-
-    return totalStock;
   },
 
   selectCategory(e) {

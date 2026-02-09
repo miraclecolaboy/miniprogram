@@ -22,7 +22,6 @@ module.exports = {
         name: '',
         categoryId: cat?._id || '',
         price: '',
-        stock: '',
         sort: '0',
         onShelf: true,
         modes: ['ziti', 'waimai', 'kuaidi'],
@@ -74,7 +73,6 @@ module.exports = {
           name: p.name || '',
           categoryId: p.categoryId || '',
           price: p.price,
-          stock: p.stock,
           sort: String(p.sort ?? '0'),
           onShelf: p.status === 1,
           modes,
@@ -304,7 +302,6 @@ module.exports = {
           skuList: Array.isArray(f.skuList) ? f.skuList : [],
         } : {
           price: toNum(f.price, 0),
-          stock: toInt(f.stock, 0),
         }),
       };
 

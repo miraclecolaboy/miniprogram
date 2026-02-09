@@ -39,7 +39,6 @@ async function listGifts() {
         desc: safeStr(g.desc),
         thumbFileId: safeStr(g.thumbFileId),
         enabled: g.enabled !== false,
-        stock: Math.floor(toNum(g.stock, 0)),
         sort: Math.floor(toNum(g.sort, 9999)),
         updatedAt: Number(g.updatedAt || 0),
       }))
@@ -63,13 +62,7 @@ async function upsertGift(data, username) {
   const desc = safeStr(data.desc);
   const points = Math.floor(toNum(data.points, 0));
   const thumbFileId = safeStr(data.thumbFileId);
-  
-  const stockRaw = data.stock;
-  if (stockRaw === undefined || stockRaw === null || stockRaw === '')
-    return { ok: false, message: '请填写库存（>=0）' };
-  const stock = Math.floor(toNum(stockRaw, -1));
-  
-  if (!Number.isFinite(stock) || stock < 0) return { ok: false, message: '库存不合法' };
+
   if (!name) return { ok: false, message: '商品名字不能为空' };
   if (!points || points <= 0) return { ok: false, message: '所需积分不合法' };
   if (desc.length > 200) return { ok: false, message: '描述最多200字' };
@@ -85,9 +78,11 @@ async function upsertGift(data, username) {
 
     await ref.update({
       data: {
-        name, desc, points, stock,
+        name, desc, points,
         ...(thumbFileId ? { thumbFileId } : {}),
         enabled: true,
+        // Inventory is no longer used; remove legacy fields to avoid confusion.
+        stock: _.remove(),
         updatedAt: tNow,
         updatedBy: username,
       }
@@ -98,7 +93,7 @@ async function upsertGift(data, username) {
   const doc = {
     type: 'points_gift',
     enabled: true,
-    name, desc, points, stock,
+    name, desc, points,
     thumbFileId: thumbFileId || '',
     sort: 0,
     createdAt: tNow,

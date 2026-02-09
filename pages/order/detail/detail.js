@@ -5,6 +5,8 @@ const { toNum } = require('../../../utils/common');
 const { resolveCloudFileList } = require('../../../utils/cloudFile');
 const { buildSkuKey, buildSpecText, getDefaultSelectedSpecs } = require('../../../utils/sku');
 
+const MAX_ITEM_QTY = 99;
+
 async function resolveCloudImgList(imgList) {
   const list = Array.isArray(imgList) ? imgList : [];
   if (!list.length) return [];
@@ -25,14 +27,13 @@ Page({
     quantity: 1,
     finalPrice: 0,
     totalPrice: '0.00',
-    currentStock: 0, // 当前可选规格的可用库存
     imgList: [],
     swiperAutoplay: false,
     swiperCurrent: 0,
   },
 
   // [新] 内部状态，不放入 data
-  _skuMap: new Map(), // Key: skuKey, Value: {price, stock}
+  _skuPriceMap: new Map(), // Key: skuKey, Value: price
   _openerChannel: null,
 
   // ========================================================
@@ -51,8 +52,8 @@ Page({
         const product = data && data.product;
         if (!product) return;
         
-        // [新] 预处理 SKU 数据，构建快速查找的 Map
-        this._buildSkuMap(product.skuList);
+        // 预处理 SKU 数据，构建快速查找的 Map（仅价格）
+        this._buildSkuPriceMap(product.skuList);
 
         const specSelected = product.hasSpecs ? getDefaultSelectedSpecs(product.specs) : {};
       
@@ -64,52 +65,46 @@ Page({
       }, () => {
         // 2. 异步加载并填充图片
         this._resolveImages(product.imgs);
-        // 3. 计算初始价格和库存
-        this.updatePriceAndStock();
+        // 3. 计算初始价格
+        this.updatePrice();
       });
     });
   },
 
   // ========================================================
-  // [核心改造] 价格与库存计算
+  // 价格计算
   // ========================================================
 
   /**
-   * [核心改造] 统一更新价格和库存
+   * 统一更新价格
    */
-  updatePriceAndStock() {
+  updatePrice() {
     const { product, specSelected, quantity } = this.data;
     if (!product) return;
 
-    const skuInfo = this._getSkuInfo(specSelected);
-    const price = skuInfo.price;
-    const stock = skuInfo.stock;
+    const price = this._getSkuPrice(specSelected);
 
     this.setData({
       finalPrice: Number(price.toFixed(2)),
       totalPrice: (price * quantity).toFixed(2),
-      currentStock: stock,
     });
   },
 
   /**
-   * [新] 根据当前选择的规格，获取对应的SKU信息
+   * 根据当前选择的规格，获取对应的SKU价格
    * @param {object} selectedSpecs - e.g., { "尺寸": "大杯", "温度": "冰" }
-   * @returns {{price: number, stock: number}}
+   * @returns {number}
    */
-  _getSkuInfo(selectedSpecs) {
+  _getSkuPrice(selectedSpecs) {
     const { product } = this.data;
-    if (!product) return { price: 0, stock: 0 };
+    if (!product) return 0;
 
     if (!product.hasSpecs) {
-      return {
-        price: toNum(product.price, 0),
-        stock: toNum(product.stock, 0)
-      };
+      return toNum(product.price, 0);
     }
     
     const skuKey = this._getSkuKey(product.id, selectedSpecs);
-    return this._skuMap.get(skuKey) || { price: 0, stock: 0 };
+    return toNum(this._skuPriceMap.get(skuKey), toNum(product.price, 0));
   },
 
   /**
@@ -122,19 +117,16 @@ Page({
   },
 
   /**
-   * [新] 将 skuList 转换成 Map 结构，便于快速查找
+   * 将 skuList 转换成 Map 结构，便于快速查找
    */
-  _buildSkuMap(skuList) {
-    this._skuMap.clear();
+  _buildSkuPriceMap(skuList) {
+    this._skuPriceMap.clear();
     if (!Array.isArray(skuList)) return;
 
     skuList.forEach(sku => {
       const key = sku.skuKey || sku._id;
       if (key) {
-        this._skuMap.set(key, {
-          price: toNum(sku.price, 0),
-          stock: toNum(sku.stock, 0),
-        });
+        this._skuPriceMap.set(key, toNum(sku.price, 0));
       }
     });
   },
@@ -187,32 +179,27 @@ Page({
     this.setData({
       [`specSelected.${group}`]: option,
       quantity: 1, // 切换规格时重置数量为1
-    }, () => this.updatePriceAndStock());
+    }, () => this.updatePrice());
   },
 
   increaseQty() {
-    const { quantity, currentStock } = this.data;
-    if (quantity + 1 > currentStock) {
-      wx.showToast({ title: '库存不足', icon: 'none' });
+    const { quantity } = this.data;
+    if (quantity + 1 > MAX_ITEM_QTY) {
+      wx.showToast({ title: `最多购买${MAX_ITEM_QTY}件`, icon: 'none' });
       return;
     }
-    this.setData({ quantity: quantity + 1 }, () => this.updatePriceAndStock());
+    this.setData({ quantity: quantity + 1 }, () => this.updatePrice());
   },
 
   decreaseQty() {
     if (this.data.quantity > 1) {
-      this.setData({ quantity: this.data.quantity - 1 }, () => this.updatePriceAndStock());
+      this.setData({ quantity: this.data.quantity - 1 }, () => this.updatePrice());
     }
   },
 
   confirmAdd() {
-    const { product, specSelected, finalPrice, quantity, currentStock } = this.data;
+    const { product, specSelected, finalPrice, quantity } = this.data;
     if (!product || !this._openerChannel) return;
-
-    if (quantity > currentStock) {
-      wx.showToast({ title: '库存不足', icon: 'none' });
-      return;
-    }
 
     const specText = product.hasSpecs ? buildSpecText(product.specs, specSelected) : '';
 

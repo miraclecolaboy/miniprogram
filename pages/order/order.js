@@ -34,7 +34,6 @@ Page(Object.assign({
     specProduct: null,
     specSelectedSpecs: {},
     specQuantity: 1,
-    specSkuStock: 0,
     specFinalPrice: 0,
     specTotalPrice: '0.00',
     storeLat: 0,
@@ -45,7 +44,7 @@ Page(Object.assign({
   _productById: {},
   _filteredIds: [],
   _cart: new Map(),
-  _skuStockMap: new Map(),
+  _skuPriceMap: new Map(),
   _isPageReady: false,
 
   async onLoad() {

@@ -186,10 +186,6 @@
         </view>
 
         <view class="form-row">
-          <input class="input" type="number" placeholder="库存（必填，0=售罄）" value="{{giftForm.stock}}" bindinput="onGiftStockInput" />
-        </view>
-
-        <view class="form-row">
           <input class="input" placeholder="描述（选填，最多200字）" value="{{giftForm.desc}}" bindinput="onGiftDescInput" />
         </view>
 
@@ -254,7 +250,7 @@
 
           <view class="item-main">
             <view class="item-name">{{item.name}}</view>
-            <view class="item-sub">需要 {{item.points}} 积分 · 库存 {{item.stockText}}</view>
+            <view class="item-sub">需要 {{item.points}} 积分</view>
             <view class="item-desc">{{item.desc}}</view>
           </view>
 

@@ -102,7 +102,7 @@ Page({
       // 合并一次 setData，减少渲染次数
       this.setData(next);
 
-      // 2) 礼品列表：每次进页都后台拉最新库存，但不阻塞首屏
+      // 2) 礼品列表：每次进页都后台拉最新数据，但不阻塞首屏
       this.fetchGiftsInBackground({ force: !!forceGifts });
     } catch (e) {
       console.error('[points] refreshPage error', e);
@@ -131,7 +131,6 @@ Page({
         ...g,
         id,
         points: Math.floor(toNum(g.points, 0)),
-        stock: Math.floor(toNum(g.stock, 0)),
       };
     }).filter(g => !!g.id);
   },
@@ -235,23 +234,11 @@ Page({
             wx.showToast({ title: '该商品已下架', icon: 'none' });
             return;
           }
-          if (r?.result?.error === 'out_of_stock') {
-            wx.showToast({ title: '库存不足', icon: 'none' });
-            return;
-          }
           if (r?.result?.error) throw new Error(r.result.message || r.result.error);
 
           const code = String(r?.result?.data?.code || '');
 
-          // 先做一次乐观库存更新，提升体感（后台会再拉最新库存）
-          const idx = (this.data.gifts || []).findIndex(x => x.id === item.id);
-          if (idx >= 0) {
-            const cur = toNum(this.data.gifts[idx].stock, 0);
-            const nextStock = Math.max(0, cur - 1);
-            this.setData({ [`gifts[${idx}].stock`]: nextStock });
-          }
-
-          // 兑换成功后刷新积分/兑换码，同时后台刷新礼品库存
+          // 兑换成功后刷新积分/兑换码，同时后台刷新礼品列表
           await this.refreshPage({ forceGifts: true });
 
           wx.showModal({

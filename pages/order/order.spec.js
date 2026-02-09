@@ -4,6 +4,8 @@
 const { toNum } = require('../../utils/common');
 const { buildSkuKey, buildSpecText, getDefaultSelectedSpecs } = require('../../utils/sku');
 
+const MAX_ITEM_QTY = 99;
+
 module.exports = {
   async openSpecPopup(e) {
     const id = e?.currentTarget?.dataset?.id;
@@ -31,16 +33,10 @@ module.exports = {
     if (!specProduct) return;
 
     const skuKey = this._getSkuKey(specProduct.id, specSelectedSpecs);
-    const skuInfo = this._skuStockMap.get(skuKey) || { stock: 0, price: specProduct.price };
-    const cartItem = this._cart.get(skuKey);
-    const usedCount = cartItem ? toNum(cartItem.count, 0) : 0;
-    const availableStock = toNum(skuInfo.stock, 0) - usedCount;
-
-    const finalPrice = toNum(skuInfo.price, toNum(specProduct.price, 0));
+    const finalPrice = toNum(this._skuPriceMap.get(skuKey), toNum(specProduct.price, 0));
     this.setData({
       specFinalPrice: finalPrice,
       specTotalPrice: (finalPrice * toNum(specQuantity, 1)).toFixed(2),
-      specSkuStock: availableStock,
     });
   },
 
@@ -66,8 +62,8 @@ module.exports = {
   },
 
   increaseSpecQty() {
-    if (this.data.specQuantity + 1 > this.data.specSkuStock) {
-      wx.showToast({ title: '库存不足', icon: 'none' });
+    if (this.data.specQuantity + 1 > MAX_ITEM_QTY) {
+      wx.showToast({ title: `最多购买${MAX_ITEM_QTY}件`, icon: 'none' });
       return;
     }
     this.setData({ specQuantity: this.data.specQuantity + 1 }, () => this.updateSpecData());
@@ -78,23 +74,17 @@ module.exports = {
       specProduct,
       specSelectedSpecs,
       specQuantity,
-      specSkuStock,
       specFinalPrice,
     } = this.data;
     if (!specProduct) return;
 
     const addQty = toNum(specQuantity, 0);
     if (addQty <= 0) return;
-    if (toNum(specSkuStock, 0) < addQty) {
-      wx.showToast({ title: '库存不足', icon: 'none' });
-      return;
-    }
 
     const baseProduct = this._productById[specProduct.id];
     if (!baseProduct) return;
 
     const skuKey = this._getSkuKey(baseProduct.id, specSelectedSpecs);
-    const skuInfo = this._skuStockMap.get(skuKey) || { stock: 0, price: toNum(baseProduct.price, 0) };
 
     const cartItem = this._cart.get(skuKey) || {
       ...baseProduct,
@@ -109,8 +99,8 @@ module.exports = {
     };
 
     const nextCount = toNum(cartItem.count, 0) + addQty;
-    if (nextCount > toNum(skuInfo.stock, 0)) {
-      wx.showToast({ title: '库存不足', icon: 'none' });
+    if (nextCount > MAX_ITEM_QTY) {
+      wx.showToast({ title: `最多购买${MAX_ITEM_QTY}件`, icon: 'none' });
       return;
     }
 
@@ -129,11 +119,10 @@ module.exports = {
 
     // 无规格商品也允许从详情页加购
     if (!product.hasSpecs) {
-      const stock = toNum(product.stock, 0);
       const cartItem = this._cart.get(product.id) || { ...product, count: 0, createdAt: Date.now() };
       const nextCount = toNum(cartItem.count, 0) + addQty;
-      if (nextCount > stock) {
-        wx.showToast({ title: '库存不足', icon: 'none' });
+      if (nextCount > MAX_ITEM_QTY) {
+        wx.showToast({ title: `最多购买${MAX_ITEM_QTY}件`, icon: 'none' });
         return;
       }
 
@@ -145,8 +134,7 @@ module.exports = {
     const sel = (selectedSpecs && typeof selectedSpecs === 'object') ? selectedSpecs : {};
     const skuKey = this._getSkuKey(id, sel);
     const fallbackPrice = toNum(finalPrice, toNum(product.price, 0));
-    const skuInfo = this._skuStockMap.get(skuKey) || { stock: 0, price: fallbackPrice };
-    const price = toNum(skuInfo.price, fallbackPrice);
+    const price = toNum(this._skuPriceMap.get(skuKey), fallbackPrice);
 
     const cartItem = this._cart.get(skuKey) || {
       ...product,
@@ -161,8 +149,8 @@ module.exports = {
     };
 
     const nextCount = toNum(cartItem.count, 0) + addQty;
-    if (nextCount > toNum(skuInfo.stock, 0)) {
-      wx.showToast({ title: '库存不足', icon: 'none' });
+    if (nextCount > MAX_ITEM_QTY) {
+      wx.showToast({ title: `最多购买${MAX_ITEM_QTY}件`, icon: 'none' });
       return;
     }
 

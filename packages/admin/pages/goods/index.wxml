@@ -12,7 +12,7 @@
       <view class="row-between">
         <view>
           <view class="title">商品管理</view>
-          <view class="sub">统一管理商品 分类 规格 库存等信息</view>
+          <view class="sub">统一管理商品 分类 规格等信息</view>
         </view>
         <view class="btn btn-primary" bindtap="openAdd">新增商品</view>
       </view>
@@ -44,7 +44,6 @@
                 <view class="item-title">{{item.name}}</view>
                 <view class="item-sub">
                   <text>¥{{item.price}}</text>
-                  <text style="margin-left: 16rpx;">{{(item.hasSpecs) ? '总库存' : '库存'}} {{item.stock}}</text>
                   <text style="margin-left: 16rpx;">{{item.status===1 ? '上架' : '下架'}}</text>
                 </view>
                 <view class="item-sub">
@@ -96,17 +95,10 @@
                 </view>
               </picker>
             </view>
-            <view class="field-row">
-              <view class="field half">
-                <view class="label">{{form.hasSpecs ? '展示价格' : '价格'}}</view>
-                <input class="input" type="digit" value="{{form.price}}" bindinput="onFormInput" data-field="price" disabled="{{form.hasSpecs}}" />
-                <view wx:if="{{form.hasSpecs}}" class="hint">由SKU最低价自动计算</view>
-              </view>
-              <view class="field half">
-                <view class="label">{{form.hasSpecs ? '总库存' : '库存'}}</view>
-                <input class="input" type="number" value="{{form.stock}}" bindinput="onFormInput" data-field="stock" disabled="{{form.hasSpecs}}" />
-                <view wx:if="{{form.hasSpecs}}" class="hint">由SKU库存总和自动计算</view>
-              </view>
+            <view class="field">
+              <view class="label">{{form.hasSpecs ? '展示价格' : '价格'}}</view>
+              <input class="input" type="digit" value="{{form.price}}" bindinput="onFormInput" data-field="price" disabled="{{form.hasSpecs}}" />
+              <view wx:if="{{form.hasSpecs}}" class="hint">由SKU最低价自动计算</view>
             </view>
             <view class="field-row">
               <view class="field half">
@@ -190,40 +182,36 @@
     </view>
   </view>
 
-  <!-- SKU库存弹层 -->
+  <!-- SKU弹层 -->
   <view class="formMask" wx:if="{{showSkuModal}}" catchtouchmove="true">
     <view class="formBg" bindtap="closeSkuModal"></view>
     <view class="formWrap" catchtap="noop">
       <scroll-view class="formScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
         <view class="card formCard">
           <view class="row-between">
-            <view class="title">SKU库存与价格</view>
+            <view class="title">SKU价格</view>
             <view class="btn" bindtap="closeSkuModal">关闭</view>
           </view>
           <view class="field">
             <view class="label">批量填充(仅空值)</view>
             <view class="row-between">
               <input class="input" placeholder="价格" type="digit" value="{{skuBulkPrice}}" bindinput="onSkuBulkInput" data-field="Price" />
-              <input class="input" placeholder="库存" type="number" value="{{skuBulkStock}}" bindinput="onSkuBulkInput" data-field="Stock" />
               <view class="btn btn-primary btn-mini" bindtap="applySkuBulk" data-field="price">填价格</view>
-              <view class="btn btn-primary btn-mini" bindtap="applySkuBulk" data-field="stock">填库存</view>
             </view>
           </view>
           <view class="sku-list">
             <view class="sku-item sku-item-header">
               <view class="sku-text">规格</view>
               <view class="input sku-price-header">价格(元)</view>
-              <view class="input sku-stock-header">库存</view>
             </view>
             <view class="sku-item" wx:for="{{skuItems}}" wx:for-item="s" wx:for-index="si" wx:key="skuKey">
               <view class="sku-text">{{s.specText}}</view>
               <input class="input sku-price" placeholder="售价" type="digit" value="{{s.price}}" data-index="{{si}}" bindinput="onSkuPriceInput" />
-              <input class="input sku-stock" placeholder="0" type="number" value="{{s.stock}}" data-index="{{si}}" bindinput="onSkuStockInput" />
             </view>
           </view>
           <view class="row-between" style="margin-top: 22rpx;">
             <view class="btn" bindtap="closeSkuModal">取消</view>
-            <view class="btn btn-primary {{skuSaving ? 'btn-disabled' : ''}}" bindtap="saveSkuStocks">{{skuSaving ? '保存中...' : '保存'}}</view>
+            <view class="btn btn-primary {{skuSaving ? 'btn-disabled' : ''}}" bindtap="saveSkus">{{skuSaving ? '保存中...' : '保存'}}</view>
           </view>
         </view>
       </scroll-view>

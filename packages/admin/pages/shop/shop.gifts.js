@@ -20,15 +20,10 @@ module.exports = {
     const fileIds = list.map((x) => safeStr(x.thumbFileId)).filter(Boolean);
     const urlMap = await getTempUrlMap(fileIds);
 
-    const gifts = list.map((x) => {
-      const stock = Number.isFinite(Number(x.stock)) ? parseInt(x.stock, 10) : 0;
-      return {
-        ...x,
-        stock,
-        stockText: stock === 0 ? '售罄' : String(stock),
-        thumbUrl: x.thumbFileId ? (urlMap[x.thumbFileId] || '') : '',
-      };
-    });
+    const gifts = list.map((x) => ({
+      ...x,
+      thumbUrl: x.thumbFileId ? (urlMap[x.thumbFileId] || '') : '',
+    }));
 
     this.setData({ gifts });
   },
@@ -38,9 +33,6 @@ module.exports = {
   },
   onGiftPointsInput(e) {
     this.setData({ giftForm: { ...this.data.giftForm, points: safeStr(e.detail.value) } });
-  },
-  onGiftStockInput(e) {
-    this.setData({ giftForm: { ...this.data.giftForm, stock: safeStr(e.detail.value) } });
   },
   onGiftDescInput(e) {
     this.setData({ giftForm: { ...this.data.giftForm, desc: safeStr(e.detail.value) } });
@@ -94,7 +86,6 @@ module.exports = {
       giftForm: {
         name: g.name,
         points: String(g.points || ''),
-        stock: String(Number.isFinite(Number(g.stock)) ? parseInt(g.stock, 10) : 0),
         desc: g.desc || '',
         thumbFileId: safeStr(g.thumbFileId),
         thumbPreview: safeStr(g.thumbUrl),
@@ -106,7 +97,7 @@ module.exports = {
     this.setData({
       editingGiftId: '',
       editingGiftName: '',
-      giftForm: { name: '', points: '', stock: '0', desc: '', thumbFileId: '', thumbPreview: '' },
+      giftForm: { name: '', points: '', desc: '', thumbFileId: '', thumbPreview: '' },
     });
   },
 
@@ -116,13 +107,11 @@ module.exports = {
 
     const name = safeStr(this.data.giftForm.name);
     const points = toInt(this.data.giftForm.points, 0);
-    const stock = toInt(this.data.giftForm.stock, -1);
     const desc = safeStr(this.data.giftForm.desc);
     const thumbFileId = safeStr(this.data.giftForm.thumbFileId);
 
     if (!name) return wx.showToast({ title: '请输入商品名字', icon: 'none' });
     if (!points || points <= 0) return wx.showToast({ title: '所需积分必须大于0', icon: 'none' });
-    if (stock < 0) return wx.showToast({ title: '库存必须>=0', icon: 'none' });
     if (desc.length > 200) return wx.showToast({ title: '描述最多200字', icon: 'none' });
 
     const r = await call('admin', {
@@ -131,7 +120,6 @@ module.exports = {
       id: this.data.editingGiftId || '',
       name,
       points,
-      stock,
       desc,
       thumbFileId,
     }, { loadingTitle: '保存中' }).catch(() => null);
@@ -143,7 +131,7 @@ module.exports = {
     this.setData({
       editingGiftId: '',
       editingGiftName: '',
-      giftForm: { name: '', points: '', stock: '0', desc: '', thumbFileId: '', thumbPreview: '' },
+      giftForm: { name: '', points: '', desc: '', thumbFileId: '', thumbPreview: '' },
     });
 
     await this.loadGifts();
@@ -173,4 +161,3 @@ module.exports = {
     await this.loadGifts();
   },
 };
-

@@ -25,8 +25,6 @@ exports.main = async (event, context) => {
       case 'getShopConfig': return await shopService.getShopConfig();
       case 'listCategories': return await shopService.listCategories();
       case 'listProducts': return await shopService.listProducts();
-      case 'listProductSkus': return await shopService.listProductSkus(event.productIds);
-      case 'checkStock': return await shopService.checkStock(event.items);
       case 'listPoints': return await shopService.listPoints(OPENID);
       case 'listGifts': return await shopService.listGifts();
       case 'redeemGift': return await shopService.redeemGift(event.giftId, OPENID);

@@ -26,7 +26,7 @@ Page(Object.assign({
     formModesMap: { ziti: true, waimai: true, kuaidi: true },
     
     form: {
-      name: '', categoryId: '', price: '', stock: '', sort: '0', onShelf: true,
+      name: '', categoryId: '', price: '', sort: '0', onShelf: true,
       modes: ['ziti', 'waimai', 'kuaidi'],
       
       displayImages: [],
@@ -41,7 +41,6 @@ Page(Object.assign({
     skuSaving: false,
     skuItems: [],
     skuBulkPrice: '',
-    skuBulkStock: '',
     showCategoryForm: false,
     categorySaving: false,
     categoryForm: { name: '', sort: '0' }
