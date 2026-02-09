@@ -8,6 +8,7 @@
     </view>
   </view>
 
+  <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}" refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" bindrefresherrefresh="onRefresherRefresh">
   <view class="content-body">
     
     <view class="coupon-list" wx:if="{{activeTab === 'available'}}">
@@ -71,4 +72,5 @@
 
     <view class="loading-tip" wx:if="{{loading}}">加载中...</view>
   </view>
+  </scroll-view>
 </view>

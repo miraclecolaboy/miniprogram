@@ -50,6 +50,7 @@ Page({
   data: {
     userInfo: null,
     isLogin: false,
+    refresherTriggered: false,
     
     // UI状态
     memberCardExpanded: false, // 会员卡是否展开
@@ -69,8 +70,15 @@ Page({
   },
 
   onPullDownRefresh() {
+    this.onRefresherRefresh();
+  },
+
+  onRefresherRefresh() {
+    if (this.data.refresherTriggered) return;
+    this.setData({ refresherTriggered: true });
     this.refreshPageData(true).finally(() => {
-      wx.stopPullDownRefresh();
+      this.setData({ refresherTriggered: false });
+      try { wx.stopPullDownRefresh(); } catch (_) {}
     });
   },
 

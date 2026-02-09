@@ -24,7 +24,24 @@ page {
   box-sizing: border-box;
 }
 
-.page { min-height: 100vh; padding: 16rpx; box-sizing: border-box; }
+.page {
+  height: 100vh;
+  padding: 16rpx;
+  box-sizing: border-box;
+  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  display: flex;
+  flex-direction: column;
+}
+
+.page-scroll {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.page-scroll-spacer {
+  height: calc(160rpx + env(safe-area-inset-bottom));
+}
 
 /* --- 通用组件 --- */
 .arrow { color: #C5C6CB; font-size: 24rpx; margin-left: 8rpx; font-family: monospace; }

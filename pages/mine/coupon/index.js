@@ -13,7 +13,8 @@ Page({
       expired: []
     },
     loading: false,
-    claimingIds: {}
+    claimingIds: {},
+    refresherTriggered: false
   },
 
   onLoad() {
@@ -26,7 +27,16 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.refreshData().finally(() => wx.stopPullDownRefresh());
+    this.onRefresherRefresh();
+  },
+
+  onRefresherRefresh() {
+    if (this.data.refresherTriggered) return;
+    this.setData({ refresherTriggered: true });
+    this.refreshData().finally(() => {
+      this.setData({ refresherTriggered: false });
+      try { wx.stopPullDownRefresh(); } catch (_) {}
+    });
   },
 
   async refreshData(options = {}) {

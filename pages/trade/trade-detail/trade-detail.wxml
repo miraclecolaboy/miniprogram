@@ -1,4 +1,5 @@
 <view class="page" wx:if="{{order}}">
+  <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
   
   <view class="header-area">
     <view class="status-big-title">
@@ -141,6 +142,7 @@
   </view>
 
   <view class="footer-spacer"></view>
+  </scroll-view>
   <view class="footer-bar safe-area-bottom">
     <button class="btn btn-outline" bindtap="contactShop">联系客服</button>
     <button class="btn btn-outline" wx:if="{{order.refund && order.refund.status === 'applied'}}" bindtap="cancelRefund">取消售后</button>

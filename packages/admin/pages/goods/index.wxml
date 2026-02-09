@@ -31,7 +31,7 @@
   </view>
 
   <view class="page-body">
-    <scroll-view class="listScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" wx:if="{{!showForm}}">
+    <scroll-view class="listScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}" wx:if="{{!showForm}}">
       <!-- [修改] 列表项图片使用 thumbUrl -->
       <view class="card" wx:for="{{list}}" wx:key="_id">
         <view class="row-between">
@@ -75,7 +75,7 @@
   <view class="formMask" wx:if="{{showForm}}" catchtouchmove="true">
     <view class="formBg" bindtap="cancelForm"></view>
     <view class="formWrap" catchtap="noop">
-      <scroll-view class="formScroll" scroll-y="true" enable-back-to-top="true">
+      <scroll-view class="formScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
         <view class="card formCard">
           <view class="row-between">
             <view class="title">{{editingId ? '编辑商品' : '新增商品'}}</view>
@@ -194,7 +194,7 @@
   <view class="formMask" wx:if="{{showSkuModal}}" catchtouchmove="true">
     <view class="formBg" bindtap="closeSkuModal"></view>
     <view class="formWrap" catchtap="noop">
-      <scroll-view class="formScroll" scroll-y="true" enable-back-to-top="true">
+      <scroll-view class="formScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
         <view class="card formCard">
           <view class="row-between">
             <view class="title">SKU库存与价格</view>

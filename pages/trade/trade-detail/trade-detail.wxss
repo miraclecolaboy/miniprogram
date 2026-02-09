@@ -1,11 +1,26 @@
 /* --- 全局配置 --- */
+page {
+  height: 100vh;
+  overflow: hidden;
+}
+
 .page {
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f7f8fa;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
   box-sizing: border-box;
+}
+
+.page-scroll {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
 }
 
 /* --- 顶部状态区 --- */

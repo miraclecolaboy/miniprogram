@@ -164,7 +164,7 @@
   padding-top: 18rpx;
   padding-bottom: 260rpx;
   box-sizing: border-box;
-  border-right: 1rpx solid rgba(0, 0, 0, 0.04);
+  border-right: 0;
 }
 
 .category-item {

@@ -4,5 +4,6 @@
   "navigationBarTextStyle": "black",
   "enableShareAppMessage": true,
   "enableShareTimeline": true,
+  "disableScroll": true,
   "usingComponents": {}
 }

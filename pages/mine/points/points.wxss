@@ -12,8 +12,24 @@ page {
   background-color: var(--bg-page);
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
   box-sizing: border-box;
-  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  height: 100vh;
+  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  padding-bottom: 0;
   color: var(--text-main);
+}
+
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-scroll {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
 /* ============================

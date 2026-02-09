@@ -55,6 +55,7 @@ Page({
     // 客服二维码：优先存 fileID（可换取新临时链接），qrSrc 为临时 URL 或直链 URL
     qrFileId: '',
     qrSrc: '',
+    refresherTriggered: false,
   },
 
   onLoad() {
@@ -65,7 +66,16 @@ Page({
   },
 
   onPullDownRefresh() {
-    this._fetchContact(true).finally(() => wx.stopPullDownRefresh());
+    this.onRefresherRefresh();
+  },
+
+  onRefresherRefresh() {
+    if (this.data.refresherTriggered) return;
+    this.setData({ refresherTriggered: true });
+    this._fetchContact(true).finally(() => {
+      this.setData({ refresherTriggered: false });
+      try { wx.stopPullDownRefresh(); } catch (_) {}
+    });
   },
 
   async previewQr() {

@@ -50,7 +50,7 @@
   <view class="order-container">
 
     <!-- 左侧分类栏 -->
-    <scroll-view class="categories" scroll-y enhanced="true" show-scrollbar="false">
+    <scroll-view class="categories" scroll-y enhanced="true" show-scrollbar="{{false}}">
       <block wx:for="{{categories}}" wx:key="id">
         <view
           class="category-item {{selectedCategoryId === item.id ? 'active' : ''}}"
@@ -64,7 +64,7 @@
     </scroll-view>
 
     <!-- 右侧商品列表 -->
-    <scroll-view class="products" scroll-y bindscrolltolower="onProductsReachBottom" lower-threshold="200" enhanced="true" show-scrollbar="false">
+    <scroll-view class="products" scroll-y bindscrolltolower="onProductsReachBottom" lower-threshold="200" enhanced="true" show-scrollbar="{{false}}">
       <view class="category-title" wx:if="{{selectedCategoryName}}">{{selectedCategoryName}}</view>
       <block wx:for="{{filteredProducts}}" wx:key="id">
         <view
@@ -158,7 +158,7 @@
   </view>
 
   <!-- 内容滚动 -->
-  <scroll-view class="spec-scroll" scroll-y enhanced="true" show-scrollbar="false">
+  <scroll-view class="spec-scroll" scroll-y enhanced="true" show-scrollbar="{{false}}">
 
     <!-- 规格组 -->
     <block wx:for="{{specProduct.specs}}" wx:key="name">
@@ -225,7 +225,7 @@
     <view class="cart-sheet-clear" bindtap="clearCart">清空</view>
   </view>
 
-  <scroll-view class="cart-sheet-list" scroll-y enhanced="true" show-scrollbar="false">
+  <scroll-view class="cart-sheet-list" scroll-y enhanced="true" show-scrollbar="{{false}}">
     <block wx:for="{{cart}}" wx:key="cartKey">
       <view wx:if="{{item.count > 0}}" class="cart-item">
         <image class="cart-item-img" src="{{item.img}}" mode="aspectFill" lazy-load="true" />

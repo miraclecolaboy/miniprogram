@@ -1,11 +1,24 @@
 /* pages/mine/member/member.wxss */
 page {
   background-color: #F8F9FB;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
 }
 
 .page-container {
-  padding-bottom: 200rpx; /* 防止底部按钮遮挡 */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-scroll {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.page-scroll-spacer {
+  height: calc(240rpx + env(safe-area-inset-bottom));
 }
 
 /* === 核心会员卡区域 === */

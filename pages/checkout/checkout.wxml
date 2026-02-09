@@ -1,4 +1,5 @@
 <view class="page">
+  <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
   <view class="header-section">
     <view class="top-right-mode">
       <view
@@ -148,6 +149,8 @@
       <input class="remark-input" placeholder="请输入口味、包装等要求" placeholder-class="ph-color" bindinput="onRemarkInput" />
     </view>
   </view>
+  <view class="page-scroll-spacer"></view>
+  </scroll-view>
 </view>
 
 <view class="bottom-bar">
@@ -174,7 +177,7 @@
     <view class="coupon-close" bindtap="closeCouponPopup" hover-class="hover-opacity">×</view>
   </view>
 
-  <scroll-view class="coupon-list" scroll-y="true" enhanced="true" show-scrollbar="false">
+  <scroll-view class="coupon-list" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
     
     <view class="coupon-option coupon-none {{!selectedCoupon ? 'active' : ''}}" bindtap="useNoCoupon" hover-class="hover-opacity">
       <text class="coupon-none-text">不使用优惠券</text>

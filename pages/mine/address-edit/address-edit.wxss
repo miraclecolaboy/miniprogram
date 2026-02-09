@@ -1,8 +1,21 @@
 .page {
   background: #f7f7f7;
-  min-height: 100vh;
-  padding-bottom: 160rpx;
+  height: 100vh;
+  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  padding-bottom: 0;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-scroll {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.page-scroll-spacer {
+  height: calc(180rpx + env(safe-area-inset-bottom));
 }
 
 /* 顶部 */

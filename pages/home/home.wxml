@@ -1,5 +1,5 @@
 <view class="page">
-  
+  <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
   <view class="header-section">
     <swiper class="banner-swiper" autoplay interval="5000" circular duration="800">
       <block wx:if="{{banners.length}}">
@@ -107,4 +107,5 @@
     </view>
 
   </view>
+</scroll-view>
 </view>

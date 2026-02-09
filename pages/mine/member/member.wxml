@@ -1,4 +1,5 @@
 <view class="page-container">
+  <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
   <view class="card-wrap">
     <view class="member-card">
       <view class="card-texture"></view>
@@ -74,6 +75,9 @@
       * 单次充值跨级将自动补发所有中间等级礼包
     </view>
   </view>
+
+  <view class="page-scroll-spacer"></view>
+  </scroll-view>
 
   <view class="fixed-footer">
     <view class="primary-btn" bindtap="onTapRecharge">

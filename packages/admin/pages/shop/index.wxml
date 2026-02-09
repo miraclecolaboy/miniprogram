@@ -225,7 +225,7 @@
   
 
   <view class="page-body">
-    <scroll-view class="listScroll" scroll-y="true" enhanced="true" enable-back-to-top="true">
+    <scroll-view class="listScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
      <view class="list-card">
       <view class="list-title">已配置优惠券（{{coupons.length}}）</view>
       <view class="empty" wx:if="{{!coupons.length}}">暂无优惠券，请在上方新增。</view>

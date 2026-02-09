@@ -38,3 +38,12 @@
     border-right: 3rpx solid currentColor;
     transform: rotate(45deg);
   }
+
+  /* Hide scrollbars globally (page scroll + scroll-view). */
+  page::-webkit-scrollbar,
+  scroll-view::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    color: transparent;
+  }

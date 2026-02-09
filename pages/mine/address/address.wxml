@@ -1,4 +1,5 @@
 <view class="page">
+  <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
 
 <block wx:if="{{list.length}}">
   <view
@@ -50,4 +51,5 @@
   </view>
 </view>
 
+  </scroll-view>
 </view>

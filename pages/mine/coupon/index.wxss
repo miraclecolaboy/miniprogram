@@ -11,10 +11,23 @@ page {
   --shadow-card: 0 8rpx 24rpx rgba(0, 0, 0, 0.03); 
   
   background-color: var(--bg-page);
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
   font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
   color: var(--text-main);
   box-sizing: border-box;
+}
+
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-scroll {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
 }
 
 /* === 顶部 Tab (极简版) === */

@@ -1,4 +1,5 @@
 <view class="page">
+  <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}" refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" bindrefresherrefresh="onRefresherRefresh">
   <view class="user-header center" bindtap="onTapUserCard">
     <view class="avatar-wrap">
       <image 
@@ -104,6 +105,9 @@
       </view>
     </view>
   </view>
+
+  <view class="page-scroll-spacer"></view>
+  </scroll-view>
 
   <view wx:if="{{showProfilePopup}}" class="spec-mask" bindtap="closeProfilePopup" catchtouchmove="noop"></view>
   

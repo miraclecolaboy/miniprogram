@@ -6,7 +6,7 @@
   </view>
 
   <block wx:for="{{['doing', 'done', 'refund']}}" wx:key="item" wx:for-item="tab">
-    <scroll-view class="order-list" scroll-y="true" bindscrolltolower="loadMore" lower-threshold="150" wx:if="{{activeTab === tab}}">
+    <scroll-view class="order-list" scroll-y="true" enhanced="true" bindscrolltolower="loadMore" lower-threshold="150" show-scrollbar="{{false}}" wx:if="{{activeTab === tab}}">
       <block wx:if="{{orders[tab] && orders[tab].length > 0}}">
         <view class="order-card" wx:for="{{orders[tab]}}" wx:key="_id" wx:for-item="order" bindtap="goDetail" data-id="{{order._id}}">
           <view class="order-header">
@@ -17,7 +17,7 @@
             </view>
           </view>
           <view class="order-main">
-            <scroll-view class="goods-scroll" scroll-x="true" show-scrollbar="{{false}}">
+            <scroll-view class="goods-scroll" scroll-x="true" enhanced="true" show-scrollbar="{{false}}">
               <view class="goods-row">
                 <view class="goods-item" wx:for="{{order.goodsView}}" wx:key="index" wx:for-item="g">
                   <image class="goods-img" src="{{g.image}}" mode="aspectFill" lazy-load="true" />
