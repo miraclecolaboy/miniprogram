@@ -7,7 +7,7 @@
     </view>
     
     <block wx:if="{{order.status === 'processing'}}">
-      <view class="status-desc" wx:if="{{order.pickupInfo.time}}">
+      <view class="status-desc" wx:if="{{order.pickupInfo.time && order.pickupInfo.time !== '立即取餐' && order.pickupInfo.time !== '立刻取餐'}}">
         订单已确认，请于 <text class="highlight">{{order.pickupInfo.time}}</text> 到店取餐
       </view>
       <view class="status-desc" wx:else>
@@ -32,6 +32,7 @@
       <view class="pickup-code">{{order.pickupInfo.code}}</view>
       <view class="pickup-status-bar">
         <text wx:if="{{order.status === 'ready'}}">请凭此号取餐</text>
+        <text wx:elif="{{order.pickupInfo.time === '立即取餐' || order.pickupInfo.time === '立刻取餐'}}">立即取餐</text>
         <text wx:elif="{{order.pickupInfo.time}}">预约 {{order.pickupInfo.time}} 取餐</text>
         <text wx:else>等待叫号取餐</text>
       </view>
@@ -123,8 +124,8 @@
 
       <view class="info-fold-area" wx:if="{{isInfoExpanded}}">
         <view class="info-row" wx:if="{{order.pickupInfo.time}}">
-          <text class="info-label">预约时间</text>
-          <text class="info-val">{{order.pickupInfo.time}}</text>
+          <text class="info-label">{{(order.pickupInfo.time === '立即取餐' || order.pickupInfo.time === '立刻取餐') ? '取餐时间' : '预约时间'}}</text>
+          <text class="info-val">{{order.pickupInfo.time === '立刻取餐' ? '立即取餐' : order.pickupInfo.time}}</text>
         </view>
         
         <view class="info-row">
