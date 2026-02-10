@@ -88,7 +88,7 @@ function genPickupTimeSlotsByServiceHours(serviceHours) {
   const now = Date.now();
   const nowD = new Date(now);
   const nowMin = nowD.getHours() * 60 + nowD.getMinutes();
-  const step = 30;
+  const step = 10;
 
   // 找到今天“下一段”营业区间：end >= nowMin（与原逻辑保持一致，结束时间点仍视为可选）
   let rangeIndex = ranges.findIndex(r => r.end >= nowMin);
@@ -137,4 +137,3 @@ module.exports = {
   promisifyGetSetting,
   storeSubModeText,
 };
-
