@@ -7,9 +7,9 @@ const { COL_SHOP_CONFIG } = require('../config/constants');
 
 // Deterministic IDs so other code can reference them safely.
 const DEFAULT_MEMBER_COUPON_TEMPLATES = [
-  { id: 'coupon_member_5', title: '等级会员无门槛5元券', minSpend: 0, discount: 5 },
-  { id: 'coupon_member_10', title: '等级会员无门槛10元券', minSpend: 0, discount: 10 },
-  { id: 'coupon_member_20', title: '等级会员无门槛20元券', minSpend: 0, discount: 20 },
+  { id: 'coupon_member_5', title: '会员无门槛5元券', minSpend: 0, discount: 5 },
+  { id: 'coupon_member_10', title: '会员无门槛10元券', minSpend: 0, discount: 10 },
+  { id: 'coupon_member_20', title: '会员无门槛20元券', minSpend: 0, discount: 20 },
 ];
 
 // 每个等级礼包仅发放一次（跨级时补发缺失等级礼包）
@@ -72,7 +72,24 @@ async function ensureMemberLevelDefaults(db, nowTs) {
 
     const ref = db.collection(COL_SHOP_CONFIG).doc(id);
     const got = await ref.get().catch(() => null);
-    if (got && got.data) continue; // Keep manual edits.
+    if (got && got.data) {
+      // Backward compatible rename (only patch when it still matches the legacy seeded title).
+      const cur = got.data || {};
+      const curTitle = String(cur.title || '').trim();
+      const legacyTitle = `等级会员无门槛${Number(tpl.discount || 0)}元券`;
+      const nextTitle = String(tpl.title || '').trim();
+      if (
+        cur &&
+        cur.type === 'coupon_template' &&
+        cur.claimable === false &&
+        curTitle === legacyTitle &&
+        nextTitle &&
+        curTitle !== nextTitle
+      ) {
+        await ref.update({ data: { title: nextTitle, updatedAt: tNow } }).catch(() => {});
+      }
+      continue; // Keep manual edits.
+    }
 
     await ref.set({
       data: {

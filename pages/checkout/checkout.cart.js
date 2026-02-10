@@ -23,7 +23,9 @@ module.exports = {
       img: pickImg(it.img),
     }));
 
-    const goodsTotal = computed.reduce((sum, item) => sum + (item.price * item.count), 0);
+    // Use "fen" to avoid floating errors and to make discount clamping strict.
+    const goodsTotalFen = computed.reduce((sum, item) => sum + (Math.round(toNum(item.price, 0) * 100) * toNum(item.count, 0)), 0);
+    const goodsTotal = goodsTotalFen / 100;
     const rawAvailableCoupons = (this.data.userCoupons || []).filter(c => toNum(c?.minSpend, 0) <= goodsTotal);
     const { groups: availableCoupons, itemsMap } = groupCouponInstancesForCheckout(rawAvailableCoupons);
     this._availableCouponItemsMap = itemsMap;
@@ -40,26 +42,36 @@ module.exports = {
     }
 
     const deliveryFeeNum = computeDeliveryFee(this.data.mode, goodsTotal, this.data);
-    const vipDiscountNum = this.data.isVip ? Number(((goodsTotal + deliveryFeeNum) * 0.05).toFixed(2)) : 0;
-    const finalPayNum = Math.max(0, goodsTotal + deliveryFeeNum - vipDiscountNum - couponDiscount);
+    const deliveryFeeFen = Math.round(toNum(deliveryFeeNum, 0) * 100);
+    const payableFen = goodsTotalFen + deliveryFeeFen;
+
+    const vipDiscountFen = this.data.isVip ? Math.round(payableFen * 0.05) : 0;
+    const afterVipFen = Math.max(0, payableFen - vipDiscountFen);
+    const couponFaceFen = Math.round(toNum(couponDiscount, 0) * 100);
+    const couponAppliedFen = Math.min(couponFaceFen, afterVipFen);
+    const finalPayFen = Math.max(0, afterVipFen - couponAppliedFen);
+    const discountTotalFen = Math.min(payableFen, vipDiscountFen + couponAppliedFen);
+    const finalPayNum = finalPayFen / 100;
 
     let freeLine = 0;
     if (this.data.mode === 'waimai') freeLine = toNum(this.data.minOrderWaimai, 0);
     if (this.data.mode === 'kuaidi') freeLine = toNum(this.data.minOrderKuaidi, 0);
-    const needMore = (freeLine > 0 && goodsTotal < freeLine) ? (freeLine - goodsTotal) : 0;
+    const freeLineFen = Math.round(toNum(freeLine, 0) * 100);
+    const needMoreFen = (freeLineFen > 0 && goodsTotalFen < freeLineFen) ? (freeLineFen - goodsTotalFen) : 0;
 
     this.setData({
       cart: computed,
-      totalPrice: goodsTotal.toFixed(2),
+      totalPrice: (goodsTotalFen / 100).toFixed(2),
       availableCoupons,
       selectedCoupon,
       selectedCouponKey: selectedCoupon ? buildCouponGroupKey(selectedCoupon) : '',
-      couponDiscount: couponDiscount.toFixed(2),
-      vipDiscount: vipDiscountNum.toFixed(2),
-      deliveryFee: deliveryFeeNum.toFixed(2),
-      finalPay: finalPayNum.toFixed(2),
-      freeDeliveryLine: freeLine.toFixed(2),
-      needMoreFreeDelivery: needMore.toFixed(2),
+      couponDiscount: (couponAppliedFen / 100).toFixed(2),
+      vipDiscount: (vipDiscountFen / 100).toFixed(2),
+      deliveryFee: (deliveryFeeFen / 100).toFixed(2),
+      finalPay: (finalPayFen / 100).toFixed(2),
+      discountTotal: (discountTotalFen / 100).toFixed(2),
+      freeDeliveryLine: (freeLineFen / 100).toFixed(2),
+      needMoreFreeDelivery: (needMoreFen / 100).toFixed(2),
       points: Math.floor(finalPayNum),
     });
   },

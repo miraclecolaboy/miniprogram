@@ -108,17 +108,16 @@ page {
 .mode-badge {
   display: flex;
   align-items: center;
-  padding: 10rpx 16rpx;
-  background: rgba(255,255,255,0.95);
+  /* Match "到店模式" active pill style */
+  padding: 14rpx 32rpx;
+  background: #FFFFFF;
   border-radius: 999rpx;
-  border: 1rpx solid rgba(0,0,0,0.06);
+  border: none;
   box-shadow: 0 10rpx 28rpx rgba(0,0,0,0.06);
 }
-/* delivery/express icons have more internal transparent padding than pickup icons */
-.mode-icon { width: 44rpx; height: 44rpx; margin-right: 10rpx; opacity: 0.9; }
-.mode-text { font-size: 24rpx; font-weight: 700; color: var(--text-main); letter-spacing: 1rpx; }
-.mode-badge--waimai, .mode-badge--kuaidi { background: #F2F3F5; border-color: transparent; }
-.mode-badge--waimai .mode-text, .mode-badge--kuaidi .mode-text { color: var(--text-main); }
+.mode-icon { width: 32rpx; height: 32rpx; margin-right: 10rpx; opacity: 1; }
+.mode-text { font-size: 28rpx; font-weight: 700; color: var(--text-main); letter-spacing: 0; }
+.mode-badge--waimai, .mode-badge--kuaidi { background: #FFFFFF; }
 .submode-tabs { display: flex; background: #F1F2F4; border-radius: 999rpx; padding: 8rpx; width: fit-content; }
 .submode-tab { display: flex; align-items: center; padding: 14rpx 32rpx; font-size: 28rpx; color: #666; border-radius: 999rpx; transition: all 0.2s; }
 .submode-icon { width: 32rpx; height: 32rpx; margin-right: 10rpx; opacity: 0.55; }

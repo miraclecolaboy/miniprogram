@@ -211,11 +211,14 @@ Page({
         if (ts && now() - ts <= CACHE_TTL) {
           const cachedQrFileId = safeStr(cached?.qrFileId);
           const cachedQrSrc = safeStr(cached?.qrSrc);
+          const hasPhoneKey = cached && typeof cached === 'object' && Object.prototype.hasOwnProperty.call(cached, 'phone');
 
           // 1) If we have fileID, refresh temp URL independently, no need to refetch config.
           if (cachedQrFileId) {
             this._refreshQrSrcIfNeeded(false);
-            return;
+            // Old cache may only include qrFileId/qrSrc and miss contact fields.
+            // In that case we still refetch once to avoid blank phone/service hours.
+            if (hasPhoneKey) return;
           }
 
           // 2) If cache only has a signed temp URL and it is expired, we must refetch config

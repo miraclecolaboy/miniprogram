@@ -33,6 +33,7 @@ Page(Object.assign({
     deliveryFee: '0.00',
     vipDiscount: '0.00',
     couponDiscount: '0.00',
+    discountTotal: '0.00',
     needMoreFreeDelivery: '0.00',
     
     // 选项

@@ -97,7 +97,7 @@ async function createOrder(event, openid) {
         }
       });
 
-      let goodsTotal = 0;
+      let goodsTotalFen = 0;
       const orderItems = [];
 
       for (const item of items) {
@@ -116,13 +116,16 @@ async function createOrder(event, openid) {
           price = product.price;
         }
 
-        goodsTotal += price * item.count;
+        const count = Number(item.count || 0);
+        goodsTotalFen += Math.round(Number(price || 0) * 100) * count;
         orderItems.push({
           productId: product._id, skuId: item.skuId || '', productName: product.name,
           specText, image: product.thumbFileID || (product.imgs && product.imgs[0]) || '',
-          count: item.count, price
+          count, price: Number(price || 0)
         });
       }
+
+      const goodsTotal = Number((goodsTotalFen / 100).toFixed(2));
 
       const [shopConfigRes, userRes] = await Promise.all([
         tx.collection(COL_SHOP_CONFIG).doc('main').get(),
@@ -136,19 +139,26 @@ async function createOrder(event, openid) {
       }
       
       const deliveryFee = computeDeliveryFee(mode, goodsTotal, shopConfig);
+      const deliveryFeeFen = Math.round(Number(deliveryFee || 0) * 100);
+      const payableFen = goodsTotalFen + deliveryFeeFen;
       const memberLevel = Number(user.memberLevel || 0);
       const isVip = memberLevel >= 4; // Lv4: permanent 95% price (5% off)
-      const vipDiscount = isVip ? Number(((goodsTotal + deliveryFee) * 0.05).toFixed(2)) : 0;
+      const vipDiscountFen = isVip ? Math.round(payableFen * 0.05) : 0;
+      const vipDiscount = Number((vipDiscountFen / 100).toFixed(2));
 
-      let couponDiscount = 0;
+      let couponDiscountFaceFen = 0;
       if (userCouponId) {
         const coupon = (user.coupons || []).find(c => c.userCouponId === userCouponId);
         if (!coupon) throw new Error('优惠券无效');
         if (goodsTotal < toNum(coupon.minSpend, 0)) throw new Error('未达到优惠券使用门槛');
-        couponDiscount = toNum(coupon.discount, 0);
+        couponDiscountFaceFen = Math.round(toNum(coupon.discount, 0) * 100);
       }
       
-      finalPayAmount = Math.max(0, goodsTotal + deliveryFee - vipDiscount - couponDiscount);
+      const afterVipFen = Math.max(0, payableFen - vipDiscountFen);
+      const couponDiscountFen = Math.min(couponDiscountFaceFen, afterVipFen);
+      const couponDiscount = Number((couponDiscountFen / 100).toFixed(2));
+
+      finalPayAmount = Math.max(0, Number(((afterVipFen - couponDiscountFen) / 100).toFixed(2)));
       const paidImmediately = payMethod === 'balance' || finalPayAmount <= 0;
       const paymentMethodFinal = finalPayAmount <= 0 ? 'free' : payMethod;
 
@@ -175,14 +185,14 @@ async function createOrder(event, openid) {
         mode,
         storeSubMode: storeSubModeFinal,
         items: orderItems,
-        amount: { 
-          goods: Number(goodsTotal.toFixed(2)), 
-          delivery: Number(deliveryFee.toFixed(2)), 
+        amount: {
+          goods: Number((goodsTotalFen / 100).toFixed(2)),
+          delivery: Number((deliveryFeeFen / 100).toFixed(2)),
           // legacy alias used by some order detail UIs ("会员折扣")
           discount: vipDiscount,
-          vipDiscount, 
+          vipDiscount,
           couponDiscount,
-          total: Number(finalPayAmount.toFixed(2)) 
+          total: Number(finalPayAmount.toFixed(2))
         },
         payment: { method: paymentMethodFinal, status: paidImmediately ? 'paid' : 'pending', paidAt: paidImmediately ? nowTs : 0 },
         userCouponId: userCouponId || '',

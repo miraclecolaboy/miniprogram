@@ -159,8 +159,8 @@
       <text class="currency">￥</text>
       <text class="total-num">{{finalPay}}</text>
     </view>
-    <view class="discount-tip" wx:if="{{(vipDiscount*1 + couponDiscount*1) > 0}}">
-      已优惠 ￥{{vipDiscount*1 + couponDiscount*1}}
+    <view class="discount-tip" wx:if="{{discountTotal*1 > 0}}">
+      已优惠 ￥{{discountTotal}}
     </view>
   </view>
   <view class="pay-btn" bindtap="onPayTap">立即支付</view>
@@ -174,7 +174,7 @@
 
   <view class="coupon-header">
     <text class="coupon-sheet-title">选择优惠券</text>
-    <view class="coupon-close" bindtap="closeCouponPopup" hover-class="hover-opacity">×</view>
+    <view class="coupon-close" bindtap="closeCouponPopup" hover-class="hover-opacity"></view>
   </view>
 
   <scroll-view class="coupon-list" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">

@@ -72,6 +72,25 @@ async function getOrderStats(openid) {
   }
 }
 
+function normalizeMemberCouponTitle(title) {
+  const t = String(title || '').trim();
+  if (!t) return '';
+  return t.replace(/^等级会员无门槛/, '会员无门槛');
+}
+
+function normalizeUserCoupons(list) {
+  const arr = Array.isArray(list) ? list : [];
+  return arr.map((c) => {
+    if (!c || typeof c !== 'object') return c;
+    const couponId = String(c.couponId || '').trim();
+    const title = String(c.title || '').trim();
+    if (couponId.startsWith('coupon_member_') && title.startsWith('等级会员无门槛')) {
+      return { ...c, title: normalizeMemberCouponTitle(title) };
+    }
+    return c;
+  });
+}
+
 // 确保用户存在 (核心登录逻辑)
 async function ensureUser(openid, profile = null) {
   try {
@@ -144,11 +163,12 @@ async function getMe(openid) {
 
   const addresses = await _listAddresses(openid);
   const orderStats = await getOrderStats(openid);
+  const coupons = normalizeUserCoupons(me && me.coupons);
 
   // 异步更新统计信息，不阻塞返回
   db.collection(COL_USERS).doc(openid).update({ data: { orderStats, updatedAt: now() } }).catch(() => {});
 
-  return { data: { ...me, _id: openid, addresses, orderStats } };
+  return { data: { ...me, coupons, _id: openid, addresses, orderStats } };
 }
 
 async function updateProfile(event, openid) {
