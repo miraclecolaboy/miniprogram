@@ -212,8 +212,8 @@ page {
 }
 
 .qty-btn {
-  width: 56rpx;
-  height: 56rpx;
+  width: 52rpx;
+  height: 52rpx;
   border-radius: 999rpx;
   display: flex;
   align-items: center;
@@ -233,7 +233,7 @@ page {
 }
 
 .qty-num {
-  min-width: 56rpx;
+  min-width: 50rpx;
   text-align: center;
   font-family: 'DIN Alternate', sans-serif;
   font-size: 32rpx;

@@ -26,7 +26,7 @@ function fmtYuan(v) {
 function getMemberProgress(memberLevel, totalRecharge) {
   const total = Number(totalRecharge || 0);
   let progress = 0;
-  let nextLevelText = '尊享会员 顶级权益生效中';
+  let nextLevelText = 'Lv.4尊享会员 顶级权益生效中';
 
   const nextTarget = LEVELS.find(l => l.threshold > total);
   if (nextTarget) {
@@ -35,7 +35,7 @@ function getMemberProgress(memberLevel, totalRecharge) {
     }
     progress = Math.min(Math.max(progress, 0), 100);
     const diff = nextTarget.threshold - total;
-    nextLevelText = `再充值 ${fmtYuan(diff)}元 升级至 Lv.${nextTarget.level} 尊享会员`;
+    nextLevelText = `再充${fmtYuan(diff)}元 升级至${getMemberTitle(nextTarget.level)}`;
   } else {
     progress = 100;
   }

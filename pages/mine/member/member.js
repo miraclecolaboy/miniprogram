@@ -65,9 +65,9 @@ Page({
     const lv = Number(memberLevel || 0);
     const total = Number(totalRecharge || 0);
     const memberTitle = lv >= 4 ? 'Lv.4尊享会员' : `Lv.${Math.max(0, lv)}会员`;
-    
+      
     let progress = 0;
-    let nextLevelText = '尊享会员 顶级权益生效中';
+    let nextLevelText = lv >= 4 ? `${memberTitle} 顶级权益生效中` : '';
 
     // 查找下一个未达到的等级目标
     const nextTarget = LEVELS.find(l => l.threshold > total);
@@ -80,11 +80,12 @@ Page({
       progress = Math.min(Math.max(progress, 0), 100);
       
       const diff = nextTarget.threshold - total;
-      nextLevelText = `再充值 ${fmtYuan(diff)}元 升级至 Lv.${nextTarget.level} 尊享会员`;
+      const targetTitle = nextTarget.level >= 4 ? 'Lv.4尊享会员' : `Lv.${nextTarget.level}会员`;
+      nextLevelText = `再充${fmtYuan(diff)}元 升级至${targetTitle}`;
     } else {
       // 已达最高等级
       progress = 100;
-      nextLevelText = '尊享会员 顶级权益生效中';
+      nextLevelText = `${memberTitle} 顶级权益生效中`;
     }
 
     // 直接生成样式字符串，防止 WXML 解析 {{progress}}% 报错

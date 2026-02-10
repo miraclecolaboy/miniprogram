@@ -11,7 +11,7 @@
           src="{{mode === 'waimai' ? '/assets/delivery.png' : (mode === 'kuaidi' ? '/assets/express.png' : '')}}"
           mode="aspectFit"
         />
-        <text class="mode-text">{{mode === 'waimai' ? '外卖配送' : (mode === 'kuaidi' ? '快递配送' : '')}}</text>
+        <text class="mode-text">{{mode === 'waimai' ? '外卖' : (mode === 'kuaidi' ? '快递' : '')}}</text>
       </view>
 
       <view class="submode-tabs" wx:if="{{mode === 'ziti'}}">
