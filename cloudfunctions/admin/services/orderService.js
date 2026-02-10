@@ -7,7 +7,6 @@ const {
   REFUND_CALLBACK_FN 
 } = require('../config/constants');
 const { now, moneyToFen, genOutRefundNo32 } = require('../utils/common');
-const { adminIdentity } = require('./authService');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
@@ -145,7 +144,6 @@ async function handleRefund(orderId, decision, remark, sess) {
   if (!['approve', 'reject'].includes(decision)) throw new Error('无效的决定');
 
   const nowTs = now();
-  const identity = adminIdentity(sess);
   let isWxPayRefund = false;
   let wxPayPayload = {};
 
@@ -161,7 +159,6 @@ async function handleRefund(orderId, decision, remark, sess) {
 
     const logEntry = {
       ts: nowTs,
-      by: identity.username,
       text: `商家 ${decision === 'approve' ? '同意' : '拒绝'} 售后。备注：${remark || '无'}`
     };
 
@@ -172,7 +169,6 @@ async function handleRefund(orderId, decision, remark, sess) {
           'refund.statusText': '商家已拒绝',
           'refund.handleRemark': remark,
           'refund.handleAt': nowTs,
-          'refund.handleBy': identity.username,
           'refund.logs': _.push(logEntry)
         }
       });
@@ -189,7 +185,6 @@ async function handleRefund(orderId, decision, remark, sess) {
           'refund.statusText': '售后完成(0元)',
           'refund.handleRemark': remark || '0元订单，无需退款',
           'refund.handleAt': nowTs,
-          'refund.handleBy': identity.username,
           'refund.refundedAt': nowTs,
           'refund.logs': _.push(logEntry)
         }
@@ -209,7 +204,6 @@ async function handleRefund(orderId, decision, remark, sess) {
           'refund.statusText': '退款成功(已退回余额)',
           'refund.handleRemark': remark,
           'refund.handleAt': nowTs,
-          'refund.handleBy': identity.username,
           'refund.refundedAt': nowTs,
           'refund.logs': _.push(logEntry)
         }
@@ -232,7 +226,6 @@ async function handleRefund(orderId, decision, remark, sess) {
         'refund.statusText': '退款处理中',
         'refund.handleRemark': remark,
         'refund.handleAt': nowTs,
-        'refund.handleBy': identity.username,
         'refund.outRefundNo': outRefundNo,
         'refund.logs': _.push(logEntry)
       }
@@ -275,14 +268,12 @@ async function handleRefund(orderId, decision, remark, sess) {
 
 
 async function orderUpdateWithLog({ id, patch, sess, action, note }) {
-  const identity = adminIdentity(sess);
   await db.collection(COL_ORDERS).doc(id).update({
     data: {
       ...patch,
       updatedAt: now(),
       logs: _.push({
         action: action || 'update',
-        by: identity.username,
         ts: now(),
         note: note || '系统操作'
       })

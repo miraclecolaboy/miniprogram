@@ -84,22 +84,19 @@ async function listCategories() {
   }
 }
 
-async function addCategory(name, sort, username) {
+async function addCategory(name, sort) {
   const doc = { 
     name: safeStr(name), 
     sort: toInt(sort, 0), 
     status: 1, 
     createdAt: now(), 
     updatedAt: now(),
-    createdBy: username,
-    updatedBy: username
   };
   const addRes = await db.collection(COL_CATEGORIES).add({ data: doc });
   return { ok: true, id: addRes._id };
 }
 
-async function removeCategory(id, role) {
-  if (role !== 'admin') return { ok: false, message: '无权限：仅管理员可删除' };
+async function removeCategory(id) {
   const countRes = await db.collection(COL_PRODUCTS).where({ categoryId: id }).count();
   if (countRes.total > 0) return { ok: false, message: '该分组下仍有商品，无法删除' };
   await db.collection(COL_CATEGORIES).doc(id).remove();
@@ -192,15 +189,13 @@ async function getProductForEdit(id) {
 }
 
 // [修改] addProduct, 增加 thumbFileID
-async function addProduct(data, tempId, username) {
+async function addProduct(data, tempId) {
   const input = normalizeProductInput(data);
   const doc = {
     ...input,
     skuList: [], 
     createdAt: now(),
-    updatedAt: now(),
-    createdBy: username,
-    updatedBy: username
+    updatedAt: now()
   };
   
   const addRes = await db.collection(COL_PRODUCTS).add({ data: doc });
@@ -226,11 +221,11 @@ async function addProduct(data, tempId, username) {
 }
 
 // [修改] updateProduct, 增加 thumbFileID
-async function updateProduct(id, data, deletedFileIDs, username) {
+async function updateProduct(id, data, deletedFileIDs) {
   if (!id || typeof id !== 'string') return { ok: false, message: '缺少商品ID' };
   
   if (id.startsWith('temp_')) {
-    return await addProduct(data, id, username);
+    return await addProduct(data, id);
   }
 
   const input = normalizeProductInput(data);
@@ -239,8 +234,7 @@ async function updateProduct(id, data, deletedFileIDs, username) {
       ...input,
       // Inventory is no longer used; remove legacy fields to avoid confusion.
       stock: _.remove(),
-      updatedAt: now(),
-      updatedBy: username,
+      updatedAt: now()
     }
   });
 
@@ -252,8 +246,7 @@ async function updateProduct(id, data, deletedFileIDs, username) {
 }
 
 // [修改] removeProduct, 增加删除缩略图
-async function removeProduct(id, role) {
-  if (role !== 'admin') return { ok: false, message: '无权限' };
+async function removeProduct(id) {
   if (!id) return { ok: false, message: '缺少商品ID' };
   const old = await db.collection(COL_PRODUCTS).doc(id).get().then(res => res.data).catch(() => null);
   const oldImgs = old?.imgs || [];
@@ -269,19 +262,18 @@ async function removeProduct(id, role) {
 }
 
 // toggleProductStatus, updateSkus 无变化
-async function toggleProductStatus(id, onShelf, username) {
+async function toggleProductStatus(id, onShelf) {
   if (!id) return { ok: false, message: '缺少商品ID' };
   await db.collection(COL_PRODUCTS).doc(id).update({
     data: {
       status: onShelf ? 1 : 0,
-      updatedAt: now(),
-      updatedBy: username
+      updatedAt: now()
     }
   });
   return { ok: true };
 }
 
-async function updateSkus(productId, skus, username) {
+async function updateSkus(productId, skus) {
   if (!productId) return { ok: false, message: '缺少商品ID' };
   const skuList = Array.isArray(skus) ? skus : [];
   if (skuList.length === 0) return { ok: false, message: 'SKU列表不能为空' };
@@ -302,8 +294,7 @@ async function updateSkus(productId, skus, username) {
       skuList: normalized,
       stock: _.remove(),
       price: Number(price.toFixed(2)),
-      updatedAt: now(),
-      updatedBy: username
+      updatedAt: now()
     }
   });
   return { ok: true };

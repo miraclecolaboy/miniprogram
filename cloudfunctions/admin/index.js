@@ -1,5 +1,6 @@
 const cloud = require('wx-server-sdk');
 const authService = require('./services/authService');
+const initService = require('./services/initService');
 const productService = require('./services/productService');
 const orderService = require('./services/orderService');
 const shopService = require('./services/shopService');
@@ -12,11 +13,14 @@ exports.main = async (event, context) => {
 
   // 定时触发器
   const triggerName = String(event?.TriggerName || '').trim();
-  if (!action && (event?.Type === 'Timer' || event?.type === 'timer') && triggerName === 'autoDoneTwiceDaily') {
-    return await orderService.autoDoneKuaidiOrders();
-  }
-
   try {
+    // Bootstrap collections (first deploy / empty DB). Safe to call repeatedly.
+    await initService.ensureCollections();
+
+    if (!action && (event?.Type === 'Timer' || event?.type === 'timer') && triggerName === 'autoDoneTwiceDaily') {
+      return await orderService.autoDoneKuaidiOrders();
+    }
+
     // 登录与会话检查接口
     if (action === 'login') {
       return await authService.login(event.username, event.password, OPENID);
@@ -29,25 +33,23 @@ exports.main = async (event, context) => {
     // 统一鉴权
     const sess = await authService.verifySession(event.token);
     if (!sess) return { ok: false, code: 'AUTH_EXPIRED', message: '未登录或登录已过期' };
-    
-    const user = sess.user;
 
     // 业务路由分发
     switch (action) {
       // --- 商品与分类 ---
       case 'categories_list': return await productService.listCategories();
-      case 'categories_add': return await productService.addCategory(event.name, event.sort, user.username);
-      case 'categories_remove': return await productService.removeCategory(event.id, user.role);
+      case 'categories_add': return await productService.addCategory(event.name, event.sort);
+      case 'categories_remove': return await productService.removeCategory(event.id);
       
       case 'products_list': return await productService.listProducts(event);
       case 'product_get_for_edit': return await productService.getProductForEdit(event.id);
 
-      case 'products_add': return await productService.addProduct(event.data, event.id, user.username);
+      case 'products_add': return await productService.addProduct(event.data, event.id);
       
-      case 'products_update': return await productService.updateProduct(event.id, event.data, event.deletedFileIDs, user.username);
-      case 'products_remove': return await productService.removeProduct(event.id, user.role);
-      case 'products_toggle': return await productService.toggleProductStatus(event.id, event.onShelf, user.username);
-      case 'product_update_skus': return await productService.updateSkus(event.productId, event.skus, user.username);
+      case 'products_update': return await productService.updateProduct(event.id, event.data, event.deletedFileIDs);
+      case 'products_remove': return await productService.removeProduct(event.id);
+      case 'products_toggle': return await productService.toggleProductStatus(event.id, event.onShelf);
+      case 'product_update_skus': return await productService.updateSkus(event.productId, event.skus);
 
       // --- 订单管理 ---
       case 'orders_list': return await orderService.listOrders(event.tab, event.pageNum, event.pageSize);
@@ -85,14 +87,14 @@ exports.main = async (event, context) => {
       case 'shop_setNotice': return await shopService.setNotice(event.notice);
       case 'shop_setConfig': return await shopService.setConfig(event);
       case 'redeem_gifts_list': return await shopService.listGifts();
-      case 'redeem_gifts_upsert': return await shopService.upsertGift(event, user.username);
+      case 'redeem_gifts_upsert': return await shopService.upsertGift(event);
       case 'redeem_gifts_disable': return await shopService.disableGift(event.id);
       case 'points_consumeCode': return await shopService.consumeCode(event.code);
         
       // --- [新增] 优惠券管理 ---
       case 'coupons_list': return await shopService.listCoupons();
-      case 'coupons_upsert': return await shopService.upsertCoupon(event.data, user.username);
-      case 'coupons_toggle_status': return await shopService.toggleCouponStatus(event.id, event.status, user.username);
+      case 'coupons_upsert': return await shopService.upsertCoupon(event.data);
+      case 'coupons_toggle_status': return await shopService.toggleCouponStatus(event.id, event.status);
 
       default:
         return { ok: false, message: `未知 action: ${action}` };

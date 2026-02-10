@@ -56,7 +56,7 @@ async function listGifts() {
   }
 }
 
-async function upsertGift(data, username) {
+async function upsertGift(data) {
   const id = safeStr(data.id);
   const name = safeStr(data.name);
   const desc = safeStr(data.desc);
@@ -84,7 +84,6 @@ async function upsertGift(data, username) {
         // Inventory is no longer used; remove legacy fields to avoid confusion.
         stock: _.remove(),
         updatedAt: tNow,
-        updatedBy: username,
       }
     });
     return { ok: true, id };
@@ -98,8 +97,6 @@ async function upsertGift(data, username) {
     sort: 0,
     createdAt: tNow,
     updatedAt: tNow,
-    createdBy: username,
-    updatedBy: username,
   };
   const addRes = await db.collection(COL_SHOP_CONFIG).add({ data: doc });
   return { ok: true, id: addRes._id };
@@ -270,7 +267,7 @@ async function listCoupons() {
   }
 }
 
-async function upsertCoupon(data, username) {
+async function upsertCoupon(data) {
   const { id, title, minSpend, discount, totalQuantity } = data;
 
   if (!safeStr(title)) return { ok: false, message: '标题不能为空' };
@@ -303,7 +300,6 @@ async function upsertCoupon(data, username) {
       discount: nDiscount,
       totalQuantity: nTotalQuantity,
       updatedAt: tNow,
-      updatedBy: username,
     };
     await ref.update({ data: patchData });
     return { ok: true, id };
@@ -319,15 +315,13 @@ async function upsertCoupon(data, username) {
       status: 'active',
       createdAt: tNow,
       updatedAt: tNow,
-      createdBy: username,
-      updatedBy: username,
     };
     const addRes = await db.collection(COL_SHOP_CONFIG).add({ data: fullDoc });
     return { ok: true, id: addRes._id };
   }
 }
 
-async function toggleCouponStatus(id, newStatus, username) {
+async function toggleCouponStatus(id, newStatus) {
   if (!id) return { ok: false, message: '缺少ID' };
   const status = newStatus ? 'active' : 'inactive';
   const got = await db.collection(COL_SHOP_CONFIG).doc(id).get().catch(() => null);
@@ -338,7 +332,6 @@ async function toggleCouponStatus(id, newStatus, username) {
     data: {
       status,
       updatedAt: now(),
-      updatedBy: username,
     }
   });
   return { ok: true };

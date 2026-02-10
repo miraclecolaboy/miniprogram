@@ -1,4 +1,5 @@
 const cloud = require('wx-server-sdk');
+const crypto = require('crypto');
 const {
   COL_USERS,
   COL_SESS
@@ -34,8 +35,6 @@ async function ensureDefaultAdmin() {
 
   const admin = {
     username: 'admin',
-    displayName: '管理员',
-    role: 'admin',
     enabled: true,
     salt,
     passwordHash,
@@ -57,7 +56,6 @@ async function createSession(openid, user) {
       token,
       openid,
       username: user.username,
-      role: user.role,
       createdAt: now(),
       expiresAt
     }
@@ -114,10 +112,7 @@ async function verifySession(token) {
 // 获取管理员身份信息
 function adminIdentity(sess) {
   const u = sess?.user || {};
-  return {
-    username: String(u.username || ''),
-    displayName: String(u.displayName || u.username || '')
-  };
+  return { username: String(u.username || sess?.username || '') };
 }
 
 // 登录业务逻辑封装
@@ -147,7 +142,7 @@ async function login(username, password, openid) {
     ok: true,
     token: sess.token,
     expiresAt: sess.expiresAt,
-    user: { username: user.username, role: user.role, displayName: user.displayName || user.username }
+    user: { username: user.username }
   };
 }
 
