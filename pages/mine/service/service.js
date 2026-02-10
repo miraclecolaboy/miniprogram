@@ -300,11 +300,19 @@ Page({
   _setDataIfChanged(next) {
     if (!next) return;
 
+    // Allow partial updates (e.g. refresh temp QR URL only) without wiping other fields.
+    const merged = {
+      phone: (Object.prototype.hasOwnProperty.call(next, 'phone') ? next.phone : this.data.phone),
+      serviceHours: (Object.prototype.hasOwnProperty.call(next, 'serviceHours') ? next.serviceHours : this.data.serviceHours),
+      qrFileId: (Object.prototype.hasOwnProperty.call(next, 'qrFileId') ? next.qrFileId : this.data.qrFileId),
+      qrSrc: (Object.prototype.hasOwnProperty.call(next, 'qrSrc') ? next.qrSrc : this.data.qrSrc),
+    };
+
     const viewModel = {
-      phone: safeStr(next.phone),
-      serviceHours: safeStr(next.serviceHours),
-      qrFileId: safeStr(next.qrFileId),
-      qrSrc: safeStr(next.qrSrc),
+      phone: safeStr(merged.phone),
+      serviceHours: safeStr(merged.serviceHours),
+      qrFileId: safeStr(merged.qrFileId),
+      qrSrc: safeStr(merged.qrSrc),
     };
     viewModel.serviceHoursLines = buildServiceHoursLines(viewModel.serviceHours);
 
