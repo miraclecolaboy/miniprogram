@@ -8,17 +8,11 @@ const { requestPaymentAsync, isUserCancelPay } = require('../../utils/wxPay');
 const { CART_CLEAR: KEY_CART_CLEAR } = require('../../utils/storageKeys');
 
 module.exports = {
-  openPaySheet() { this.setData({ paySheetVisible: true }); },
-  closePaySheet() { this.setData({ paySheetVisible: false }); },
-
   applyDefaultPayMethod() {
     const { balance, finalPay } = this.data;
     const shouldBalance = toNum(balance, 0) >= toNum(finalPay, 0) && toNum(finalPay, 0) > 0;
     const method = shouldBalance ? 'balance' : 'wechat';
-    this.setData({
-      payMethod: method,
-      payMethodText: method === 'wechat' ? '微信支付' : '余额支付',
-    });
+    this.setData({ payMethod: method });
   },
 
   choosePay(e) {
@@ -27,14 +21,10 @@ module.exports = {
 
     if (method === 'balance' && toNum(this.data.balance, 0) < toNum(this.data.finalPay, 0)) {
       wx.showToast({ title: '余额不足', icon: 'none' });
-      return this.setData({ paySheetVisible: false });
+      return;
     }
 
-    this.setData({
-      payMethod: method,
-      payMethodText: method === 'wechat' ? '微信支付' : '余额支付',
-      paySheetVisible: false,
-    });
+    this.setData({ payMethod: method });
   },
 
   async onPayTap() {
@@ -110,4 +100,3 @@ module.exports = {
     }
   },
 };
-

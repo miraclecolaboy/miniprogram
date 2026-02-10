@@ -9,8 +9,6 @@ Page({
     availableCoupons: [],
     myCoupons: {
       unused: [],
-      used: [], // 暂不处理“已使用/已过期”
-      expired: []
     },
     loading: false,
     claimingIds: {},
@@ -62,7 +60,7 @@ Page({
       const me = resMe?.result?.data;
       const userCoupons = me?.coupons || [];
 
-      const myCouponsCategorized = { unused: [], used: [], expired: [] };
+      const myCouponsCategorized = { unused: [] };
       const userCouponIds = new Set(userCoupons.map(c => c.couponId));
 
       myCouponsCategorized.unused = groupUserCoupons(userCoupons);

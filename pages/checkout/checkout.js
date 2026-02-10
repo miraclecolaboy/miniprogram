@@ -14,7 +14,7 @@ const syncMethods = require('./checkout.sync');
 
 Page(Object.assign({
   data: {
-    // 核心模式: 'ziti' (门店自提) | 'waimai' (外卖配送)
+    // 核心模式: 'ziti' (门店自提) | 'waimai' (外卖配送) | 'kuaidi' (全国快递)
     mode: 'ziti', 
     // 自提子模式: 'ziti'(打包) | 'tangshi'(堂食)
     storeSubMode: 'ziti', 

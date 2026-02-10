@@ -59,6 +59,7 @@ Page({
           storeAddress: cfg.storeAddress || '',
           storeLat: toNum(cfg.storeLat, 0),
           storeLng: toNum(cfg.storeLng, 0),
+          phone: String(cfg.phone || '').trim(),
         }
       });
     } catch (e) {
@@ -124,7 +125,9 @@ Page({
 
   // 联系商家/客服
   contactShop() {
-    wx.makePhoneCall({ phoneNumber: '13800138000' }); // 请替换为真实配置
+    const phone = String(this.data.shopCfg?.phone || '').trim();
+    if (!phone) return wx.showToast({ title: '暂未配置联系电话', icon: 'none' });
+    wx.makePhoneCall({ phoneNumber: phone });
   },
 
   // --- 售后逻辑 ---
