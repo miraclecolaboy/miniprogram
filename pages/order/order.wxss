@@ -64,7 +64,7 @@
 .store-name {
   font-size: 40rpx;
   font-weight: 800;
-  letter-spacing: 4rpx;
+  letter-spacing: 2rpx;
   line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;

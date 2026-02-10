@@ -223,7 +223,8 @@ page {
 }
 
 .qty-btn.minus {
-  background: #F2F3F5;
+  background: #FFFFFF; 
+  border: 2rpx solid rgba(0, 0, 0, 0.18);
   color: var(--black);
 }
 
@@ -249,7 +250,7 @@ page {
 }
 
 .icon-bar.h {
-  width: 18rpx;
+  width: 14rpx;
   height: 4rpx;
 }
 
