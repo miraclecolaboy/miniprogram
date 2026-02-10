@@ -29,7 +29,7 @@
     <view class="main-info-box {{mode !== 'ziti' ? 'main-info-box--delivery' : ''}}">
       <block wx:if="{{mode === 'ziti'}}">
         <view class="store-info">
-          <text class="store-name">{{storeName || '加载中...'}}</text>
+          <text class="store-name {{storeName ? 'store-name--in' : ''}}">{{storeName}}</text>
           <text class="distance-tag" wx:if="{{distance}}">距您 {{distance}}{{distanceUnit}}</text>
         </view>
         <picker mode="selector" range="{{timeList}}" bindchange="choosePickupTime">

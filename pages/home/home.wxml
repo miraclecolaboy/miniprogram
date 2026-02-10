@@ -102,8 +102,8 @@
       </view>
     </view>
 
-    <view class="footer-tips">
-      <text>· {{storeName}} ·</text>
+    <view class="footer-tips" wx:if="{{storeName}}">
+      <text class="footer-store-name">· {{storeName}} ·</text>
     </view>
 
   </view>

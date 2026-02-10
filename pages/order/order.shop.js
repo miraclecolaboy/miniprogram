@@ -3,12 +3,16 @@
 
 const { callUser } = require('../../utils/cloud');
 const { toNum } = require('../../utils/common');
+const { setShopConfigCache } = require('../../utils/shopConfigCache');
 
 module.exports = {
   async loadShopConfig() {
     try {
       const res = await callUser('getShopConfig');
       const cfg = res?.result?.data || {};
+
+      // Cache for other pages / next entry.
+      setShopConfigCache(cfg);
 
       const kuaidiOn = cfg.kuaidiOn !== false;
       const nextMode = (!kuaidiOn && this.data.mode === 'kuaidi') ? 'ziti' : this.data.mode;

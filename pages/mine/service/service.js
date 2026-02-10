@@ -5,6 +5,7 @@ const { SHOP_CONTACT_CACHE_MAIN: CACHE_KEY } = require('../../../utils/storageKe
 const { safeStr, isCloudFileId } = require('../../../utils/common');
 const { getTempFileUrl } = require('../../../utils/cloudFile');
 const { parseServiceHoursRanges, fmtMinOfDay } = require('../../../utils/serviceHours');
+const { getShopConfigCache, setShopConfigCache } = require('../../../utils/shopConfigCache');
 const CACHE_TTL = 6 * 60 * 60 * 1000; 
 
 function now() { return Date.now(); }
@@ -146,27 +147,51 @@ Page({
   },
 
   _loadCache() {
+    let cachedPhone = '';
     try {
       const cached = wx.getStorageSync(CACHE_KEY);
-      if (!cached || typeof cached !== 'object') return;
+      if (cached && typeof cached === 'object') {
+        const ts = Number(cached.ts || 0);
+        if (ts && now() - ts <= CACHE_TTL) {
+          const cachedQrFileId = safeStr(cached.qrFileId);
+          let cachedQrSrc = safeStr(cached.qrSrc);
 
-      const ts = Number(cached.ts || 0);
-      if (!ts || now() - ts > CACHE_TTL) return;
+          // Prevent using expired temp URLs (403) on first render.
+          if (cachedQrSrc && isExpiredTempUrl(cachedQrSrc)) {
+            cachedQrSrc = '';
+          }
 
-      const cachedQrFileId = safeStr(cached.qrFileId);
-      let cachedQrSrc = safeStr(cached.qrSrc);
+          cachedPhone = safeStr(cached.phone);
 
-      // Prevent using expired temp URLs (403) on first render.
-      if (cachedQrSrc && isExpiredTempUrl(cachedQrSrc)) {
-        cachedQrSrc = '';
+          this._setDataIfChanged({
+            phone: cachedPhone,
+            serviceHours: safeStr(cached.serviceHours),
+            qrFileId: cachedQrFileId,
+            qrSrc: cachedQrSrc,
+          });
+        }
       }
+    } catch (_) {}
 
-      this._setDataIfChanged({
-        phone: safeStr(cached.phone),
-        serviceHours: safeStr(cached.serviceHours),
-        qrFileId: cachedQrFileId,
-        qrSrc: cachedQrSrc,
-      });
+    // Fallback: use general shop config cache if contact cache is missing phone.
+    if (cachedPhone) return;
+    try {
+      const cfg = getShopConfigCache();
+      if (!cfg || typeof cfg !== 'object') return;
+
+      const phone = safeStr(cfg.phone || cfg.kefuPhone || cfg.contactPhone || cfg.servicePhone || cfg.tel || cfg.mobile);
+      const serviceHours = safeStr(cfg.serviceHours || cfg.businessHours || cfg.openHours);
+
+      const qrRaw = safeStr(cfg.kefuQrUrl || cfg.kefuQr || cfg.qrUrl);
+      let qrFileId = '';
+      let qrSrc = '';
+
+      if (qrRaw && isCloudFileId(qrRaw)) qrFileId = qrRaw;
+      else qrSrc = qrRaw;
+
+      if (phone || serviceHours || qrFileId || qrSrc) {
+        this._setDataIfChanged({ phone, serviceHours, qrFileId, qrSrc });
+      }
     } catch (_) {}
   },
 
@@ -240,11 +265,14 @@ Page({
 
       const cfg = res?.result?.data || res?.result || {};
 
-      const phone = safeStr(cfg.phone);
-      const serviceHours = safeStr(cfg.serviceHours);
+      // Cache for other pages / next entry.
+      setShopConfigCache(cfg);
+
+      const phone = safeStr(cfg.phone || cfg.kefuPhone || cfg.contactPhone || cfg.servicePhone || cfg.tel || cfg.mobile);
+      const serviceHours = safeStr(cfg.serviceHours || cfg.businessHours || cfg.openHours);
 
       // 商家配置：kefuQrUrl 允许 http(s) 或 cloud:// fileID
-      const qrRaw = safeStr(cfg.kefuQrUrl);
+      const qrRaw = safeStr(cfg.kefuQrUrl || cfg.kefuQr || cfg.qrUrl);
       let qrFileId = '';
       let qrSrc = '';
 

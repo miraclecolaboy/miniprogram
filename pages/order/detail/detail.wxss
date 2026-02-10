@@ -250,10 +250,12 @@ page {
 }
 
 .icon-bar.h {
-  width: 14rpx;
+  width: 18rpx;
   height: 4rpx;
 }
-
+.qty-btn.minus .icon-bar.h {
+  width: 14rpx;
+}
 .icon-bar.v {
   width: 4rpx;
   height: 18rpx;

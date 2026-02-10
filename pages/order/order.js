@@ -5,6 +5,9 @@ const {
   CART_CLEAR: KEY_CART_CLEAR,
   ORDER_MODE: KEY_ORDER_MODE,
 } = require('../../utils/storageKeys');
+const { getShopConfigCache } = require('../../utils/shopConfigCache');
+
+const CACHED_SHOP_CFG = getShopConfigCache() || {};
 
 const cartMethods = require('./order.cart');
 const catalogMethods = require('./order.catalog');
@@ -14,9 +17,9 @@ const shopMethods = require('./order.shop');
 Page(Object.assign({
   data: {
     mode: 'ziti',
-    kuaidiOn: true,
-    storeName: '加载中...',
-    notice: '',
+    kuaidiOn: CACHED_SHOP_CFG.kuaidiOn !== false,
+    storeName: CACHED_SHOP_CFG.storeName || '',
+    notice: CACHED_SHOP_CFG.notice || '',
     minOrderMap: { ziti: 0, waimai: 88, kuaidi: 100 },
     catalogLoading: true,
     skeletonList: [0, 1, 2, 3, 4, 5],

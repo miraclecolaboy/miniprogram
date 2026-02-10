@@ -57,7 +57,7 @@
         </view>
         
         <view class="phone-bottom">
-          <view class="phone-num-sm din-font">{{phone}}</view>
+          <view class="phone-num-sm din-font">{{phone || '暂未配置'}}</view>
           <view class="btn-call" catchtap="callPhone" hover-class="btn-call--hover" hover-stay-time="80">拨打</view>
         </view>
       </view>

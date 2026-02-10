@@ -20,6 +20,7 @@ module.exports = {
   POINTS_GIFTS_CACHE_AT: 'LLJ_POINTS_GIFTS_CACHE_AT',
 
   SHOP_CONTACT_CACHE_MAIN: 'shop_contact_cache_main_v1',
+  SHOP_CONFIG_CACHE_MAIN: 'shop_config_cache_main_v1',
 
   // ===== 商家端（admin 子包）=====
   IS_MERCHANT: 'IS_MERCHANT_V1',

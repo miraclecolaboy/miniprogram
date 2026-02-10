@@ -1,6 +1,9 @@
 // pages/checkout/checkout.js
 const { isLoginOK } = require('../../utils/auth');
 const { CART_CLEAR: KEY_CART_CLEAR } = require('../../utils/storageKeys');
+const { getShopConfigCache } = require('../../utils/shopConfigCache');
+
+const CACHED_SHOP_CFG = getShopConfigCache() || {};
 
 // 引入子模块保持不变
 const cartMethods = require('./checkout.cart');
@@ -20,7 +23,7 @@ Page(Object.assign({
     isMenuExpanded: false,
     
     // 基础数据
-    storeName: '',
+    storeName: CACHED_SHOP_CFG.storeName || '',
     storeAddress: '', 
     address: null,
     distance: '',
@@ -62,7 +65,8 @@ Page(Object.assign({
       const rawSub = options.storeSubMode || 'ziti';
       const storeSubMode = (mode === 'ziti' && rawSub === 'tangshi') ? 'tangshi' : 'ziti';
 
-      this.setData({ mode, storeSubMode });
+      const cachedCfg = getShopConfigCache() || {};
+      this.setData({ mode, storeSubMode, storeName: cachedCfg.storeName || '' });
 
       // 2. 加载用户与购物车
       this.syncUserFromStorage();

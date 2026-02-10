@@ -1,5 +1,6 @@
 const { callUser } = require('../../../utils/cloud');
 const { toNum } = require('../../../utils/common');
+const { setShopConfigCache } = require('../../../utils/shopConfigCache');
 
 Page({
   data: {
@@ -48,6 +49,10 @@ Page({
     try {
       const res = await callUser('getShopConfig');
       const cfg = res?.result?.data || {};
+
+      // Cache for other pages / next entry.
+      setShopConfigCache(cfg);
+
       this.setData({
         shopCfg: {
           storeName: cfg.storeName || '',

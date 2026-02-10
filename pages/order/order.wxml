@@ -8,7 +8,7 @@
 
     <view class="top-card-main">
       <view class="top-card-left">
-        <view class="store-name">{{storeName}}</view>
+        <view class="store-name {{storeName ? 'store-name--in' : ''}}">{{storeName}}</view>
       </view>
       <view class="top-card-right">
         <view
@@ -116,25 +116,19 @@
                   <!-- 无规格：显示 + - 数量 -->
                   <view wx:else class="qty-control">
                     <view wx:if="{{item.count > 0}}" class="qty-control">
-                      <view class="qty-btn qty-btn-plain" catchtap="decreaseCount" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
-                        <view class="qty-icon qty-icon-minus">
-                          <view class="qty-bar h"></view>
-                        </view>
+                      <view class="qty-btn minus" catchtap="decreaseCount" data-id="{{item.id}}" hover-class="qty-hover" hover-stay-time="80" hover-stop-propagation="true">
+                        <view class="icon-bar h"></view>
                       </view>
                       <text class="qty-count">{{item.count}}</text>
-                      <view class="qty-btn qty-btn-solid" catchtap="addToCart" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
-                        <view class="qty-icon qty-icon-plus">
-                          <view class="qty-bar h"></view>
-                          <view class="qty-bar v"></view>
-                        </view>
+                      <view class="qty-btn plus" catchtap="addToCart" data-id="{{item.id}}" hover-class="qty-hover-dark" hover-stay-time="80" hover-stop-propagation="true">
+                        <view class="icon-bar h"></view>
+                        <view class="icon-bar v"></view>
                       </view>
                     </view>
                     <view wx:else class="qty-control">
-                      <view class="qty-btn qty-btn-solid" catchtap="addToCart" data-id="{{item.id}}" hover-class="btn-hover" hover-stop-propagation="true">
-                        <view class="qty-icon qty-icon-plus">
-                          <view class="qty-bar h"></view>
-                          <view class="qty-bar v"></view>
-                        </view>
+                      <view class="qty-btn plus" catchtap="addToCart" data-id="{{item.id}}" hover-class="qty-hover-dark" hover-stay-time="80" hover-stop-propagation="true">
+                        <view class="icon-bar h"></view>
+                        <view class="icon-bar v"></view>
                       </view>
                     </view>
                   </view>
@@ -201,17 +195,13 @@
     <view class="spec-qty">
       <view class="spec-qty-label">数量</view>
       <view class="spec-qty-control">
-        <view class="qty-btn qty-btn-plain" bindtap="decreaseSpecQty" hover-class="btn-hover" hover-stop-propagation="true">
-          <view class="qty-icon qty-icon-minus">
-            <view class="qty-bar h"></view>
-          </view>
+        <view class="qty-btn minus" bindtap="decreaseSpecQty" hover-class="qty-hover" hover-stay-time="80" hover-stop-propagation="true">
+          <view class="icon-bar h"></view>
         </view>
         <text class="qty-count">{{specQuantity}}</text>
-        <view class="qty-btn qty-btn-solid" bindtap="increaseSpecQty" hover-class="btn-hover" hover-stop-propagation="true">
-          <view class="qty-icon qty-icon-plus">
-            <view class="qty-bar h"></view>
-            <view class="qty-bar v"></view>
-          </view>
+        <view class="qty-btn plus" bindtap="increaseSpecQty" hover-class="qty-hover-dark" hover-stay-time="80" hover-stop-propagation="true">
+          <view class="icon-bar h"></view>
+          <view class="icon-bar v"></view>
         </view>
       </view>
     </view>
@@ -260,17 +250,13 @@
           <view class="cart-item-bottom">
               <view class="cart-item-total">小计 ￥{{item.total}}</view>
             <view class="cart-item-qty">
-              <view class="qty-btn qty-btn-plain" bindtap="decreaseCount" data-id="{{item.cartKey}}" hover-class="btn-hover" hover-stop-propagation="true">
-                <view class="qty-icon qty-icon-minus">
-                  <view class="qty-bar h"></view>
-                </view>
+              <view class="qty-btn minus" bindtap="decreaseCount" data-id="{{item.cartKey}}" hover-class="qty-hover" hover-stay-time="80" hover-stop-propagation="true">
+                <view class="icon-bar h"></view>
               </view>
               <text class="qty-count">{{item.count}}</text>
-              <view class="qty-btn qty-btn-solid" bindtap="increaseCartItemCount" data-id="{{item.cartKey}}" hover-class="btn-hover" hover-stop-propagation="true">
-                <view class="qty-icon qty-icon-plus">
-                  <view class="qty-bar h"></view>
-                  <view class="qty-bar v"></view>
-                </view>
+              <view class="qty-btn plus" bindtap="increaseCartItemCount" data-id="{{item.cartKey}}" hover-class="qty-hover-dark" hover-stay-time="80" hover-stop-propagation="true">
+                <view class="icon-bar h"></view>
+                <view class="icon-bar v"></view>
               </view>
             </view>
           </view>

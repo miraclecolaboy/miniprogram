@@ -4,6 +4,7 @@
 const { callUser } = require('../../utils/cloud');
 const { toNum } = require('../../utils/common');
 const { genPickupTimeSlotsByServiceHours, storeSubModeText } = require('./checkout.helpers');
+const { setShopConfigCache } = require('../../utils/shopConfigCache');
 
 const DEFAULT_WAIMAI_MAX_KM = 10;
 
@@ -12,6 +13,10 @@ module.exports = {
     try {
       const res = await callUser('getShopConfig', {});
       const cfg = res?.result?.data || {};
+
+      // Cache for other pages / next entry.
+      setShopConfigCache(cfg);
+
       this.setData({
         storeName: cfg.storeName || '',
         storeLat: Number(cfg.storeLat || 0),
@@ -65,4 +70,3 @@ module.exports = {
     this.setData({ storeSubMode: sub, modeText: storeSubModeText(sub) });
   },
 };
-

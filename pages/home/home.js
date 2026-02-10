@@ -2,12 +2,15 @@
 const { callUser } = require('../../utils/cloud');
 const { getTempUrlMap } = require('../../utils/cloudFile'); // [新增] 引入工具
 const { ORDER_MODE: KEY_ORDER_MODE } = require('../../utils/storageKeys');
+const { getShopConfigCache, setShopConfigCache } = require('../../utils/shopConfigCache');
+
+const CACHED_SHOP_CFG = getShopConfigCache() || {};
 
 Page({
   data: {
     showUI: true, // 控制动画重置
-    storeName: '加载中...',
-    kuaidiOn: true,
+    storeName: CACHED_SHOP_CFG.storeName || '',
+    kuaidiOn: CACHED_SHOP_CFG.kuaidiOn !== false,
     loading: true,
     banners: [], // [新增] 轮播图 URL 列表
 
@@ -40,14 +43,23 @@ Page({
   },
 
   async initPage() {
-    await Promise.all([this.loadShopInfo(), this.loadMemberStats()]);
-    this.setData({ loading: false });
+    const [shopPatch, memberPatch] = await Promise.all([
+      this.loadShopInfo({ returnPatch: true }),
+      this.loadMemberStats({ returnPatch: true }),
+    ]);
+
+    // Merge into a single initial setData (avoid flicker).
+    this.setData({ ...(shopPatch || {}), ...(memberPatch || {}), loading: false });
   },
 
-  async loadShopInfo() {
+  async loadShopInfo(opts = {}) {
+    const returnPatch = !!opts.returnPatch;
     try {
       const res = await callUser('getShopConfig', {});
       const data = res?.result?.data || {};
+
+      // Cache for other pages (avoid store name flicker on next entry).
+      setShopConfigCache(data);
       
       // [新增] 处理轮播图：ID 转 URL
       const bannerIds = Array.isArray(data.banners) ? data.banners : [];
@@ -57,32 +69,41 @@ Page({
         banners = bannerIds.map(id => urlMap[id]).filter(Boolean);
       }
 
-      this.setData({ 
+      const patch = { 
         storeName: data.storeName || '',
         kuaidiOn: data.kuaidiOn !== false,
         banners // 设置转换后的图片链接
-      });
+      };
+
+      if (returnPatch) return patch;
+      this.setData(patch);
     } catch (e) { console.error(e); }
+    return returnPatch ? null : undefined;
   },
 
-  async loadMemberStats() {
+  async loadMemberStats(opts = {}) {
+    const returnPatch = !!opts.returnPatch;
     try {
       const res = await callUser('getMe');
       const me = res?.result?.data;
       if (me) {
         const memberLevelNum = Number(me.memberLevel || 0);
         const memberLevel = Number.isFinite(memberLevelNum) ? memberLevelNum : 0;
-        this.setData({
-          memberStats: { 
+        const patch = {
+          memberStats: {
             memberLevel,
             memberName: memberLevel >= 4 ? '尊享会员' : '普通会员',
             balance: (typeof me.balance === 'number' ? me.balance : 0).toFixed(2), 
             points: me.points || 0, 
             coupons: Array.isArray(me.coupons) ? me.coupons.length : 0 
-          }
-        });
+          },
+        };
+
+        if (returnPatch) return patch;
+        this.setData(patch);
       }
     } catch (e) { console.error(e); }
+    return returnPatch ? null : undefined;
   },
 
   onNavTap(e) {
