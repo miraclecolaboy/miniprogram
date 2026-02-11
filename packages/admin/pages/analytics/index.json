@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "运营分析",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "admin-tabbar": "/packages/admin/components/admin-tabbar/index"
+  }
+}

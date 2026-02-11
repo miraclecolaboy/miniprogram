@@ -1,0 +1,276 @@
+@import "../../styles/admin.wxss";
+
+.page {
+  min-height: 100%;
+  padding: 20rpx;
+  box-sizing: border-box;
+  background: #f7f7f7;
+}
+
+.top-card {
+  margin-bottom: 18rpx;
+  border-radius: 20rpx;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #111;
+}
+
+.sub {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.btn {
+  padding: 0 24rpx;
+  height: 62rpx;
+  line-height: 62rpx;
+  border-radius: 14rpx;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.btn-primary {
+  background: #111;
+  color: #fff;
+}
+
+.btn-disabled {
+  opacity: 0.55;
+}
+
+.range-row {
+  margin-top: 18rpx;
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.range-item {
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  background: #eceff3;
+  color: #374151;
+  font-size: 24rpx;
+}
+
+.range-item.is-active {
+  background: #111;
+  color: #fff;
+}
+
+.meta-row {
+  margin-top: 14rpx;
+  font-size: 22rpx;
+  color: #6b7280;
+}
+
+.error-row {
+  margin-top: 10rpx;
+  padding: 10rpx 14rpx;
+  border-radius: 10rpx;
+  background: #fff1f2;
+  color: #b42318;
+  font-size: 24rpx;
+}
+
+.loading-card {
+  text-align: center;
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.section-title {
+  margin: 20rpx 0 14rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #111;
+}
+
+.metrics-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -14rpx;
+}
+
+.metric-card {
+  width: calc(50% - 14rpx);
+  margin-right: 14rpx;
+  margin-bottom: 14rpx;
+  box-sizing: border-box;
+  border-radius: 16rpx;
+}
+
+.metric-label {
+  color: #6b7280;
+  font-size: 22rpx;
+}
+
+.metric-value {
+  margin-top: 8rpx;
+  color: #111;
+  font-size: 34rpx;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.section-card {
+  margin-top: 14rpx;
+  border-radius: 20rpx;
+}
+
+.sub-title {
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #111;
+}
+
+.line-item {
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid #f1f3f5;
+}
+
+.line-item:first-of-type {
+  border-top: none;
+  padding-top: 4rpx;
+}
+
+.line-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 25rpx;
+  color: #111;
+  font-weight: 700;
+}
+
+.line-sub {
+  margin-top: 8rpx;
+  color: #6b7280;
+  font-size: 22rpx;
+}
+
+.trend-row {
+  margin-top: 10rpx;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.6fr;
+  column-gap: 10rpx;
+  font-size: 22rpx;
+  color: #374151;
+}
+
+.trend-row text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trend-head {
+  margin-top: 12rpx;
+  color: #111;
+  font-weight: 700;
+}
+
+.member-item {
+  margin-top: 16rpx;
+}
+
+.member-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 23rpx;
+  color: #374151;
+}
+
+.member-bar {
+  margin-top: 8rpx;
+  height: 12rpx;
+  border-radius: 999rpx;
+  overflow: hidden;
+  background: #edf0f3;
+}
+
+.member-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #111 0%, #4b5563 100%);
+}
+
+.empty {
+  margin-top: 14rpx;
+  color: #9ca3af;
+  font-size: 24rpx;
+}
+
+.top-item {
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid #f1f3f5;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.top-item:first-of-type {
+  border-top: none;
+  padding-top: 4rpx;
+}
+
+.rank {
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  border-radius: 50%;
+  text-align: center;
+  background: #111;
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.top-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.top-name {
+  color: #111;
+  font-size: 26rpx;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-sub {
+  margin-top: 6rpx;
+  color: #6b7280;
+  font-size: 22rpx;
+}
+
+.top-order {
+  color: #374151;
+  font-size: 22rpx;
+  white-space: nowrap;
+}
+
+.tips {
+  background: #fffbeb;
+  border: 1rpx solid #fde68a;
+}
+
+.tip-line {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #92400e;
+}

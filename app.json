@@ -66,6 +66,7 @@
     {
       "root": "packages/admin",
       "pages": [
+        "pages/analytics/index",
         "pages/goods/index",
         "pages/login/login",
         "pages/orders/index",

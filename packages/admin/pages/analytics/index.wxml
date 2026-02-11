@@ -1,0 +1,112 @@
+<view class="page">
+  <view class="card top-card">
+    <view class="header-row">
+      <view>
+        <view class="title">运营分析</view>
+        <view class="sub">订单、顾客/会员、商品数据总览</view>
+      </view>
+      <view class="btn btn-primary {{loading ? 'btn-disabled' : ''}}" bindtap="onReloadTap">刷新</view>
+    </view>
+
+    <view class="range-row">
+      <view
+        wx:for="{{rangeOptions}}"
+        wx:key="value"
+        class="range-item {{rangeDays === item.value ? 'is-active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onRangeTap"
+      >{{item.label}}</view>
+    </view>
+
+    <view class="meta-row" wx:if="{{generatedAtText}}">更新时间：{{generatedAtText}}</view>
+    <view class="error-row" wx:if="{{errorText}}">{{errorText}}</view>
+  </view>
+
+  <view class="card loading-card" wx:if="{{loading && !hasData}}">数据加载中...</view>
+
+  <block wx:if="{{hasData}}">
+    <view class="section-title">订单分析</view>
+    <view class="metrics-grid">
+      <view class="card metric-card" wx:for="{{orderCards}}" wx:key="label">
+        <view class="metric-label">{{item.label}}</view>
+        <view class="metric-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view class="card section-card">
+      <view class="sub-title">订单渠道分布</view>
+      <view class="line-item" wx:for="{{modeStats}}" wx:key="label">
+        <view class="line-head">
+          <text>{{item.label}}</text>
+          <text>{{item.count}}单</text>
+        </view>
+        <view class="line-sub">支付 {{item.paidCount}} 单 · 占比 {{item.shareText}} · {{item.amountText}}</view>
+      </view>
+    </view>
+
+    <view class="card section-card">
+      <view class="sub-title">订单趋势</view>
+      <view class="trend-row trend-head">
+        <text>日期</text>
+        <text>订单</text>
+        <text>支付</text>
+        <text>成交额</text>
+      </view>
+      <view class="trend-row" wx:for="{{trend}}" wx:key="date">
+        <text>{{item.date}}</text>
+        <text>{{item.orderCount}}</text>
+        <text>{{item.paidCount}}</text>
+        <text>{{item.amountText}}</text>
+      </view>
+    </view>
+
+    <view class="section-title">顾客/会员分析</view>
+    <view class="metrics-grid">
+      <view class="card metric-card" wx:for="{{customerCards}}" wx:key="label">
+        <view class="metric-label">{{item.label}}</view>
+        <view class="metric-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view class="card section-card">
+      <view class="sub-title">会员等级分布</view>
+      <view class="member-item" wx:for="{{memberStats}}" wx:key="label">
+        <view class="member-head">
+          <text>{{item.label}}</text>
+          <text>{{item.count}}人（{{item.ratioText}}）</text>
+        </view>
+        <view class="member-bar">
+          <view class="member-bar-fill" style="width: {{item.widthPct}}%;"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-title">商品分析</view>
+    <view class="metrics-grid">
+      <view class="card metric-card" wx:for="{{productCards}}" wx:key="label">
+        <view class="metric-label">{{item.label}}</view>
+        <view class="metric-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view class="card section-card">
+      <view class="sub-title">商品销量 TOP10</view>
+      <view wx:if="{{!topProducts.length}}" class="empty">暂无销量数据</view>
+      <view class="top-item" wx:for="{{topProducts}}" wx:key="rank">
+        <view class="rank">{{item.rank}}</view>
+        <view class="top-main">
+          <view class="top-name">{{item.name}}</view>
+          <view class="top-sub">销量 {{item.quantityText}} 件 · 销售额 {{item.amountText}}</view>
+        </view>
+        <view class="top-order">{{item.orderCount}}单</view>
+      </view>
+    </view>
+
+    <view class="card section-card tips" wx:if="{{tips.length}}">
+      <view class="sub-title">统计说明</view>
+      <view class="tip-line" wx:for="{{tips}}" wx:key="*this">{{item}}</view>
+    </view>
+  </block>
+
+  <admin-tabbar />
+</view>
