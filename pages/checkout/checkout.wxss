@@ -133,6 +133,17 @@ page {
 .pickup-time-row { display: flex; align-items: center; margin-top: 24rpx; font-size: 28rpx; }
 .pickup-time-row .label { color: var(--text-sub); margin-right: 20rpx; }
 .pickup-time-row .time-val { font-weight: 600; color: var(--text-main); display: flex; align-items: center; }
+.reserve-phone-row { display: flex; align-items: center; margin-top: 18rpx; font-size: 28rpx; }
+.reserve-phone-row .label { color: var(--text-sub); margin-right: 20rpx; }
+.reserve-phone-input {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  height: 68rpx;
+}
 .address-info { position: relative; padding-right: 40rpx; }
 .addr-placeholder { font-size: 32rpx; font-weight: 700; color: var(--text-main); }
 .arrow-right { position: absolute; right: 0; top: 50%; transform: translateY(-50%); color: #ccc; }

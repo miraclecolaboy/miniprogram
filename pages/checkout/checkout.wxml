@@ -40,6 +40,19 @@
             </view>
           </view>
         </picker>
+        <view class="reserve-phone-row">
+          <text class="label">预留电话</text>
+          <input
+            class="reserve-phone-input"
+            type="number"
+            maxlength="11"
+            value="{{reservePhone}}"
+            placeholder="请输入取餐联系电话"
+            placeholder-class="ph-color"
+            bindinput="onReservePhoneInput"
+            bindblur="onReservePhoneBlur"
+          />
+        </view>
       </block>
 
       <block wx:else>
@@ -99,7 +112,7 @@
     <view class="cell-row" wx:if="{{!isVip}}" bindtap="goOpenVip">
       <text class="cell-label">会员折扣</text>
       <view class="cell-right" style="color: var(--gold-dark); font-weight: 500;">
-        <text class="shimmer-anim">开通立减 ￥{{vipDiscount}}</text>
+        <text class="shimmer-anim">开通Lv.4立减 ￥{{vipPreviewDiscount}}</text>
         <text class="arrow">></text>
       </view>
     </view>

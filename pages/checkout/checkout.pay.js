@@ -7,6 +7,14 @@ const { sleep, toNum } = require('../../utils/common');
 const { requestPaymentAsync, isUserCancelPay } = require('../../utils/wxPay');
 const { CART_CLEAR: KEY_CART_CLEAR } = require('../../utils/storageKeys');
 
+function normalizePhone(v) {
+  return String(v == null ? '' : v).replace(/\D+/g, '').slice(0, 11);
+}
+
+function isValidPhone(v) {
+  return /^1\d{10}$/.test(String(v || ''));
+}
+
 module.exports = {
   applyDefaultPayMethod() {
     const { balance, finalPay } = this.data;
@@ -30,13 +38,19 @@ module.exports = {
   async onPayTap() {
     if (this.data.paying) return;
     if (this._initPromise) await this._initPromise.catch(() => {});
-    const { mode, cart, address, payMethod, remark, pickupTime, selectedCoupon, storeSubMode } = this.data;
+    const { mode, cart, address, payMethod, remark, pickupTime, selectedCoupon, storeSubMode, reservePhone } = this.data;
+    const reservePhoneNorm = normalizePhone(reservePhone);
     if (!Array.isArray(cart) || cart.length === 0) return wx.showToast({ title: '购物车为空', icon: 'none' });
     if (mode !== 'ziti' && !address) return wx.showToast({ title: '请选择地址', icon: 'none' });
+
+    if (mode === 'ziti' && !isValidPhone(reservePhoneNorm)) return wx.showToast({ title: '请输入11位预留电话', icon: 'none' });
 
     try {
       this.setData({ paying: true });
       await ensureLogin();
+      if (mode === 'ziti' && typeof this.persistReservePhone === 'function') {
+        await this.persistReservePhone(reservePhoneNorm, { silent: true });
+      }
       wx.showLoading({ title: '正在创建订单...', mask: true });
 
       const payload = {
@@ -46,6 +60,7 @@ module.exports = {
         addressId: address ? address.id : '',
         remark,
         pickupTime,
+        reservePhone: mode === 'ziti' ? reservePhoneNorm : '',
         paymentMethod: payMethod,
         userCouponId: selectedCoupon ? selectedCoupon.userCouponId : ''
       };

@@ -45,7 +45,8 @@ module.exports = {
     const deliveryFeeFen = Math.round(toNum(deliveryFeeNum, 0) * 100);
     const payableFen = goodsTotalFen + deliveryFeeFen;
 
-    const vipDiscountFen = this.data.isVip ? Math.round(payableFen * 0.05) : 0;
+    const vipPreviewDiscountFen = Math.round(payableFen * 0.05);
+    const vipDiscountFen = this.data.isVip ? vipPreviewDiscountFen : 0;
     const afterVipFen = Math.max(0, payableFen - vipDiscountFen);
     const couponFaceFen = Math.round(toNum(couponDiscount, 0) * 100);
     const couponAppliedFen = Math.min(couponFaceFen, afterVipFen);
@@ -67,6 +68,7 @@ module.exports = {
       selectedCouponKey: selectedCoupon ? buildCouponGroupKey(selectedCoupon) : '',
       couponDiscount: (couponAppliedFen / 100).toFixed(2),
       vipDiscount: (vipDiscountFen / 100).toFixed(2),
+      vipPreviewDiscount: (vipPreviewDiscountFen / 100).toFixed(2),
       deliveryFee: (deliveryFeeFen / 100).toFixed(2),
       finalPay: (finalPayFen / 100).toFixed(2),
       discountTotal: (discountTotalFen / 100).toFixed(2),

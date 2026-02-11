@@ -35,6 +35,7 @@ Page(Object.assign({
     finalPay: '0.00',
     deliveryFee: '0.00',
     vipDiscount: '0.00',
+    vipPreviewDiscount: '0.00',
     couponDiscount: '0.00',
     discountTotal: '0.00',
     needMoreFreeDelivery: '0.00',
@@ -43,6 +44,7 @@ Page(Object.assign({
     pickupTime: '立即取餐',
     timeList: [],
     remark: '',
+    reservePhone: '',
     
     // 支付状态
     paying: false,

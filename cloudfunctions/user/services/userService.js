@@ -91,6 +91,10 @@ function normalizeUserCoupons(list) {
   });
 }
 
+function normalizeReservePhone(v) {
+  return String(v == null ? '' : v).replace(/\D+/g, '').slice(0, 11);
+}
+
 // 确保用户存在 (核心登录逻辑)
 async function ensureUser(openid, profile = null) {
   try {
@@ -122,6 +126,7 @@ async function ensureUser(openid, profile = null) {
       // Level-based membership (cumulative recharge). Lv4 gets permanent discount.
       memberLevel: 0,
       totalRecharge: 0,
+      reservePhone: '',
       defaultAddressId: '',
       addresses: [],
       coupons: [],
@@ -185,6 +190,9 @@ async function updateProfile(event, openid) {
   if (event.nickName) patch.nickName = String(event.nickName).trim();
   if (event.avatarUrl) patch.avatarUrl = String(event.avatarUrl).trim();
   if (typeof event.gender === 'number') patch.gender = event.gender;
+  if (Object.prototype.hasOwnProperty.call(event || {}, 'reservePhone')) {
+    patch.reservePhone = normalizeReservePhone(event.reservePhone);
+  }
 
   await db.collection(COL_USERS).doc(openid).update({ data: patch });
 

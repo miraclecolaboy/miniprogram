@@ -46,10 +46,19 @@ function genPickupCode4() {
   return String(Math.floor(1000 + Math.random() * 9000));
 }
 
+function normalizePhone(v) {
+  return String(v == null ? '' : v).replace(/\D+/g, '').slice(0, 11);
+}
+
+function isValidPhone(v) {
+  return /^1\d{10}$/.test(String(v || ''));
+}
+
 // --- 订单服务 ---
 
 async function createOrder(event, openid) {
-  const { mode, items, addressId, remark, pickupTime, paymentMethod, userCouponId, storeSubMode } = event;
+  const { mode, items, addressId, remark, pickupTime, paymentMethod, userCouponId, storeSubMode, reservePhone } = event;
+  const reservePhoneInput = normalizePhone(reservePhone);
 
   const rawStoreSubMode = String(storeSubMode || '').trim();
   const storeSubModeFinal = mode === 'ziti'
@@ -133,6 +142,13 @@ async function createOrder(event, openid) {
       ]);
       const shopConfig = shopConfigRes.data || {};
       const user = userRes.data || {};
+      const storedReservePhone = normalizePhone(user.reservePhone || '');
+      const reservePhoneFinal = mode === 'ziti'
+        ? (isValidPhone(reservePhoneInput) ? reservePhoneInput : storedReservePhone)
+        : '';
+      if (mode === 'ziti' && !isValidPhone(reservePhoneFinal)) {
+        throw { error: 'reserve_phone_required', message: '请输入11位预留电话' };
+      }
 
       if (mode === 'kuaidi' && shopConfig.kuaidiOn === false) {
         throw { error: 'kuaidi_disabled', message: '快递暂未开放' };
@@ -174,6 +190,12 @@ async function createOrder(event, openid) {
           }
         });
       }
+
+      if (mode === 'ziti' && reservePhoneFinal && reservePhoneFinal !== storedReservePhone) {
+        await tx.collection(COL_USERS).doc(openid).update({
+          data: { reservePhone: reservePhoneFinal }
+        });
+      }
       
       const address = mode !== 'ziti' ? (user.addresses || []).find(a => a.id === addressId) || null : null;
       orderNo = genOrderNo();
@@ -197,7 +219,13 @@ async function createOrder(event, openid) {
         payment: { method: paymentMethodFinal, status: paidImmediately ? 'paid' : 'pending', paidAt: paidImmediately ? nowTs : 0 },
         userCouponId: userCouponId || '',
         shippingInfo: address,
-        pickupInfo: { code: mode === 'ziti' ? genPickupCode4() : '', time: mode === 'ziti' ? pickupTime : '' },
+        receiverPhone: mode === 'ziti' ? reservePhoneFinal : '',
+        reservePhone: mode === 'ziti' ? reservePhoneFinal : '',
+        pickupInfo: {
+          code: mode === 'ziti' ? genPickupCode4() : '',
+          time: mode === 'ziti' ? pickupTime : '',
+          phone: mode === 'ziti' ? reservePhoneFinal : ''
+        },
         remark: remark || '', isVip, memberLevel, pointsEarn: Math.floor(finalPayAmount),
         createdAt: nowTs, updatedAt: nowTs, paidAt: paidImmediately ? nowTs : 0,
         storeName: shopConfig.storeName || '',

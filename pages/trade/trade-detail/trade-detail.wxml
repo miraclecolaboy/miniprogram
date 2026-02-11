@@ -127,6 +127,11 @@
           <text class="info-label">{{(order.pickupInfo.time === '立即取餐' || order.pickupInfo.time === '立刻取餐') ? '取餐时间' : '预约时间'}}</text>
           <text class="info-val">{{order.pickupInfo.time === '立刻取餐' ? '立即取餐' : order.pickupInfo.time}}</text>
         </view>
+
+        <view class="info-row" wx:if="{{order.mode === 'ziti' && order.pickupInfo.phone}}">
+          <text class="info-label">预留电话</text>
+          <text class="info-val">{{order.pickupInfo.phone}}</text>
+        </view>
         
         <view class="info-row">
           <text class="info-label">支付方式</text>

@@ -148,6 +148,8 @@ function buildReceiptText(order, storeName) {
 
     const pickupShow = fmtHM(raw) || '立刻取餐';
     lines.push(`取餐时间：${pickupShow}`);
+    const pickupPhone = String((o.pickupInfo && o.pickupInfo.phone) || o.reservePhone || o.receiverPhone || '').trim();
+    if (pickupPhone) lines.push(`预留电话：${pickupPhone}`);
   }
 
   // 保留原来的“取餐码：xxx”

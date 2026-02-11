@@ -33,15 +33,16 @@ module.exports = {
 
     // 地址
     const addr = o.shippingInfo || {}; // 直接读取 shippingInfo
-    const receiverName = addr.name || '';
-    const receiverPhone = addr.phone || '';
+    const pickupInfo = o.pickupInfo || {}; // 直接读取 pickupInfo
+    const pickupPhone = String(pickupInfo.phone || o.reservePhone || o.receiverPhone || '').trim();
+    const receiverName = o.mode === 'ziti' ? '' : (addr.name || '');
+    const receiverPhone = o.mode === 'ziti' ? pickupPhone : (addr.phone || '');
     const addrText = `${addr.region || ''}${addr.detail || ''}`;
     const addrCopyText = (o.mode !== 'ziti')
       ? `${[receiverName, receiverPhone].filter(Boolean).join(' ')}\n${addrText}`.trim()
       : '';
 
     // 自提
-    const pickupInfo = o.pickupInfo || {}; // 直接读取 pickupInfo
     const pickupCodeText = String(pickupInfo.code || '');
     let pickupTimeText = '';
     if (o.mode === 'ziti' && pickupInfo.time) {
@@ -94,4 +95,3 @@ module.exports = {
     };
   },
 };
-
