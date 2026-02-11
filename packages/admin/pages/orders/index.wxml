@@ -1,67 +1,132 @@
 <view class="page" bindtap="onScreenTap">
-  <view class="page-header">
-    <view class="page-title">订单管理</view>
-    <view class="tabs">
-      <view class="tabRow">
-        <view wx:for="{{tabs}}" wx:key="key" class="tabItem {{activeTab===item.key?'tabActive':''}}" data-key="{{item.key}}" bindtap="onTabTap">{{item.title}}</view>
-      </view>
+  
+  <view class="header-section">
+    <view class="page-header" style="padding-bottom: 0;">
+      <view class="page-title">订单管理</view>
     </view>
+    
+    <scroll-view class="tabs-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="tabs">
+        <view wx:for="{{tabs}}" wx:key="key" class="tab-item {{activeTab===item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="onTabTap">
+          {{item.title}}
+          <view class="tab-line" wx:if="{{activeTab===item.key}}"></view>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 
-  <view class="list">
+  <view class="list-container">
     <view wx:for="{{list}}" wx:key="_id" class="card order-card">
-      <view class="top-row">
-        <view class="order-type">{{item.modeText}}订单 <text class="order-no">#{{item.orderNo}}</text></view>
+      
+      <view class="card-header row-between">
+        <view class="order-id-group">
+          <text class="mode-tag mode-{{item.mode}}">{{item.modeText}}</text>
+          <text class="order-no">#{{item.orderNo}}</text>
+        </view>
         <view class="badge badge-{{item.status}} {{item.refund ? 'badge-refund' : ''}}">{{item.statusView}}</view>
       </view>
 
-      <view class="order-info">
-        <view class="info-line">商品：<text wx:for="{{item.itemsView}}" wx:for-item="g" wx:key="key">{{g.line}} </text></view>
-        <view class="info-line" wx:if="{{item.mode==='ziti'}}">预留：{{item.receiverPhoneMasked || '-'}}</view>
-        <view class="info-line" wx:if="{{item.mode!=='ziti'}}">收件：{{item.receiverName}} ({{item.receiverPhoneMasked}})</view>
-        <view class="info-line" wx:if="{{item.mode!=='ziti'}}">地址：{{item.addrText}}</view>
-        <view class="info-line" wx:if="{{item.mode==='kuaidi' && item.expressNoText}}">快递单号：{{item.expressNoText}}</view>
-        <view class="info-line" wx:if="{{item.mode==='ziti' && item.pickupCodeText}}">取餐号：{{item.pickupCodeText}}</view>
-        <view class="info-line" wx:if="{{item.mode==='ziti' && item.pickupTimeText}}">取餐时间：{{item.pickupTimeText}}</view>
-        <view class="info-line">下单时间：{{item.createdAtText}}</view>
-        <view class="info-line" wx:if="{{item.remarkText}}">备注：<text style="color:#D97706; font-weight:600;">{{item.remarkText}}</text></view>
+      <view class="goods-block">
+        <view wx:for="{{item.itemsView}}" wx:for-item="g" wx:key="key" class="goods-line">
+          <text class="goods-dot">•</text>
+          <text class="goods-name">{{g.line}}</text>
+        </view>
       </view>
 
-      <view class="order-price-row">
-        <view class="price-main">实付：¥{{item.payAmountText}} <text class="pay-method">({{item.payMethodText}})</text></view>
-        <view class="price-detail">商品{{item.amountGoodsText}} + 运费{{item.amountDeliveryText}} - 会员{{item.amountVipDiscountText}} - 券{{item.amountCouponDiscountText}}</view>
+      <view class="info-grid">
+        <view class="info-row" wx:if="{{item.mode==='ziti'}}">
+          <text class="info-label">预留电话</text><text class="info-value">{{item.receiverPhoneMasked || '-'}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.mode!=='ziti'}}">
+          <text class="info-label">收件人</text><text class="info-value">{{item.receiverName}} ({{item.receiverPhoneMasked}})</text>
+        </view>
+        <view class="info-row" wx:if="{{item.mode!=='ziti'}}">
+          <text class="info-label">收件地址</text><text class="info-value" user-select>{{item.addrText}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.mode==='kuaidi' && item.expressNoText}}">
+          <text class="info-label">快递单号</text><text class="info-value" user-select>{{item.expressNoText}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.mode==='ziti' && item.pickupCodeText}}">
+          <text class="info-label">取餐号</text><text class="info-value" style="color: var(--primary); font-weight: 800; font-size: 28rpx;">{{item.pickupCodeText}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.mode==='ziti' && item.pickupTimeText}}">
+          <text class="info-label">取餐时间</text><text class="info-value">{{item.pickupTimeText}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.buyerNickName}}">
+          <text class="info-label">买家昵称</text><text class="info-value">{{item.buyerNickName}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">下单时间</text><text class="info-value" style="color: var(--text-muted);">{{item.createdAtText}}</text>
+        </view>
       </view>
 
-      <view wx:if="{{item.refund}}" class="refund-block">
-        <text>售后：{{item.refund.statusText || '处理中'}}</text>
-        <button wx:if="{{item.needRefundHandle}}" class="btn btn-primary btn-mini" data-id="{{item._id}}" bindtap="goRefundHandle">处理售后</button>
+      <view class="remark-block" wx:if="{{item.remarkText}}">
+        <text class="remark-label">买家备注：</text><text class="remark-text">{{item.remarkText}}</text>
       </view>
 
-      <view class="action-row">
-        <button class="btn btn-outline btn-mini" data-id="{{item._id}}" bindtap="onPrint">打印小票</button>
-        <button wx:if="{{item.mode!=='ziti'}}" class="btn btn-outline btn-mini" data-copytext="{{item.addrCopyText}}" bindtap="onCopyAddress">复制地址</button>
-        <button wx:if="{{item.receiverPhone}}" class="btn btn-outline btn-mini" data-phone="{{item.receiverPhone}}" bindtap="onCallPhone">拨打电话</button>
-        <button wx:if="{{item.mode==='kuaidi'}}" class="btn btn-outline btn-mini" data-id="{{item._id}}" data-no="{{item.expressNoText||''}}" bindtap="onOpenExpressModal">快递单号</button>
+      <view wx:if="{{item.refund}}" class="refund-alert">
+        <view class="refund-alert-text"> 售后状态：{{item.refund.statusText || '处理中'}}</view>
+        <view wx:if="{{item.needRefundHandle}}" class="btn btn-primary btn-mini" data-id="{{item._id}}" bindtap="goRefundHandle">处理售后</view>
+      </view>
+
+      <view class="price-section">
+        <view class="price-detail">
+          商品 ¥{{item.amountGoodsText}} 
+          <text wx:if="{{item.amountDeliveryText > 0}}">+ 运 ¥{{item.amountDeliveryText}}</text> 
+          <text wx:if="{{item.amountVipDiscountText > 0}}">- 会员 ¥{{item.amountVipDiscountText}}</text> 
+          <text wx:if="{{item.amountCouponDiscountText > 0}}">- 券 ¥{{item.amountCouponDiscountText}}</text>
+        </view>
+        <view class="price-main">
+          实付 <text class="price-symbol">¥</text><text class="price-amount">{{item.payAmountText}}</text>
+          <text class="pay-method">({{item.payMethodText}})</text>
+        </view>
+      </view>
+
+      <view class="action-bar">
+        <view class="action-group-left">
+          <view class="btn btn-outline btn-mini" data-id="{{item._id}}" bindtap="onPrint">打印小票</view>
+          <view wx:if="{{item.mode!=='ziti'}}" class="btn btn-outline btn-mini" data-copytext="{{item.addrCopyText}}" bindtap="onCopyAddress">复制地址</view>
+          <view wx:if="{{item.receiverPhone}}" class="btn btn-outline btn-mini" data-phone="{{item.receiverPhone}}" bindtap="onCallPhone">联系买家</view>
+        </view>
         
-        <button wx:if="{{!item.refundHandled && (item.status==='paid' || item.status==='making' || item.status==='processing')}}" class="btn btn-primary btn-mini" data-id="{{item._id}}" data-status="{{item.mode==='ziti'?'ready':'delivering'}}" bindtap="onUpdateStatus">已出餐/发货</button>
-        <button wx:if="{{!item.refundHandled && (item.status==='ready' || item.status==='delivering')}}" class="btn btn-primary btn-mini" data-id="{{item._id}}" data-status="done" bindtap="onUpdateStatus">完成订单</button>
-        <button wx:if="{{item.canApplyRefund}}" class="btn btn-danger btn-mini" data-id="{{item._id}}" bindtap="onApplyRefund">申请售后</button>
+        <view class="action-group-right">
+          <view wx:if="{{item.canApplyRefund}}" class="btn btn-danger btn-mini" data-id="{{item._id}}" bindtap="onApplyRefund">申请售后</view>
+          <view wx:if="{{item.mode==='kuaidi'}}" class="btn btn-outline btn-mini" data-id="{{item._id}}" data-no="{{item.expressNoText||''}}" bindtap="onOpenExpressModal">发货单号</view>
+          
+          <view wx:if="{{!item.refundHandled && (item.status==='paid' || item.status==='making' || item.status==='processing')}}" class="btn btn-primary btn-mini" data-id="{{item._id}}" data-status="{{item.mode==='ziti'?'ready':'delivering'}}" bindtap="onUpdateStatus">
+            {{item.mode==='ziti' ? '出餐完成' : '立即发货'}}
+          </view>
+          
+          <view wx:if="{{!item.refundHandled && (item.status==='ready' || item.status==='delivering')}}" class="btn btn-primary btn-mini" data-id="{{item._id}}" data-status="done" bindtap="onUpdateStatus">完成订单</view>
+        </view>
       </view>
+
     </view>
-    <view wx:if="{{loading}}" class="tip">加载中…</view>
-    <view wx:if="{{!loading && noMore && list.length>0}}" class="tip">没有更多了</view>
-    <view wx:if="{{!loading && list.length===0}}" class="tip">暂无订单</view>
+
+    <view wx:if="{{loading}}" class="empty-hint">加载数据中…</view>
+    <view wx:if="{{!loading && noMore && list.length>0}}" class="empty-hint">到底啦，没有更多订单了</view>
+    <view wx:if="{{!loading && list.length===0}}" class="empty-hint">
+      <view>暂无该状态下的订单</view>
+    </view>
+    
+    <view style="height: 180rpx;"></view> 
   </view>
 
-  <view wx:if="{{expressModal.show}}" class="modalMask" catchtouchmove="noop" bindtap="onCloseExpressModal">
-    <view class="modalCard" catchtap="noop">
-      <view class="modalTitle">录入快递单号</view>
-      <input class="modalInput" placeholder="请输入快递单号" value="{{expressModal.value}}" bindinput="onExpressInput" />
-      <view class="modalBtnRow">
-        <button class="btn btn-mini" bindtap="onCloseExpressModal">取消</button>
-        <button class="btn btn-primary btn-mini" bindtap="onConfirmExpress">保存</button>
+  <view wx:if="{{expressModal.show}}" class="mask" catchtouchmove="noop" bindtap="onCloseExpressModal">
+    <view class="modal-center" catchtap="noop">
+      <view class="modal-header row-between">
+        <view class="page-title" style="font-size: 32rpx;">录入快递单号</view>
+        <view class="btn btn-mini btn-outline" bindtap="onCloseExpressModal">关闭</view>
+      </view>
+      <view style="padding: 32rpx;">
+        <input class="input-full" placeholder="请输入或粘贴快递单号" value="{{expressModal.value}}" bindinput="onExpressInput" />
+        <view class="row-between" style="margin-top: 40rpx;">
+          <view class="btn btn-outline" style="width: 45%; text-align: center;" bindtap="onCloseExpressModal">取消</view>
+          <view class="btn btn-primary" style="width: 45%; text-align: center;" bindtap="onConfirmExpress">确认保存</view>
+        </view>
       </view>
     </view>
   </view>
+
   <admin-tabbar />
 </view>

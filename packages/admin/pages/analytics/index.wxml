@@ -1,112 +1,132 @@
 <view class="page">
-  <view class="card top-card">
-    <view class="header-row">
-      <view>
-        <view class="title">运营分析</view>
-        <view class="sub">订单、顾客/会员、商品数据总览</view>
+  <scroll-view class="main-scroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
+    
+    <view class="page-header row-between">
+      <view class="header-left">
+        <view class="page-title">运营分析</view>
+        <view class="page-sub">核心指标与数据总览</view>
       </view>
-      <view class="btn btn-primary {{loading ? 'btn-disabled' : ''}}" bindtap="onReloadTap">刷新</view>
-    </view>
-
-    <view class="range-row">
-      <view
-        wx:for="{{rangeOptions}}"
-        wx:key="value"
-        class="range-item {{rangeDays === item.value ? 'is-active' : ''}}"
-        data-value="{{item.value}}"
-        bindtap="onRangeTap"
-      >{{item.label}}</view>
-    </view>
-
-    <view class="meta-row" wx:if="{{generatedAtText}}">更新时间：{{generatedAtText}}</view>
-    <view class="error-row" wx:if="{{errorText}}">{{errorText}}</view>
-  </view>
-
-  <view class="card loading-card" wx:if="{{loading && !hasData}}">数据加载中...</view>
-
-  <block wx:if="{{hasData}}">
-    <view class="section-title">订单分析</view>
-    <view class="metrics-grid">
-      <view class="card metric-card" wx:for="{{orderCards}}" wx:key="label">
-        <view class="metric-label">{{item.label}}</view>
-        <view class="metric-value">{{item.value}}</view>
+      <view class="btn btn-outline btn-mini {{loading ? 'btn-disabled' : ''}}" bindtap="onReloadTap">
+        {{loading ? '加载中...' : '刷新数据'}}
       </view>
     </view>
 
-    <view class="card section-card">
-      <view class="sub-title">订单渠道分布</view>
-      <view class="line-item" wx:for="{{modeStats}}" wx:key="label">
-        <view class="line-head">
-          <text>{{item.label}}</text>
-          <text>{{item.count}}单</text>
+    <view class="page-content">
+      
+      <view class="error-row" wx:if="{{errorText}}">{{errorText}}</view>
+
+      <view class="filter-section">
+        <view class="tabs-pill">
+          <view wx:for="{{rangeOptions}}" wx:key="value" 
+                class="tab-pill-item {{rangeDays === item.value ? 'active' : ''}}" 
+                data-value="{{item.value}}" 
+                bindtap="onRangeTap">
+            {{item.label}}
+          </view>
         </view>
-        <view class="line-sub">支付 {{item.paidCount}} 单 · 占比 {{item.shareText}} · {{item.amountText}}</view>
+        <view class="meta-row" wx:if="{{generatedAtText}}">更新时间：{{generatedAtText}}</view>
       </view>
-    </view>
 
-    <view class="card section-card">
-      <view class="sub-title">订单趋势</view>
-      <view class="trend-row trend-head">
-        <text>日期</text>
-        <text>订单</text>
-        <text>支付</text>
-        <text>成交额</text>
-      </view>
-      <view class="trend-row" wx:for="{{trend}}" wx:key="date">
-        <text>{{item.date}}</text>
-        <text>{{item.orderCount}}</text>
-        <text>{{item.paidCount}}</text>
-        <text>{{item.amountText}}</text>
-      </view>
-    </view>
+      <view class="empty-hint" wx:if="{{loading && !hasData}}">数据加载中...</view>
 
-    <view class="section-title">顾客/会员分析</view>
-    <view class="metrics-grid">
-      <view class="card metric-card" wx:for="{{customerCards}}" wx:key="label">
-        <view class="metric-label">{{item.label}}</view>
-        <view class="metric-value">{{item.value}}</view>
-      </view>
-    </view>
-
-    <view class="card section-card">
-      <view class="sub-title">会员等级分布</view>
-      <view class="member-item" wx:for="{{memberStats}}" wx:key="label">
-        <view class="member-head">
-          <text>{{item.label}}</text>
-          <text>{{item.count}}人（{{item.ratioText}}）</text>
+      <block wx:if="{{hasData}}">
+        
+        <view class="section-title">订单分析</view>
+        <view class="metrics-grid">
+          <view class="metric-card" wx:for="{{orderCards}}" wx:key="label">
+            <view class="metric-label">{{item.label}}</view>
+            <view class="metric-value">{{item.value}}</view>
+          </view>
         </view>
-        <view class="member-bar">
-          <view class="member-bar-fill" style="width: {{item.widthPct}}%;"></view>
+
+        <view class="card">
+          <view class="card-title">订单渠道分布</view>
+          <view class="list-row" wx:for="{{modeStats}}" wx:key="label">
+            <view>
+              <view class="row-label">{{item.label}}</view>
+              <view class="data-sub">支付 {{item.paidCount}} 单 · 占比 {{item.shareText}}</view>
+            </view>
+            <view class="input-inline" style="text-align: right; font-weight: 800; font-size: 30rpx;">
+              {{item.amountText}}
+            </view>
+          </view>
         </view>
-      </view>
-    </view>
 
-    <view class="section-title">商品分析</view>
-    <view class="metrics-grid">
-      <view class="card metric-card" wx:for="{{productCards}}" wx:key="label">
-        <view class="metric-label">{{item.label}}</view>
-        <view class="metric-value">{{item.value}}</view>
-      </view>
-    </view>
-
-    <view class="card section-card">
-      <view class="sub-title">商品销量 TOP10</view>
-      <view wx:if="{{!topProducts.length}}" class="empty">暂无销量数据</view>
-      <view class="top-item" wx:for="{{topProducts}}" wx:key="rank">
-        <view class="rank">{{item.rank}}</view>
-        <view class="top-main">
-          <view class="top-name">{{item.name}}</view>
-          <view class="top-sub">销量 {{item.quantityText}} 件 · 销售额 {{item.amountText}}</view>
+        <view class="card">
+          <view class="card-title">订单趋势</view>
+          <view class="trend-table">
+            <view class="trend-header">
+              <view class="th" style="flex: 2;">日期</view>
+              <view class="th" style="flex: 1; text-align: center;">订单</view>
+              <view class="th" style="flex: 1; text-align: center;">支付</view>
+              <view class="th" style="flex: 1.5; text-align: right;">成交额</view>
+            </view>
+            <view class="trend-row" wx:for="{{trend}}" wx:key="date">
+              <view class="td" style="flex: 2; color: var(--text-sub);">{{item.date}}</view>
+              <view class="td" style="flex: 1; text-align: center;">{{item.orderCount}}</view>
+              <view class="td" style="flex: 1; text-align: center;">{{item.paidCount}}</view>
+              <view class="td" style="flex: 1.5; text-align: right; font-weight: 800;">{{item.amountText}}</view>
+            </view>
+          </view>
         </view>
-        <view class="top-order">{{item.orderCount}}单</view>
-      </view>
-    </view>
 
-    <view class="card section-card tips" wx:if="{{tips.length}}">
-      <view class="sub-title">统计说明</view>
-      <view class="tip-line" wx:for="{{tips}}" wx:key="*this">{{item}}</view>
+        <view class="section-title">顾客与会员分析</view>
+        <view class="metrics-grid">
+          <view class="metric-card" wx:for="{{customerCards}}" wx:key="label">
+            <view class="metric-label">{{item.label}}</view>
+            <view class="metric-value">{{item.value}}</view>
+          </view>
+        </view>
+
+        <view class="card">
+          <view class="card-title">会员等级分布</view>
+          <view class="member-item" wx:for="{{memberStats}}" wx:key="label">
+            <view class="member-head">
+              <text class="row-label" style="font-size: 26rpx;">{{item.label}}</text>
+              <text class="data-sub" style="margin: 0;">{{item.count}}人 ({{item.ratioText}})</text>
+            </view>
+            <view class="member-bar">
+              <view class="member-bar-fill" style="width: {{item.widthPct}};"></view>
+            </view>
+          </view>
+        </view>
+
+        <view class="section-title">商品分析</view>
+        <view class="metrics-grid">
+          <view class="metric-card" wx:for="{{productCards}}" wx:key="label">
+            <view class="metric-label">{{item.label}}</view>
+            <view class="metric-value">{{item.value}}</view>
+          </view>
+        </view>
+
+        <view class="card">
+          <view class="card-title">商品销量 TOP10</view>
+          <view class="empty-hint" wx:if="{{!topProducts.length}}">暂无销量数据</view>
+          
+          <view class="data-item" wx:for="{{topProducts}}" wx:key="rank">
+            <view class="rank-badge {{index < 3 ? 'rank-top' : ''}}">{{item.rank}}</view>
+            <view class="data-main">
+              <view class="data-title" style="font-size: 28rpx;">{{item.name}}</view>
+              <view class="data-sub">销量 {{item.quantityText}} 件 · 销售额 {{item.amountText}}</view>
+            </view>
+            <view class="data-side">
+              <view style="font-size: 28rpx; font-weight: 800; color: var(--text-main);">{{item.orderCount}}单</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="remark-block" wx:if="{{tips.length}}">
+          <text class="remark-label" style="color: var(--text-muted); font-weight: 600;">统计说明：</text>
+          <view style="flex:1;">
+            <view class="remark-text" wx:for="{{tips}}" wx:key="*this" style="color: var(--text-sub);">{{item}}</view>
+          </view>
+        </view>
+
+      </block>
+
+      <view style="height: 180rpx;"></view>
     </view>
-  </block>
+  </scroll-view>
 
   <admin-tabbar />
 </view>

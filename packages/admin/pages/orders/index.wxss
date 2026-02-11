@@ -1,40 +1,255 @@
 @import "../../styles/admin.wxss";
 
-.page { box-sizing: border-box; min-height: 100vh; padding-bottom: 140rpx; }
-.tabs { margin-top: 24rpx; }
-.tabRow { display: flex; gap: 32rpx; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 16rpx; }
-.tabItem { font-size: 28rpx; color: var(--text-sub); padding-bottom: 8rpx; white-space: nowrap; transition: all 0.2s; }
-.tabActive { color: var(--primary); font-weight: 800; border-bottom: 4rpx solid var(--primary); }
+.page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  background: var(--bg);
+  /* 恢复页面级原生滚动，利用原生触底刷新 onReachBottom */
+}
 
-.list { padding: 0 32rpx; margin-top: 8rpx; }
-.order-card { padding: 32rpx; }
+/* ================= 固定的头部与分类栏 ================= */
+.header-section {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(243, 244, 246, 0.95);
+  backdrop-filter: blur(12px);
+  padding-bottom: 8rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.02);
+}
 
-.top-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2rpx solid var(--border); padding-bottom: 24rpx; margin-bottom: 24rpx; }
-.order-type { font-weight: 800; font-size: 30rpx; color: var(--text-main); }
-.order-no { color: var(--text-muted); font-size: 24rpx; font-weight: normal; margin-left: 8rpx; }
+.tabs-scroll {
+  width: 100%;
+  box-sizing: border-box;
+}
 
-.badge { padding: 8rpx 16rpx; border-radius: 12rpx; font-size: 22rpx; font-weight: 600; }
+.tabs {
+  display: flex;
+  padding: 0 32rpx;
+  gap: 48rpx;
+  flex-wrap: nowrap;
+}
+
+.tab-item {
+  position: relative;
+  font-size: 28rpx;
+  color: var(--text-sub);
+  padding: 16rpx 0;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.tab-item.active {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 30rpx;
+}
+
+.tab-line {
+  position: absolute;
+  bottom: 6rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32rpx;
+  height: 6rpx;
+  background: var(--primary);
+  border-radius: 4rpx;
+}
+
+/* ================= 列表区域 ================= */
+.list-container {
+  padding: 24rpx;
+}
+
+.order-card {
+  margin-bottom: 24rpx;
+  padding: 32rpx;
+}
+
+/* 1. 卡片头部 */
+.card-header {
+  border-bottom: 1rpx solid var(--border);
+  padding-bottom: 24rpx;
+  margin-bottom: 24rpx;
+}
+.order-id-group {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.mode-tag {
+  font-size: 20rpx;
+  font-weight: 800;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  color: #fff;
+}
+.mode-ziti { background: #3B82F6; } /* 到店蓝色 */
+.mode-waimai { background: #F59E0B; } /* 外卖橙色 */
+.mode-kuaidi { background: #10B981; } /* 快递绿色 */
+
+.order-no {
+  font-size: 26rpx;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* 徽章体系优化 */
+.badge {
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  font-weight: 800;
+}
 .badge-making, .badge-paid, .badge-processing { background: #FEF3C7; color: #D97706; }
 .badge-ready, .badge-delivering { background: #D1FAE5; color: #059669; }
-.badge-done { background: #F3F4F6; color: #6B7280; }
+.badge-done { background: var(--bg); color: var(--text-sub); }
 .badge-refund { background: #FEE2E2; color: #EF4444; }
 
-.order-info { font-size: 26rpx; color: var(--text-sub); line-height: 1.8; }
-.info-line { word-break: break-all; }
+/* 2. 商品明细区块 (浅灰背景块收纳) */
+.goods-block {
+  background: #F9FAFB;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  margin-bottom: 24rpx;
+}
+.goods-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+.goods-line:last-child { margin-bottom: 0; }
+.goods-dot {
+  color: #D1D5DB;
+  font-size: 24rpx;
+  margin-top: -2rpx;
+}
+.goods-name {
+  font-size: 26rpx;
+  color: var(--text-main);
+  font-weight: 600;
+  line-height: 1.4;
+}
 
-.order-price-row { margin-top: 24rpx; }
-.price-main { font-size: 30rpx; font-weight: 800; color: var(--text-main); }
-.pay-method { font-size: 24rpx; color: var(--text-muted); font-weight: normal; }
-.price-detail { font-size: 22rpx; color: var(--text-muted); margin-top: 4rpx; }
+/* 3. 信息网格 (Label对齐排版) */
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+}
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+.info-label {
+  color: var(--text-muted);
+  width: 140rpx;
+  flex-shrink: 0;
+}
+.info-value {
+  color: var(--text-main);
+  flex: 1;
+  word-break: break-all;
+}
 
-.refund-block { margin-top: 24rpx; background: #FFFBF0; border: 2rpx solid #FDE68A; padding: 16rpx 24rpx; border-radius: 16rpx; display: flex; justify-content: space-between; align-items: center; font-size: 24rpx; color: #D97706; }
+/* 4. 备注突出 */
+.remark-block {
+  background: #FFFBEB;
+  border: 1rpx dashed #FDE68A;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+}
+.remark-label { font-size: 24rpx; color: #D97706; font-weight: 800; flex-shrink: 0;}
+.remark-text { font-size: 24rpx; color: #B45309; font-weight: 600; line-height: 1.5; }
 
-.action-row { display: flex; justify-content: flex-end; gap: 16rpx; margin-top: 32rpx; flex-wrap: wrap; }
-.tip { text-align: center; color: var(--text-muted); font-size: 24rpx; padding: 32rpx 0; }
+/* 5. 售后警报 */
+.refund-alert {
+  background: #FEF2F2;
+  border: 1rpx solid #FECACA;
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+.refund-alert-text {
+  font-size: 24rpx;
+  color: #EF4444;
+  font-weight: 800;
+}
 
-/* 快递弹窗 */
-.modalMask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 99; }
-.modalCard { width: 80%; background: #fff; border-radius: 24rpx; padding: 32rpx; }
-.modalTitle { font-size: 32rpx; font-weight: 800; margin-bottom: 24rpx; }
-.modalInput { background: #f5f5f5; border-radius: 16rpx; padding: 20rpx; font-size: 28rpx; }
-.modalBtnRow { display: flex; justify-content: flex-end; gap: 16rpx; margin-top: 32rpx; }
+/* 6. 价格与结算栏 */
+.price-section {
+  border-top: 1rpx dashed var(--border);
+  padding-top: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+}
+.price-detail {
+  font-size: 22rpx;
+  color: var(--text-muted);
+}
+.price-main {
+  font-size: 26rpx;
+  color: var(--text-main);
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+}
+.price-symbol {
+  font-size: 24rpx;
+  font-weight: 800;
+  margin-left: 8rpx;
+}
+.price-amount {
+  font-size: 40rpx;
+  font-weight: 800;
+  letter-spacing: -1rpx;
+}
+.pay-method {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-left: 8rpx;
+}
+
+/* 7. 操作按钮栏 */
+.action-bar {
+  border-top: 1rpx solid var(--border);
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.action-group-left { display: flex; gap: 16rpx; flex-wrap: wrap; }
+.action-group-right { display: flex; gap: 16rpx; flex-wrap: wrap; justify-content: flex-end; flex: 1; }
+
+/* 列表缺省与状态提示 */
+.empty-hint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 26rpx;
+  padding: 100rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ================= 共用弹窗样式补充 ================= */
+.mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 200; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(4px); }
+.modal-center { background: #FFFFFF; border-radius: 24rpx; width: 85%; margin: auto; overflow: hidden; box-shadow: 0 10rpx 40rpx rgba(0,0,0,0.1); }
+.modal-header { padding: 32rpx 32rpx 24rpx; border-bottom: 1rpx solid var(--border); }
+.input-full { width: 100%; height: 84rpx; padding: 0 24rpx; border: 1rpx solid var(--border); border-radius: 16rpx; background: var(--bg); font-size: 28rpx; box-sizing: border-box; color: var(--text-main); }

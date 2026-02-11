@@ -1,251 +1,249 @@
-<!-- packages/admin/pages/goods/index.wxml -->
 <view class="page">
-  <!-- [新增] 隐藏的 Canvas, 用于图片裁剪 -->
-  <canvas
-    canvas-id="image-cropper"
-    id="image-cropper"
-    style="position: fixed; left: -9999px; top: -9999px; width: 300px; height: 300px;"
-  ></canvas>
+  <canvas canvas-id="image-cropper" id="image-cropper" style="position: fixed; left: -9999px; top: -9999px; width: 300px; height: 300px;"></canvas>
 
-  <view class="page-header">
-    <view class="top-card">
+  <view wx:if="{{!showForm}}" style="height: 100%; display: flex; flex-direction: column;">
+    
+    <view class="page-header">
       <view class="row-between">
-        <view>
-          <view class="title">商品管理</view>
-          <view class="sub">统一管理商品 分类 规格等信息</view>
+        <view class="header-left">
+          <view class="page-title">商品管理</view>
+          <view class="page-sub">统一管理商品、分类、规格等信息</view>
         </view>
-        <view class="btn btn-primary" bindtap="openAdd">新增商品</view>
+        <view class="btn btn-primary btn-mini" bindtap="openAdd">新增商品</view>
       </view>
 
-      <view class="filter-row">
-        <input class="input" placeholder="搜索商品名" value="{{keyword}}" bindinput="onKeywordInput" />
-        <picker class="picker picker-inline" mode="selector" range="{{categories}}" range-key="name" value="{{filterCategoryIndex}}" bindchange="onFilterCategoryChange">
-          <view class="picker-view">
-            <text class="picker-text">{{categories[filterCategoryIndex].name || '全部分类'}}</text>
-            <text class="picker-arrow">›</text>
+      <view class="toolbar">
+        <view class="search-box">
+          <icon type="search" size="16" color="#9CA3AF"></icon>
+          <input class="search-input" placeholder="搜索商品名" value="{{keyword}}" bindinput="onKeywordInput" />
+        </view>
+        
+        <picker mode="selector" range="{{categories}}" range-key="name" value="{{filterCategoryIndex}}" bindchange="onFilterCategoryChange">
+          <view class="filter-btn">
+            {{categories[filterCategoryIndex].name || '全部分类'}} <text class="arrow">▾</text>
           </view>
         </picker>
-        <view class="btn" bindtap="openCategoryForm">新增分组</view>
+        <view class="filter-btn" bindtap="openCategoryForm">+ 分组</view>
       </view>
     </view>
-  </view>
 
-  <view class="page-body">
-    <scroll-view class="listScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}" wx:if="{{!showForm}}">
-      <!-- [修改] 列表项图片使用 thumbUrl -->
-      <view class="card" wx:for="{{list}}" wx:key="_id">
-        <view class="row-between">
-          <view class="item-left">
-            <view class="row">
-              <view class="thumb" wx:if="{{item.thumbUrl}}">
-                <image class="thumb-img" mode="aspectFill" src="{{item.thumbUrl}}" />
+    <scroll-view class="main-scroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
+      <view class="page-content">
+        <view class="card" style="padding: 16rpx 32rpx;">
+          <view class="data-item" wx:for="{{list}}" wx:key="_id">
+            <image class="item-thumb" wx:if="{{item.thumbUrl}}" src="{{item.thumbUrl}}" mode="aspectFill" />
+            <view class="data-main">
+              <view class="data-title">
+                {{item.name}}
+                <text class="badge {{item.status===1 ? 'badge-success' : 'badge-disabled'}}">{{item.status===1 ? '上架中' : '已下架'}}</text>
               </view>
-              <view class="info">
-                <view class="item-title">{{item.name}}</view>
-                <view class="item-sub">
-                  <text>¥{{item.price}}</text>
-                  <text style="margin-left: 16rpx;">{{item.status===1 ? '上架' : '下架'}}</text>
-                </view>
-                <view class="item-sub">
-                  <text>分类：{{item.categoryName || '-'}}</text>
-                </view>
-                <view class="item-sub" wx:if="{{item.hasSpecs}}">
-                  <text>规格：{{item.specsCountText}}</text>
-                </view>
-              </view>
+              <view class="data-sub" style="color: var(--warning); font-weight: 700; font-size: 26rpx;">¥{{item.price}}</view>
+              <view class="data-sub">分类：{{item.categoryName || '-'}} <text wx:if="{{item.hasSpecs}}" style="margin-left: 16rpx;">规格：{{item.specsCountText}}</text></view>
+            </view>
+            <view class="data-side" style="flex-direction: row; gap: 16rpx; align-items: center;">
+              <view class="btn btn-mini btn-outline" data-id="{{item._id}}" data-onshelf="{{item.status===1}}" bindtap="toggleShelf">{{item.status===1 ? '下架' : '上架'}}</view>
+              <view class="btn btn-mini btn-outline" data-id="{{item._id}}" bindtap="openEdit">编辑</view>
+              <view class="btn btn-mini btn-danger" data-id="{{item._id}}" bindtap="removeItem">删除</view>
             </view>
           </view>
-          <view class="item-actions">
-            <view class="btn btn-mini" data-id="{{item._id}}" data-onshelf="{{item.status===1}}" bindtap="toggleShelf">
-              {{item.status===1 ? '下架' : '上架'}}
-            </view>
-            <view class="btn btn-mini" data-id="{{item._id}}" bindtap="openEdit">编辑</view>
-            <view class="btn btn-danger btn-mini" data-id="{{item._id}}" bindtap="removeItem">删除</view>
-          </view>
+
+          <view class="empty-hint" wx:if="{{loading}}">加载中...</view>
+          <view class="empty-hint" wx:if="{{!loading && list.length===0}}">暂无商品数据</view>
+          <view class="empty-hint" wx:if="{{!loading && !hasMore && list.length>0}}">没有更多了</view>
         </view>
+        <view style="height: 180rpx;"></view>
       </view>
-      <view class="footer-tip" wx:if="{{loading}}">加载中...</view>
-      <view class="footer-tip" wx:if="{{!loading && list.length===0}}">暂无商品</view>
-      <view class="footer-tip" wx:if="{{!loading && !hasMore && list.length>0}}">没有更多了</view>
     </scroll-view>
   </view>
 
-  <!-- 表单弹层 -->
-  <view class="formMask" wx:if="{{showForm}}" catchtouchmove="true">
-    <view class="formBg" bindtap="cancelForm"></view>
-    <view class="formWrap" catchtap="noop">
-      <scroll-view class="formScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
-        <view class="card formCard">
-          <view class="row-between">
-            <view class="title">{{editingId ? '编辑商品' : '新增商品'}}</view>
-            <view class="btn" bindtap="cancelForm">关闭</view>
+
+  <view class="full-modal" wx:if="{{showForm}}" catchtouchmove="true">
+    <view class="full-modal-header row-between">
+      <view class="page-title" style="font-size: 36rpx;">{{editingId ? '编辑商品' : '新增商品'}}</view>
+      <view class="btn btn-outline btn-mini" bindtap="cancelForm">关闭</view>
+    </view>
+
+    <scroll-view class="full-modal-scroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
+      <view class="page-content" style="padding-top: 24rpx; padding-bottom: 240rpx;">
+        
+        <view class="card">
+          <view class="card-title">基础信息</view>
+          
+          <view class="form-group">
+            <view class="label">商品名</view>
+            <input class="input-full" placeholder="例如：招牌手作吐司" value="{{form.name}}" bindinput="onFormInput" data-field="name" />
           </view>
-          <view class="form">
-            <view class="section-title">基础信息</view>
-            <view class="field">
-              <view class="label">商品名</view>
-              <input class="input" placeholder="例如：招牌面包" value="{{form.name}}" bindinput="onFormInput" data-field="name" />
-            </view>
-            <view class="field">
-              <view class="label">商品分类</view>
-              <picker class="picker picker-full" mode="selector" range="{{categories}}" range-key="name" value="{{formCategoryIndex}}" bindchange="onFormCategoryChange">
-                <view class="picker-view">
-                  <text class="picker-text">{{categories[formCategoryIndex].name || '请选择分类'}}</text>
-                  <text class="picker-arrow">›</text>
-                </view>
-              </picker>
-            </view>
-            <view class="field">
-              <view class="label">{{form.hasSpecs ? '展示价格' : '价格'}}</view>
-              <input class="input" type="digit" value="{{form.price}}" bindinput="onFormInput" data-field="price" disabled="{{form.hasSpecs}}" />
-              <view wx:if="{{form.hasSpecs}}" class="hint">由SKU最低价自动计算</view>
-            </view>
-            <view class="field-row">
-              <view class="field half">
-                <view class="label">排序</view>
-                <input class="input" type="number" value="{{form.sort}}" bindinput="onFormInput" data-field="sort" />
-              </view>
-              <view class="field half">
-                <view class="label">上架状态</view>
-                <switch checked="{{form.onShelf}}" bindchange="onShelfSwitch" />
-              </view>
-            </view>
-            <view class="field">
-              <view class="label">售卖模式</view>
-              <view class="pill-group">
-                <view class="pill {{formModesMap.ziti ? 'pill-on' : ''}}" data-mode="ziti" bindtap="toggleMode">到店</view>
-                <view class="pill {{formModesMap.waimai ? 'pill-on' : ''}}" data-mode="waimai" bindtap="toggleMode">外卖</view>
-                <view class="pill {{formModesMap.kuaidi ? 'pill-on' : ''}}" data-mode="kuaidi" bindtap="toggleMode">快递</view>
-              </view>
-            </view>
-            <view class="section-title">规格与描述</view>
-            <view class="field">
-              <view class="label">商品图片 (最多3张，第一张为主图)</view>
-              <!-- [修改] 循环新的 displayImages 数组 -->
-              <view class="img-grid">
-                <view class="img-box" wx:for="{{form.displayImages}}" wx:key="key" bindtap="previewImage" data-index="{{index}}">
-                  <image class="img" mode="aspectFill" src="{{item.preview}}" />
-                  <view class="img-remove" catchtap="removeImage" data-index="{{index}}">×</view>
-                </view>
-                <view class="img-box img-box-add" wx:if="{{form.displayImages.length < 3}}" bindtap="chooseImage">
-                  <text class="img-add-plus">+</text>
-                  <text class="img-add-sub">{{form.displayImages.length}}/3</text>
-                </view>
-              </view>
-            </view>
-            <view class="field">
-              <view class="label">简短描述</view>
-              <input class="input" placeholder="例如：醇香浓郁，回购率高" value="{{form.desc}}" bindinput="onFormInput" data-field="desc" />
-            </view>
-            <view class="field">
-              <view class="label">详情</view>
-              <textarea class="textarea" placeholder="例如：配料/口感/注意事项..." value="{{form.detail}}" bindinput="onFormInput" data-field="detail" />
-            </view>
-            <view class="field">
-              <view class="row-between">
-                <view class="label">启用规格</view>
-                <switch checked="{{form.hasSpecs}}" bindchange="onHasSpecsSwitch" />
-              </view>
-            </view>
-            <view class="spec-box" wx:if="{{form.hasSpecs}}">
-              <view class="row-between">
-                <view class="label">规格组</view>
-                <view class="btn" bindtap="addSpecGroup">新增规格组</view>
-              </view>
-              <view class="spec-group" wx:for="{{form.specs}}" wx:for-item="g" wx:for-index="gi" wx:key="__g">
-                <view class="row-between">
-                  <input class="input" placeholder="规格组名：如 尺寸" value="{{g.name}}" bindinput="onSpecGroupNameInput" data-gi="{{gi}}" />
-                  <view class="btn btn-danger" data-gi="{{gi}}" bindtap="removeSpecGroup">删除组</view>
-                </view>
-                <view class="spec-options">
-                  <view class="spec-option" wx:for="{{g.options}}" wx:for-item="o" wx:for-index="oi" wx:key="__o">
-                    <input class="input small" placeholder="选项：如 大杯" value="{{o.label}}" bindinput="onSpecOptionInput" data-gi="{{gi}}" data-oi="{{oi}}"/>
-                    <view class="btn btn-danger btn-mini" data-gi="{{gi}}" data-oi="{{oi}}" bindtap="removeSpecOption">删除</view>
-                  </view>
-                  <view class="row" style="margin-top: 16rpx;">
-                    <view class="btn btn-mini" data-gi="{{gi}}" bindtap="addSpecOption">新增选项</view>
-                  </view>
-                </view>
-              </view>
-              <view class="row-between" style="margin-top: 12rpx;">
-                <view class="hint">修改规格后，请管理SKU</view>
-                <view class="btn btn-primary btn-mini {{!editingId ? 'btn-disabled' : ''}}" bindtap="openSkuModal">管理SKU</view>
-              </view>
-            </view>
-            <view class="row-between" style="margin-top: 22rpx;">
-              <view class="btn" bindtap="cancelForm">取消</view>
-              <view class="btn btn-primary {{saving ? 'btn-disabled' : ''}}" bindtap="saveForm">{{saving ? '保存中...' : '保存'}}</view>
+          
+          <view class="list-row">
+            <view class="row-label">商品分类</view>
+            <picker mode="selector" range="{{categories}}" range-key="name" value="{{formCategoryIndex}}" bindchange="onFormCategoryChange">
+              <view class="input-inline" style="width: 300rpx;">{{categories[formCategoryIndex].name || '请选择分类'}} ›</view>
+            </picker>
+          </view>
+
+          <view class="list-row">
+            <view class="row-label">{{form.hasSpecs ? '展示价格 (元)' : '价格 (元)'}}</view>
+            <input class="input-inline" type="digit" value="{{form.price}}" bindinput="onFormInput" data-field="price" disabled="{{form.hasSpecs}}" placeholder="0.00" />
+          </view>
+          <view class="hint" wx:if="{{form.hasSpecs}}" style="text-align: right; margin-top: -12rpx; margin-bottom: 16rpx;">由SKU最低价自动计算</view>
+
+          <view class="list-row">
+            <view class="row-label">排序权重</view>
+            <input class="input-inline" type="number" value="{{form.sort}}" bindinput="onFormInput" data-field="sort" placeholder="数字越大越靠前" />
+          </view>
+
+          <view class="list-row">
+            <view class="row-label">上架状态</view>
+            <switch checked="{{form.onShelf}}" bindchange="onShelfSwitch" color="#10B981" />
+          </view>
+
+          <view class="form-group" style="margin-top: 24rpx;">
+            <view class="label" style="margin-bottom: 12rpx;">售卖模式支持</view>
+            <view class="pill-group">
+              <view class="pill {{formModesMap.ziti ? 'pill-on' : ''}}" data-mode="ziti" bindtap="toggleMode">到店自提</view>
+              <view class="pill {{formModesMap.waimai ? 'pill-on' : ''}}" data-mode="waimai" bindtap="toggleMode">同城外卖</view>
+              <view class="pill {{formModesMap.kuaidi ? 'pill-on' : ''}}" data-mode="kuaidi" bindtap="toggleMode">快递发货</view>
             </view>
           </view>
         </view>
-      </scroll-view>
-    </view>
-  </view>
 
-  <!-- SKU弹层 -->
-  <view class="formMask" wx:if="{{showSkuModal}}" catchtouchmove="true">
-    <view class="formBg" bindtap="closeSkuModal"></view>
-    <view class="formWrap" catchtap="noop">
-      <scroll-view class="formScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
-        <view class="card formCard">
-          <view class="row-between">
-            <view class="title">SKU价格</view>
-            <view class="btn" bindtap="closeSkuModal">关闭</view>
+        <view class="card">
+          <view class="card-title">图文与描述</view>
+          
+          <view class="form-group">
+            <view class="label">商品图片 <text class="hint" style="display:inline;">(最多3张，首图为主图)</text></view>
+            <view class="img-grid">
+              <view class="img-box" wx:for="{{form.displayImages}}" wx:key="key" bindtap="previewImage" data-index="{{index}}">
+                <image class="img" mode="aspectFill" src="{{item.preview}}" />
+                <view class="img-remove" catchtap="removeImage" data-index="{{index}}">×</view>
+              </view>
+              <view class="img-box img-box-add" wx:if="{{form.displayImages.length < 3}}" bindtap="chooseImage">
+                <text class="img-add-plus">+</text>
+                <text class="img-add-sub">{{form.displayImages.length}}/3</text>
+              </view>
+            </view>
           </view>
-          <view class="field">
-            <view class="label">批量填充(仅空值)</view>
+          
+          <view class="form-group">
+            <view class="label">简短描述</view>
+            <input class="input-full" placeholder="例如：醇香浓郁，回购率高" value="{{form.desc}}" bindinput="onFormInput" data-field="desc" />
+          </view>
+          
+          <view class="form-group">
+            <view class="label">详细介绍</view>
+            <textarea class="textarea" placeholder="例如：配料 / 口感 / 保存注意事项..." value="{{form.detail}}" bindinput="onFormInput" data-field="detail"></textarea>
+          </view>
+        </view>
+
+        <view class="card">
+          <view class="card-title">多规格配置</view>
+          
+          <view class="list-row" style="{{form.hasSpecs ? 'border-bottom: 1rpx solid var(--border);' : 'border-bottom: none;'}}">
+            <view class="row-label">启用多规格</view>
+            <switch checked="{{form.hasSpecs}}" bindchange="onHasSpecsSwitch" color="#10B981" />
+          </view>
+
+          <view wx:if="{{form.hasSpecs}}" style="margin-top: 24rpx;">
+            <view class="row-between" style="margin-bottom: 24rpx;">
+              <view class="label" style="margin: 0;">规格组管理</view>
+              <view class="btn btn-outline btn-mini" bindtap="addSpecGroup">+ 新增规格组</view>
+            </view>
+
+            <view class="spec-group" wx:for="{{form.specs}}" wx:for-item="g" wx:for-index="gi" wx:key="__g">
+              <view class="row-between" style="margin-bottom: 16rpx;">
+                <input class="input-full" style="width: 400rpx; height: 64rpx; background: var(--card-bg);" placeholder="组名，如：温度" value="{{g.name}}" bindinput="onSpecGroupNameInput" data-gi="{{gi}}" />
+                <view class="btn btn-danger btn-mini" data-gi="{{gi}}" bindtap="removeSpecGroup">删除组</view>
+              </view>
+              <view class="spec-tags">
+                <view class="spec-tag" wx:for="{{g.options}}" wx:for-item="o" wx:for-index="oi" wx:key="__o">
+                  <input class="spec-tag-input" placeholder="选项" value="{{o.label}}" bindinput="onSpecOptionInput" data-gi="{{gi}}" data-oi="{{oi}}"/>
+                  <view class="spec-tag-close" data-gi="{{gi}}" data-oi="{{oi}}" bindtap="removeSpecOption">×</view>
+                </view>
+                <view class="spec-tag-add" data-gi="{{gi}}" bindtap="addSpecOption">+ 选项</view>
+              </view>
+            </view>
+
+            <view class="divider"></view>
+            
             <view class="row-between">
-              <input class="input" placeholder="价格" type="digit" value="{{skuBulkPrice}}" bindinput="onSkuBulkInput" data-field="Price" />
-              <view class="btn btn-primary btn-mini" bindtap="applySkuBulk" data-field="price">填价格</view>
+              <view class="hint" style="margin: 0;">* 修改规格后，请务必更新 SKU 价格</view>
+              <view class="btn btn-primary btn-mini {{!editingId ? 'btn-disabled' : ''}}" bindtap="openSkuModal">配置 SKU 价格</view>
             </view>
-          </view>
-          <view class="sku-list">
-            <view class="sku-item sku-item-header">
-              <view class="sku-text">规格</view>
-              <view class="input sku-price-header">价格(元)</view>
-            </view>
-            <view class="sku-item" wx:for="{{skuItems}}" wx:for-item="s" wx:for-index="si" wx:key="skuKey">
-              <view class="sku-text">{{s.specText}}</view>
-              <input class="input sku-price" placeholder="售价" type="digit" value="{{s.price}}" data-index="{{si}}" bindinput="onSkuPriceInput" />
-            </view>
-          </view>
-          <view class="row-between" style="margin-top: 22rpx;">
-            <view class="btn" bindtap="closeSkuModal">取消</view>
-            <view class="btn btn-primary {{skuSaving ? 'btn-disabled' : ''}}" bindtap="saveSkus">{{skuSaving ? '保存中...' : '保存'}}</view>
           </view>
         </view>
-      </scroll-view>
+      </view>
+    </scroll-view>
+
+    <view class="bottom-action-bar">
+      <view class="btn btn-outline" style="width: 200rpx;" bindtap="cancelForm">取消</view>
+      <view class="btn btn-primary {{saving ? 'btn-disabled' : ''}}" style="flex: 1;" bindtap="saveForm">{{saving ? '保存中...' : '保存商品'}}</view>
     </view>
   </view>
 
-  <!-- 新增分组弹窗 -->
-  <view wx:if="{{showCategoryForm}}">
-    <view class="mask" bindtap="closeCategoryForm"></view>
-    <view class="modal" catchtap="noop">
-      <view class="modal-card">
-        <view class="row-between">
-          <view class="title">新增分组</view>
-          <view class="btn btn-mini" bindtap="closeCategoryForm">关闭</view>
-        </view>
 
-        <view class="field" style="margin-top: 16rpx;">
+  <view class="mask" wx:if="{{showSkuModal}}" catchtouchmove="true">
+    <view class="modal-bottom" catchtap="noop">
+      <view class="modal-header row-between">
+        <view class="page-title" style="font-size: 32rpx;">配置 SKU 价格</view>
+        <view class="btn btn-mini btn-outline" bindtap="closeSkuModal">关闭</view>
+      </view>
+      
+      <view class="list-row" style="padding: 16rpx 32rpx; background: var(--bg);">
+        <view class="row-label" style="font-size: 26rpx;">批量填充(仅空值)</view>
+        <view class="row" style="gap: 16rpx;">
+          <input class="input-full" style="width: 160rpx; height: 56rpx; background: #fff;" placeholder="价格" type="digit" value="{{skuBulkPrice}}" bindinput="onSkuBulkInput" data-field="Price" />
+          <view class="btn btn-primary btn-mini" bindtap="applySkuBulk" data-field="price">填入</view>
+        </view>
+      </view>
+
+      <scroll-view scroll-y style="max-height: 50vh; padding: 0 32rpx; box-sizing: border-box;">
+        <view class="sku-item sku-item-header">
+          <view class="sku-text">规格组合</view>
+          <view class="sku-price-header">售价 (元)</view>
+        </view>
+        <view class="sku-item" wx:for="{{skuItems}}" wx:for-item="s" wx:for-index="si" wx:key="skuKey">
+          <view class="sku-text">{{s.specText}}</view>
+          <input class="input-full sku-price-input" placeholder="0.00" type="digit" value="{{s.price}}" data-index="{{si}}" bindinput="onSkuPriceInput" />
+        </view>
+        <view style="height: 40rpx;"></view>
+      </scroll-view>
+
+      <view class="bottom-action-bar" style="position: relative; padding-bottom: calc(24rpx + env(safe-area-inset-bottom)); box-shadow: none;">
+        <view class="btn btn-outline" style="width: 200rpx;" bindtap="closeSkuModal">取消</view>
+        <view class="btn btn-primary {{skuSaving ? 'btn-disabled' : ''}}" style="flex: 1;" bindtap="saveSkus">{{skuSaving ? '保存中...' : '确认保存'}}</view>
+      </view>
+    </view>
+  </view>
+
+
+  <view class="mask" wx:if="{{showCategoryForm}}" catchtouchmove="true">
+    <view class="modal-center" catchtap="noop">
+      <view class="modal-header row-between">
+        <view class="page-title" style="font-size: 32rpx;">新增分组</view>
+        <view class="btn btn-mini btn-outline" bindtap="closeCategoryForm">关闭</view>
+      </view>
+
+      <view style="padding: 24rpx 32rpx;">
+        <view class="form-group">
           <view class="label">分组名称</view>
-          <input class="input" placeholder="例如：饮品" value="{{categoryForm.name}}" bindinput="onCategoryInput" data-field="name" />
+          <input class="input-full" placeholder="例如：招牌面包" value="{{categoryForm.name}}" bindinput="onCategoryInput" data-field="name" />
         </view>
 
-        <view class="field">
-          <view class="label">排序</view>
-          <input class="input" placeholder="0" type="number" value="{{categoryForm.sort}}" bindinput="onCategoryInput" data-field="sort" />
+        <view class="form-group" style="margin-top: 24rpx;">
+          <view class="label">排序权重</view>
+          <input class="input-full" placeholder="数字越大越靠前" type="number" value="{{categoryForm.sort}}" bindinput="onCategoryInput" data-field="sort" />
         </view>
 
-        <view class="row-between" style="margin-top: 18rpx;">
-          <view class="btn" bindtap="closeCategoryForm">取消</view>
-          <view class="btn btn-primary {{categorySaving ? 'btn-disabled' : ''}}" bindtap="saveCategory">
+        <view class="row-between" style="margin-top: 40rpx;">
+          <view class="btn btn-outline" style="width: 45%; text-align: center;" bindtap="closeCategoryForm">取消</view>
+          <view class="btn btn-primary {{categorySaving ? 'btn-disabled' : ''}}" style="width: 45%; text-align: center;" bindtap="saveCategory">
             {{categorySaving ? '保存中...' : '保存'}}
           </view>
         </view>
       </view>
     </view>
   </view>
+
 </view>
-<admin-tabbar />
+
+<admin-tabbar wx:if="{{!showForm}}" />

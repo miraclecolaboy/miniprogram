@@ -64,6 +64,7 @@ module.exports = {
     const payMethodText = payMethod === 'balance'
       ? '余额支付'
       : (payMethod === 'free' ? '无需支付' : '微信支付');
+    const buyerNickName = String(o.buyerNickName || o.userNickName || o.nickName || '').trim();
 
     // 状态
     const st = String(o.status || '').toLowerCase();
@@ -94,6 +95,7 @@ module.exports = {
       amountVipDiscountText: vipDiscountText,
       amountCouponDiscountText: couponDiscountText,
       expressNoText: String(o.expressNo || '').trim(),
+      buyerNickName,
       refundHandled: refundBlocksOrder,
       needRefundHandle: needHandle,
       canApplyRefund,

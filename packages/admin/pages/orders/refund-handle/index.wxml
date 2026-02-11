@@ -1,56 +1,119 @@
-<!-- pages/orders/refund-handle/index.wxml -->
 <view class="page">
-  <view wx:if="{{order}}" class="card">
-    <view class="row">
-      <view class="title">订单信息</view>
-      <view class="status">{{order.modeText}} · ¥{{order.payAmountText}}</view>
-    </view>
-
-    <view class="sub">订单号：{{order.orderNo || order._id}}</view>
-    <view class="sub" wx:if="{{order.buyerNickName}}">用户：{{order.buyerNickName}}</view>
-    <view class="sub">下单：{{order.createdAtText}}</view>
-
-    <view class="goods">
-      <view class="sub">商品：</view>
-      <view wx:for="{{order.itemsView}}" wx:key="key" class="goodsLine">{{item.line}}</view>
-      <view wx:if="{{order.remarkText}}" class="sub">下单备注：{{order.remarkText}}</view>
-    </view>
-
-    <view class="hr"></view>
-
-    <view class="title">售后信息</view>
-    <view class="sub">状态：{{order.refundStatusText}}</view>
-    <view wx:if="{{order.refundLatestText}}" class="sub">进度：{{order.refundLatestText}}</view>
-    <view wx:if="{{order.refundLatestTimeText}}" class="sub">时间：{{order.refundLatestTimeText}}</view>
-
-    <!-- ✅ 同步客户端排序规则：
-         处理中：处理备注在上、申请原因在下
-         非处理中：申请原因在上、处理备注在下 -->
-    <block wx:if="{{order.refundIsProcessing}}">
-      <view wx:if="{{order.refundHandleRemarkText}}" class="sub">处理备注：{{order.refundHandleRemarkText}}</view>
-      <view wx:if="{{order.refundApplyReasonText}}" class="sub">申请原因：{{order.refundApplyReasonText}}</view>
-    </block>
-    <block wx:else>
-      <view wx:if="{{order.refundApplyReasonText}}" class="sub">申请原因：{{order.refundApplyReasonText}}</view>
-      <view wx:if="{{order.refundHandleRemarkText}}" class="sub">处理备注：{{order.refundHandleRemarkText}}</view>
-    </block>
-
-    <view class="inputLabel">处理备注（可选）</view>
-    <textarea
-      class="textarea"
-      placeholder="给用户的说明，例如：已同意退款 / 不符合售后条件"
-      value="{{remark}}"
-      maxlength="200"
-      bindinput="onRemarkInput"
-    ></textarea>
-
-    <view class="btnRow">
-      <button class="btn danger" bindtap="onReject">拒绝</button>
-      <button class="btn primary" bindtap="onApprove">同意并退款</button>
-    </view>
-
-    <view class="tip">提示：同意售后会发起微信和余额退款（原路退回）。</view>
+  
+  <view class="page-header">
+    <view class="page-title">售后处理</view>
+    <view class="page-sub">审核并处理买家的退款申请</view>
   </view>
 
-  <view wx:if="{{!order && !loading}}" class="tip">加载失败或订单不存在</view>
+  <view wx:if="{{order}}" class="content">
+    
+    <view class="card">
+      <view class="card-title">订单摘要</view>
+      
+      <view class="info-grid">
+        <view class="info-row">
+          <text class="info-label">实付金额</text>
+          <text class="info-value" style="font-size: 32rpx; font-weight: 800; color: #EF4444;">¥{{order.payAmountText}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">订单类型</text>
+          <text class="info-value">{{order.modeText}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">订单编号</text>
+          <text class="info-value" user-select>{{order.orderNo || order._id}}</text>
+        </view>
+        <view class="info-row" wx:if="{{order.buyerNickName}}">
+          <text class="info-label">买家昵称</text>
+          <text class="info-value" style="color: var(--primary); font-weight: 600;">{{order.buyerNickName}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">下单时间</text>
+          <text class="info-value" style="color: var(--text-muted);">{{order.createdAtText}}</text>
+        </view>
+      </view>
+
+      <view class="goods-block">
+        <view wx:for="{{order.itemsView}}" wx:key="key" class="goods-line">
+          <text class="goods-dot">•</text>
+          <text class="goods-name">{{item.line}}</text>
+        </view>
+      </view>
+
+      <view class="remark-block" wx:if="{{order.remarkText}}">
+        <text class="remark-label">买家备注：</text>
+        <text class="remark-text" user-select>{{order.remarkText}}</text>
+      </view>
+    </view>
+
+
+    <view class="card">
+      <view class="card-title">售后详情</view>
+
+      <view class="info-grid">
+        <view class="info-row">
+          <text class="info-label">售后状态</text>
+          <text class="info-value" style="color: #D97706; font-weight: 800;">{{order.refundStatusText}}</text>
+        </view>
+        <view class="info-row" wx:if="{{order.refundLatestText}}">
+          <text class="info-label">当前进度</text>
+          <text class="info-value">{{order.refundLatestText}}</text>
+        </view>
+        <view class="info-row" wx:if="{{order.refundLatestTimeText}}">
+          <text class="info-label">更新时间</text>
+          <text class="info-value" style="color: var(--text-muted);">{{order.refundLatestTimeText}}</text>
+        </view>
+
+        <block wx:if="{{order.refundIsProcessing}}">
+          <view class="info-row" wx:if="{{order.refundHandleRemarkText}}">
+            <text class="info-label">处理备注</text>
+            <text class="info-value">{{order.refundHandleRemarkText}}</text>
+          </view>
+          <view class="info-row" wx:if="{{order.refundApplyReasonText}}">
+            <text class="info-label">申请原因</text>
+            <text class="info-value" style="color: #EF4444; font-weight: 600;">{{order.refundApplyReasonText}}</text>
+          </view>
+        </block>
+        
+        <block wx:else>
+          <view class="info-row" wx:if="{{order.refundApplyReasonText}}">
+            <text class="info-label">申请原因</text>
+            <text class="info-value">{{order.refundApplyReasonText}}</text>
+          </view>
+          <view class="info-row" wx:if="{{order.refundHandleRemarkText}}">
+            <text class="info-label">处理备注</text>
+            <text class="info-value">{{order.refundHandleRemarkText}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+
+    <view class="card">
+      <view class="card-title">审批操作</view>
+      
+      <view class="form-group">
+        <view class="label">处理备注（可选）</view>
+        <textarea 
+          class="textarea" 
+          placeholder="给用户的说明，例如：已同意退款 / 不符合售后条件" 
+          value="{{remark}}" 
+          maxlength="200" 
+          bindinput="onRemarkInput"
+        ></textarea>
+      </view>
+
+      <view class="action-row">
+        <view class="btn btn-danger" bindtap="onReject">拒绝申请</view>
+        <view class="btn btn-primary" bindtap="onApprove">同意并退款</view>
+      </view>
+
+      <view class="hint-center">提示：同意售后会发起微信和余额退款（原路退回）。</view>
+    </view>
+
+    <view style="height: 60rpx;"></view>
+
+  </view>
+
+  <view wx:if="{{!order && !loading}}" class="empty-hint">加载失败或该售后单不存在</view>
 </view>
