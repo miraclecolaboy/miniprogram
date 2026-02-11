@@ -14,6 +14,15 @@ const couponMethods = require('./shop.coupons');
 
 Page(Object.assign({
   data: {
+    // 分组折叠
+    sectionOpen: {
+      consume: true,
+      shopInfo: true,
+      deliveryPay: false,
+      coupons: false,
+      gifts: false,
+    },
+
     // 公告
     notice: '',
     noticeChanged: false,
@@ -50,6 +59,9 @@ Page(Object.assign({
     cloudPrinterKey: '',
     cloudPrinterTimes: '',
     cloudPrintChanged: false,
+    cloudPrintStatusOk: false,
+    cloudPrintStatusText: '待检测',
+    cloudPrintStatusLoading: false,
 
     // 礼品
     giftForm: { name: '', points: '', desc: '', thumbFileId: '', thumbPreview: '' },

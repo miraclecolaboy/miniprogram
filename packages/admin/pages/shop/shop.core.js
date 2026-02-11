@@ -16,16 +16,32 @@ module.exports = {
   onShow() {
     const s = requireLogin();
     if (!s) return;
+
+    if (typeof this.onRefreshCloudPrintStatus === 'function') {
+      this.onRefreshCloudPrintStatus({ silent: true });
+    }
   },
 
   async init() {
-    await Promise.allSettled([this.loadConfig(), this.loadGifts()]);
-    this.loadCoupons();
+    await Promise.allSettled([this.loadConfig(), this.loadGifts(), this.loadCoupons()]);
+
+    if (typeof this.onRefreshCloudPrintStatus === 'function') {
+      await this.onRefreshCloudPrintStatus({ silent: true });
+    }
   },
 
   async onReload() {
     await this.init();
     wx.showToast({ title: '已刷新', icon: 'success' });
+  },
+
+  toggleSection(e) {
+    const key = String(e?.currentTarget?.dataset?.key || '').trim();
+    if (!key) return;
+
+    const path = `sectionOpen.${key}`;
+    const cur = !!this.data?.sectionOpen?.[key];
+    this.setData({ [path]: !cur });
   },
 
   async loadConfig() {
@@ -88,7 +104,15 @@ module.exports = {
       cloudPrinterKey: safeStr(cfg.cloudPrinterKey),
       cloudPrinterTimes: safeStr(cfg.cloudPrinterTimes),
       cloudPrintChanged: false,
+
+      // 默认展开与操作高频相关的区域
+      sectionOpen: {
+        consume: true,
+        shopInfo: true,
+        deliveryPay: false,
+        coupons: false,
+        gifts: false,
+      },
     });
   },
 };
-

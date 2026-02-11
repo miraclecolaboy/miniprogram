@@ -11,6 +11,4 @@
   >
     <text class="admin-tabbar__text">{{item.text}}</text>
   </view>
-  <printer-float />
 </view>
-

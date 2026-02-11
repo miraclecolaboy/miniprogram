@@ -1,6 +1,3 @@
 {
-  "component": true,
-  "usingComponents": {
-    "printer-float": "../printer-float/index"
-  }
+  "component": true
 }

@@ -1,268 +1,316 @@
 <view class="page">
-  <view class="page-header">
-    <view class="top-card">
-      <view class="row-between">
-        <view>
-          <view class="title">店铺配置</view>
-          <view class="sub">公告 / 轮播图 / 配送 / 客服 / 积分 / 打印</view>
-        </view>
-        <view class="btn btn-primary" bindtap="onReload">刷新</view>
+  <scroll-view class="main-scroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
+    <view class="page-header row-between">
+      <view class="header-left">
+        <view class="page-title">店铺配置</view>
+        <view class="page-sub">核销优先 / 分组折叠 / 便捷操作</view>
       </view>
-
-      <view class="block">
-        <view class="block-title">下单页公告</view>
-        <textarea class="textarea" maxlength="200" value="{{notice}}" placeholder="输入公告（最多200字）" bindinput="onNoticeInput"></textarea>
-        <view class="row-right">
-          <view class="btn btn-primary {{noticeChanged ? '' : 'btn-disabled'}}" bindtap="onSaveNotice">保存公告</view>
-        </view>
-      </view>
-
-      <view class="block">
-        <view class="block-title">店铺首页轮播图</view>
-        <view class="hint">展示在客户端首页顶部，比例为4：3。建议尺寸 750x300。</view>
-
-        <view style="display: flex; flex-wrap: wrap; gap: 20rpx; margin-top: 20rpx;">
-          <view wx:for="{{banners}}" wx:key="fileId" style="position: relative; width: 200rpx; height: 120rpx;">
-            <image src="{{item.preview}}" mode="aspectFill" style="width: 100%; height: 100%; border-radius: 8rpx; background: #eee;" />
-            <view catchtap="onRemoveBanner" data-index="{{index}}" style="position: absolute; top: -10rpx; right: -10rpx; background: rgba(0,0,0,0.5); color: #fff; width: 40rpx; height: 40rpx; border-radius: 50%; text-align: center; line-height: 36rpx; font-size: 28rpx; z-index: 2;">×</view>
-          </view>
-          
-          <view bindtap="onUploadBanner" style="width: 200rpx; height: 120rpx; border: 2rpx dashed #ddd; border-radius: 8rpx; display: flex; align-items: center; justify-content: center; color: #999; font-size: 40rpx;">+</view>
-        </view>
-
-        <view class="row-right" style="margin-top: 20rpx;">
-          <view class="btn btn-primary {{configChanged ? '' : 'btn-disabled'}}" bindtap="onSaveConfig">保存配置</view>
-        </view>
-      </view>
-
-      <view class="block">
-        <view class="block-title">配送配置</view>
-        
-        <view class="form-row row-between">
-          <view class="form-label">外卖最大距离 (km)</view>
-          <input class="input input-inline" type="number" value="{{waimaiMaxKm}}" bindinput="onWaimaiMaxKmInput" />
-        </view>
-
-        <view class="form-row row-between">
-          <view class="form-label">外卖配送费 (元)</view>
-          <input class="input input-inline" type="number" value="{{waimaiDeliveryFee}}" bindinput="onWaimaiDeliveryFeeInput" />
-        </view>
-
-        <view class="form-row row-between">
-          <view class="form-label">开启快递</view>
-          <switch checked="{{kuaidiOn}}" bindchange="onKuaidiOnChange" />
-        </view>
-
-        <view class="form-row row-between">
-          <view class="form-label">快递配送费 (元)</view>
-          <input class="input input-inline" type="number" value="{{kuaidiDeliveryFee}}" bindinput="onKuaidiDeliveryFeeInput" />
-        </view>
-
-        <view class="form-row row-between">
-          <view class="form-label">外卖起送价 (元)</view>
-          <input class="input input-inline" type="number" value="{{minOrderWaimai}}" bindinput="onMinOrderWaimaiInput" />
-        </view>
-
-        <view class="form-row row-between">
-          <view class="form-label">快递起送价 (元)</view>
-          <input class="input input-inline" type="number" value="{{minOrderKuaidi}}" bindinput="onMinOrderKuaidiInput" />
-        </view>
-
-        <view class="row-right">
-          <view class="btn btn-primary {{configChanged ? '' : 'btn-disabled'}}" bindtap="onSaveConfig">保存配送配置</view>
-        </view>
-      </view>
-
-      <view class="block">
-        <view class="block-title">微信支付配置</view>
-        <view class="hint">配置子商户号后，用户端充值/下单微信支付才可用</view>
-
-        <view class="form-row">
-          <input class="input" placeholder="子商户号 subMchId（必填）" value="{{subMchId}}" bindinput="onSubMchIdInput" />
-        </view>
-
-        <view class="row-right">
-          <view class="btn btn-primary {{payChanged ? '' : 'btn-disabled'}}" bindtap="onSavePayConfig">保存支付配置</view>
-        </view>
-      </view>
-
-      <view class="block">
-        <view class="block-title">客服与联系方式</view>
-
-        <view class="form-row">
-          <input class="input" placeholder="联系电话（选填）" value="{{phone}}" bindinput="onPhoneInput" />
-        </view>
-
-        <view class="form-row">
-          <view class="service-hours">
-            <view class="time-range-row" wx:for="{{serviceHoursRanges}}" wx:key="index">
-              <input class="time-input" type="number" maxlength="2" value="{{item.sh}}" placeholder="10" data-index="{{index}}" data-field="sh" bindinput="onServiceHourPartInput" />
-              <text class="time-sep">:</text>
-              <input class="time-input" type="number" maxlength="2" value="{{item.sm}}" placeholder="00" data-index="{{index}}" data-field="sm" bindinput="onServiceHourPartInput" />
-              <text class="time-sep">-</text>
-              <input class="time-input" type="number" maxlength="2" value="{{item.eh}}" placeholder="22" data-index="{{index}}" data-field="eh" bindinput="onServiceHourPartInput" />
-              <text class="time-sep">:</text>
-              <input class="time-input" type="number" maxlength="2" value="{{item.em}}" placeholder="00" data-index="{{index}}" data-field="em" bindinput="onServiceHourPartInput" />
-              <view wx:if="{{serviceHoursRanges.length > 1}}" class="btn time-range-del" data-index="{{index}}" bindtap="onRemoveServiceHoursRange">删除</view>
-            </view>
-
-            <view class="row-right">
-              <view class="btn" bindtap="onAddServiceHoursRange">添加时段</view>
-            </view>
-
-            <view class="hint">留空则默认 10:00-22:00；多时段示例：10:00-14:00 17:00-22:00</view>
-          </view>
-        </view>
-
-        <view class="form-row row-between">
-          <view class="hint">客服二维码（选填）</view>
-          <view class="btn" bindtap="onUploadKefuQr">上传二维码</view>
-        </view>
-
-        <image wx:if="{{kefuQrPreview}}" class="qr-preview" src="{{kefuQrPreview}}" mode="aspectFill" lazy-load="true" />
-
-        <view class="row-right">
-          <view class="btn btn-primary {{contactChanged ? '' : 'btn-disabled'}}" bindtap="onSaveContact">保存客服信息</view>
-        </view>
-      </view>
-
-      <view class="block">
-        <view class="block-title">云打印配置 (飞鹅云)</view>
-        <view class="hint">新订单将自动打印。请确保打印机在线。</view>
-      
-        <view class="form-row">
-          <input class="input" placeholder="打印机SN（必填）" value="{{cloudPrinterSn}}" bindinput="onCloudPrintInput" data-field="cloudPrinterSn" />
-        </view>
-      
-        <view class="form-row">
-          <input class="input" placeholder="飞鹅云 USER（必填）" value="{{cloudPrinterUser}}" bindinput="onCloudPrintInput" data-field="cloudPrinterUser" />
-        </view>
-      
-        <view class="form-row">
-          <input class="input" placeholder="飞鹅云 UKEY（必填）" value="{{cloudPrinterKey}}" bindinput="onCloudPrintInput" data-field="cloudPrinterKey" />
-        </view>
-        
-        <view class="form-row">
-          <input class="input" type="number" placeholder="打印联数（选填，默认1）" value="{{cloudPrinterTimes}}" bindinput="onCloudPrintInput" data-field="cloudPrinterTimes" />
-        </view>
-      
-        <view class="row-right">
-          <view class="btn btn-primary {{cloudPrintChanged ? '' : 'btn-disabled'}}" bindtap="onSaveCloudPrint">保存打印机配置</view>
-        </view>
-      </view>
-
-      <view class="block">
-        <view class="block-title">优惠券管理</view>
-        <view class="form-row">
-          <input class="input" placeholder="标题, 如：新人5元券" value="{{couponForm.title}}" bindinput="onCouponFormInput" data-field="title" />
-        </view>
-        <view class="form-row">
-          <input class="input" type="digit" placeholder="最低消费 (元), 0为无门槛" value="{{couponForm.minSpend}}" bindinput="onCouponFormInput" data-field="minSpend" />
-        </view>
-        <view class="form-row">
-          <input class="input" type="digit" placeholder="减免金额 (元)" value="{{couponForm.discount}}" bindinput="onCouponFormInput" data-field="discount" />
-        </view>
-        <view class="form-row">
-          <input class="input" type="number" placeholder="发放总量" value="{{couponForm.totalQuantity}}" bindinput="onCouponFormInput" data-field="totalQuantity" />
-        </view>
-        <view class="row-right">
-          <view class="btn" wx:if="{{editingCouponId}}" bindtap="cancelCouponEdit">取消编辑</view>
-          <view class="btn btn-primary {{couponSaving ? 'btn-disabled' : ''}}" bindtap="saveCouponForm">
-            {{editingCouponId ? '保存修改' : '新增优惠券'}}
-          </view>
-        </view>
-        <view class="hint" wx:if="{{editingCouponTitle}}">正在编辑：{{editingCouponTitle}}</view>
-      </view>
-
-      <view class="block">
-        <view class="block-title">积分兑换商品</view>
-
-        <view class="form-row">
-          <input class="input" placeholder="商品名字（必填）" value="{{giftForm.name}}" bindinput="onGiftNameInput" />
-        </view>
-
-        <view class="form-row">
-          <input class="input" type="number" placeholder="所需积分（必填）" value="{{giftForm.points}}" bindinput="onGiftPointsInput" />
-        </view>
-
-        <view class="form-row">
-          <input class="input" placeholder="描述（选填，最多200字）" value="{{giftForm.desc}}" bindinput="onGiftDescInput" />
-        </view>
-
-        <view class="form-row row-between">
-          <view class="hint">图片（选填，列表展示用）</view>
-          <view class="btn" bindtap="onUploadGiftThumb">上传图片</view>
-        </view>
-
-        <image wx:if="{{giftForm.thumbPreview}}" class="thumb-preview" src="{{giftForm.thumbPreview}}" mode="aspectFill" lazy-load="true" />
-
-        <view class="row-right">
-          <view class="btn" wx:if="{{editingGiftId}}" bindtap="onCancelEdit">取消编辑</view>
-          <view class="btn btn-primary" bindtap="onSaveGift">{{editingGiftId ? '保存修改' : '新增礼品'}}</view>
-        </view>
-
-        <view class="hint" wx:if="{{editingGiftName}}">正在编辑：{{editingGiftName}}</view>
-      </view>
-
-      <view class="block">
-        <view class="block-title">核销（6位码）</view>
-
-        <view class="form-row">
-          <input class="input" type="number" placeholder="输入6位核销码" value="{{consumeCode}}" bindinput="onConsumeCodeInput" maxlength="6" />
-          <view class="hint" wx:if="{{consumeTip}}">{{consumeTip}}</view>
-        </view>
-
-        <view class="row-right">
-          <view class="btn btn-primary" bindtap="onConsume">核销</view>
-        </view>
-      </view>
+      <view class="btn btn-outline btn-mini" bindtap="onReload">刷新数据</view>
     </view>
-  </view>
-  
 
-  <view class="page-body">
-    <scroll-view class="listScroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
-     <view class="list-card">
-      <view class="list-title">已配置优惠券（{{coupons.length}}）</view>
-      <view class="empty" wx:if="{{!coupons.length}}">暂无优惠券，请在上方新增。</view>
-      <view class="item" wx:for="{{coupons}}" wx:key="_id">
-        <view class="item-main">
-          <view class="item-name">{{item.title}}</view>
-          <view class="item-sub">满 {{item.minSpend}} 减 {{item.discount}}</view>
-          <view class="item-sub">总量: {{item.totalQuantity}} / 已领: {{item.claimedQuantity || 0}}</view>
-          <view class="item-sub">状态: {{item.status === 'active' ? '上架中' : '已下架'}}</view>
+    <view class="page-content">
+      <view class="fold-card {{sectionOpen.consume ? 'is-open' : ''}}">
+        <view class="fold-head" bindtap="toggleSection" data-key="consume">
+          <view class="fold-head-main">
+            <view class="fold-title">快速核销</view>
+            <view class="fold-sub">输入 6 位码，核销后自动清空</view>
+          </view>
+          <view class="fold-arrow">{{sectionOpen.consume ? '收起' : '展开'}}</view>
         </view>
-        <view class="item-right">
-          <view class="btn" bindtap="openEditCoupon" data-id="{{item._id}}">编辑</view>
-          <view class="btn {{item.status === 'active' ? 'btn-danger' : 'btn-primary'}}" bindtap="toggleCouponStatus" data-id="{{item._id}}" data-status="{{item.status}}">
-            {{item.status === 'active' ? '下架' : '上架'}}
+        <view class="fold-body" wx:if="{{sectionOpen.consume}}">
+          <view class="card compact-card consume-card">
+            <view class="list-row" style="border-bottom: none; padding-bottom: 0;">
+              <view class="row-label">6位核销码</view>
+              <input class="input-inline consume-input" type="number" value="{{consumeCode}}" bindinput="onConsumeCodeInput" maxlength="6" placeholder="输入6位数字" />
+            </view>
+            <view class="hint consume-tip" wx:if="{{consumeTip}}">{{consumeTip}}</view>
+            <view class="card-action">
+              <view class="btn btn-primary" bindtap="onConsume">立即核销</view>
+            </view>
           </view>
         </view>
       </view>
+
+      <view class="fold-card {{sectionOpen.shopInfo ? 'is-open' : ''}}">
+        <view class="fold-head" bindtap="toggleSection" data-key="shopInfo">
+          <view class="fold-head-main">
+            <view class="fold-title">店铺信息</view>
+            <view class="fold-sub">公告、轮播、客服、营业、云打印</view>
+          </view>
+          <view class="fold-arrow">{{sectionOpen.shopInfo ? '收起' : '展开'}}</view>
+        </view>
+        <view class="fold-body" wx:if="{{sectionOpen.shopInfo}}">
+          <view class="card compact-card">
+            <view class="card-title">基础外观</view>
+            <view class="form-group">
+              <view class="label">下单页公告</view>
+              <textarea class="textarea" maxlength="200" value="{{notice}}" placeholder="输入公告（最多200字）" bindinput="onNoticeInput"></textarea>
+              <view class="card-action">
+                <view class="btn {{noticeChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSaveNotice">保存公告</view>
+              </view>
+            </view>
+            <view class="divider"></view>
+            <view class="form-group">
+              <view class="label">店铺首页轮播图</view>
+              <view class="hint">展示在客户端首页顶部，比例 4:3，建议尺寸 750x300。</view>
+              <view class="banner-list">
+                <view class="banner-item" wx:for="{{banners}}" wx:key="fileId">
+                  <image src="{{item.preview}}" mode="aspectFill" class="banner-img" />
+                  <view catchtap="onRemoveBanner" data-index="{{index}}" class="banner-del">×</view>
+                </view>
+                <view bindtap="onUploadBanner" class="banner-add">+</view>
+              </view>
+              <view class="card-action">
+                <view class="btn {{configChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSaveConfig">保存轮播图</view>
+              </view>
+            </view>
+          </view>
+
+          <view class="card compact-card">
+            <view class="card-title">客服与营业时间</view>
+            <view class="list-row">
+              <view class="row-label">联系电话</view>
+              <input class="input-inline" style="width: 300rpx;" type="text" value="{{phone}}" bindinput="onPhoneInput" placeholder="选填" />
+            </view>
+            <view class="form-group" style="margin-top: 24rpx;">
+              <view class="label" style="margin-bottom: 8rpx;">营业时段</view>
+              <view class="hint">留空则默认 10:00-22:00；多时段例如 10:00-14:00, 17:00-22:00</view>
+              <view class="time-range-row" wx:for="{{serviceHoursRanges}}" wx:key="index">
+                <input class="time-input" type="number" maxlength="2" value="{{item.sh}}" placeholder="10" data-index="{{index}}" data-field="sh" bindinput="onServiceHourPartInput" />
+                <text class="time-sep">:</text>
+                <input class="time-input" type="number" maxlength="2" value="{{item.sm}}" placeholder="00" data-index="{{index}}" data-field="sm" bindinput="onServiceHourPartInput" />
+                <text class="time-sep">-</text>
+                <input class="time-input" type="number" maxlength="2" value="{{item.eh}}" placeholder="22" data-index="{{index}}" data-field="eh" bindinput="onServiceHourPartInput" />
+                <text class="time-sep">:</text>
+                <input class="time-input" type="number" maxlength="2" value="{{item.em}}" placeholder="00" data-index="{{index}}" data-field="em" bindinput="onServiceHourPartInput" />
+                <view wx:if="{{serviceHoursRanges.length > 1}}" class="btn btn-danger btn-mini" style="margin-left: 12rpx;" data-index="{{index}}" bindtap="onRemoveServiceHoursRange">删除</view>
+              </view>
+              <view class="card-action" style="justify-content: flex-start;">
+                <view class="btn btn-outline btn-mini" bindtap="onAddServiceHoursRange">+ 添加时段</view>
+              </view>
+            </view>
+            <view class="divider"></view>
+            <view class="form-group">
+              <view class="row-between">
+                <view class="label" style="margin: 0;">客服二维码 (选填)</view>
+                <view class="btn btn-outline btn-mini" bindtap="onUploadKefuQr">上传二维码</view>
+              </view>
+              <image wx:if="{{kefuQrPreview}}" class="qr-preview" src="{{kefuQrPreview}}" mode="aspectFill" lazy-load="true" />
+            </view>
+            <view class="card-action">
+              <view class="btn {{contactChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSaveContact">保存客服信息</view>
+            </view>
+          </view>
+
+          <view class="card compact-card">
+            <view class="card-title">云打印配置 (飞鹅云)</view>
+            <view class="row-between printer-status-row">
+              <view class="printer-status-main">
+                <view class="printer-status-title">打印机状态</view>
+                <view class="hint" style="margin-top: 4rpx;">{{cloudPrintStatusText}}</view>
+              </view>
+              <view class="printer-dot {{cloudPrintStatusOk ? 'is-on' : 'is-off'}}"></view>
+            </view>
+            <view class="card-action" style="margin-top: 16rpx;">
+              <view class="btn btn-outline" bindtap="onRefreshCloudPrintStatus">刷新状态</view>
+              <view class="btn btn-outline" bindtap="onTestCloudPrint">测试打印</view>
+            </view>
+            <view class="hint" style="margin-bottom: 24rpx;">新订单将自动打印，请确保打印机在线。</view>
+            <view class="list-row">
+              <view class="row-label">打印机 SN</view>
+              <input class="input-inline" style="width: 350rpx;" type="text" value="{{cloudPrinterSn}}" bindinput="onCloudPrintInput" data-field="cloudPrinterSn" placeholder="必填" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">飞鹅云 USER</view>
+              <input class="input-inline" style="width: 350rpx;" type="text" value="{{cloudPrinterUser}}" bindinput="onCloudPrintInput" data-field="cloudPrinterUser" placeholder="必填" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">飞鹅云 UKEY</view>
+              <input class="input-inline" style="width: 350rpx;" type="text" value="{{cloudPrinterKey}}" bindinput="onCloudPrintInput" data-field="cloudPrinterKey" placeholder="必填" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">打印联数</view>
+              <input class="input-inline" type="number" value="{{cloudPrinterTimes}}" bindinput="onCloudPrintInput" data-field="cloudPrinterTimes" placeholder="默认 1" />
+            </view>
+            <view class="card-action">
+              <view class="btn {{cloudPrintChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSaveCloudPrint">保存打印配置</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="fold-card {{sectionOpen.deliveryPay ? 'is-open' : ''}}">
+        <view class="fold-head" bindtap="toggleSection" data-key="deliveryPay">
+          <view class="fold-head-main">
+            <view class="fold-title">配送与支付</view>
+            <view class="fold-sub">外卖/同城快递 + 微信支付子商户</view>
+          </view>
+          <view class="fold-arrow">{{sectionOpen.deliveryPay ? '收起' : '展开'}}</view>
+        </view>
+        <view class="fold-body" wx:if="{{sectionOpen.deliveryPay}}">
+          <view class="card compact-card">
+            <view class="card-title">配送与起送</view>
+            <view class="list-row">
+              <view class="row-label">外卖最大距离 (km)</view>
+              <input class="input-inline" type="number" value="{{waimaiMaxKm}}" bindinput="onWaimaiMaxKmInput" placeholder="0" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">外卖配送费 (元)</view>
+              <input class="input-inline" type="digit" value="{{waimaiDeliveryFee}}" bindinput="onWaimaiDeliveryFeeInput" placeholder="0.00" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">外卖起送价 (元)</view>
+              <input class="input-inline" type="digit" value="{{minOrderWaimai}}" bindinput="onMinOrderWaimaiInput" placeholder="0.00" />
+            </view>
+            <view class="divider" style="margin: 10rpx 0;"></view>
+            <view class="list-row">
+              <view class="row-label">开启全国快递</view>
+              <switch checked="{{kuaidiOn}}" bindchange="onKuaidiOnChange" color="#10B981" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">快递配送费 (元)</view>
+              <input class="input-inline" type="digit" value="{{kuaidiDeliveryFee}}" bindinput="onKuaidiDeliveryFeeInput" placeholder="0.00" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">快递起送价 (元)</view>
+              <input class="input-inline" type="digit" value="{{minOrderKuaidi}}" bindinput="onMinOrderKuaidiInput" placeholder="0.00" />
+            </view>
+            <view class="card-action">
+              <view class="btn {{configChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSaveConfig">保存配送配置</view>
+            </view>
+          </view>
+
+          <view class="card compact-card">
+            <view class="card-title">微信支付配置</view>
+            <view class="hint" style="margin-bottom: 24rpx;">配置子商户号后，用户端充值及下单微信支付才可用</view>
+            <view class="list-row">
+              <view class="row-label">子商户号 subMchId</view>
+              <input class="input-inline" style="width: 300rpx;" type="text" value="{{subMchId}}" bindinput="onSubMchIdInput" placeholder="选填" />
+            </view>
+            <view class="card-action">
+              <view class="btn {{payChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSavePayConfig">保存支付配置</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="fold-card {{sectionOpen.coupons ? 'is-open' : ''}}">
+        <view class="fold-head" bindtap="toggleSection" data-key="coupons">
+          <view class="fold-head-main">
+            <view class="fold-title">优惠券管理</view>
+            <view class="fold-sub">新增/编辑/上下架（{{coupons.length}}）</view>
+          </view>
+          <view class="fold-arrow">{{sectionOpen.coupons ? '收起' : '展开'}}</view>
+        </view>
+        <view class="fold-body" wx:if="{{sectionOpen.coupons}}">
+          <view class="card compact-card">
+            <view class="card-title">{{editingCouponId ? '编辑优惠券' : '新增优惠券'}}</view>
+            <view class="hint" wx:if="{{editingCouponTitle}}" style="margin-bottom: 16rpx; color: var(--warning);">正在编辑：{{editingCouponTitle}}</view>
+            <view class="list-row">
+              <view class="row-label">标题</view>
+              <input class="input-inline" style="width: 350rpx;" type="text" value="{{couponForm.title}}" bindinput="onCouponFormInput" data-field="title" placeholder="如：新人5元券" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">最低消费 (元)</view>
+              <input class="input-inline" type="digit" value="{{couponForm.minSpend}}" bindinput="onCouponFormInput" data-field="minSpend" placeholder="0为无门槛" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">减免金额 (元)</view>
+              <input class="input-inline" type="digit" value="{{couponForm.discount}}" bindinput="onCouponFormInput" data-field="discount" placeholder="0.00" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">发放总量</view>
+              <input class="input-inline" type="number" value="{{couponForm.totalQuantity}}" bindinput="onCouponFormInput" data-field="totalQuantity" placeholder="必填" />
+            </view>
+            <view class="card-action">
+              <view class="btn btn-outline" wx:if="{{editingCouponId}}" bindtap="cancelCouponEdit">取消</view>
+              <view class="btn {{couponSaving ? 'btn-disabled' : 'btn-primary'}}" bindtap="saveCouponForm">{{editingCouponId ? '保存修改' : '新增优惠券'}}</view>
+            </view>
+          </view>
+
+          <view class="card compact-card">
+            <view class="card-title">已配置优惠券 ({{coupons.length}})</view>
+            <view class="empty-hint" wx:if="{{!coupons.length}}">暂无优惠券，请在上方新增</view>
+
+            <view class="data-item" wx:for="{{coupons}}" wx:key="_id">
+              <view class="data-main">
+                <view class="data-title">
+                  {{item.title}}
+                  <text class="badge {{item.status === 'active' ? 'badge-success' : 'badge-disabled'}}">{{item.status === 'active' ? '上架中' : '已下架'}}</text>
+                </view>
+                <view class="data-sub">满 {{item.minSpend}} 减 {{item.discount}}</view>
+                <view class="data-sub">总量: {{item.totalQuantity}} / 已领: {{item.claimedQuantity || 0}}</view>
+              </view>
+              <view class="data-side">
+                <view class="btn btn-mini btn-outline" bindtap="openEditCoupon" data-id="{{item._id}}">编辑</view>
+                <view class="btn btn-mini {{item.status === 'active' ? 'btn-danger' : 'btn-primary'}}" bindtap="toggleCouponStatus" data-id="{{item._id}}" data-status="{{item.status}}">
+                  {{item.status === 'active' ? '下架' : '上架'}}
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="fold-card {{sectionOpen.gifts ? 'is-open' : ''}}">
+        <view class="fold-head" bindtap="toggleSection" data-key="gifts">
+          <view class="fold-head-main">
+            <view class="fold-title">兑换商品管理</view>
+            <view class="fold-sub">新增/编辑/删除（{{gifts.length}}）</view>
+          </view>
+          <view class="fold-arrow">{{sectionOpen.gifts ? '收起' : '展开'}}</view>
+        </view>
+        <view class="fold-body" wx:if="{{sectionOpen.gifts}}">
+          <view class="card compact-card">
+            <view class="card-title">{{editingGiftId ? '编辑兑换商品' : '新增兑换商品'}}</view>
+            <view class="hint" wx:if="{{editingGiftName}}" style="margin-bottom: 16rpx; color: var(--warning);">正在编辑：{{editingGiftName}}</view>
+            <view class="list-row">
+              <view class="row-label">商品名字</view>
+              <input class="input-inline" style="width: 350rpx;" type="text" value="{{giftForm.name}}" bindinput="onGiftNameInput" placeholder="必填" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">所需积分</view>
+              <input class="input-inline" type="number" value="{{giftForm.points}}" bindinput="onGiftPointsInput" placeholder="必填" />
+            </view>
+            <view class="form-group" style="margin-top: 24rpx;">
+              <view class="label">描述信息</view>
+              <textarea class="textarea" style="min-height: 100rpx;" value="{{giftForm.desc}}" bindinput="onGiftDescInput" placeholder="选填，最多200字"></textarea>
+            </view>
+            <view class="form-group">
+              <view class="row-between">
+                <view class="label" style="margin: 0;">商品主图 (选填)</view>
+                <view class="btn btn-outline btn-mini" bindtap="onUploadGiftThumb">上传图片</view>
+              </view>
+              <image wx:if="{{giftForm.thumbPreview}}" class="thumb-preview" src="{{giftForm.thumbPreview}}" mode="aspectFill" lazy-load="true" />
+            </view>
+            <view class="card-action">
+              <view class="btn btn-outline" wx:if="{{editingGiftId}}" bindtap="onCancelEdit">取消</view>
+              <view class="btn btn-primary" bindtap="onSaveGift">{{editingGiftId ? '保存修改' : '新增礼品'}}</view>
+            </view>
+          </view>
+
+          <view class="card compact-card">
+            <view class="card-title">已配置兑换商品 ({{gifts.length}})</view>
+            <view class="empty-hint" wx:if="{{!gifts.length}}">暂无兑换商品，请在上方新增</view>
+            <view class="data-item" wx:for="{{gifts}}" wx:key="id">
+              <image wx:if="{{item.thumbUrl}}" class="item-thumb" src="{{item.thumbUrl}}" mode="aspectFill" lazy-load="true" />
+              <view class="data-main">
+                <view class="data-title">{{item.name}}</view>
+                <view class="data-sub" style="color: var(--warning); font-weight: 600;">所需积分: {{item.points}}</view>
+                <view class="data-sub" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{item.desc}}</view>
+              </view>
+              <view class="data-side">
+                <view class="btn btn-mini btn-outline" bindtap="onEditGift" data-id="{{item.id}}">编辑</view>
+                <view class="btn btn-mini btn-danger" bindtap="onDisableGift" data-id="{{item.id}}">删除</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view style="height: 180rpx;"></view>
     </view>
-      <view class="list-card">
-        <view class="list-title">已配置兑换商品（{{gifts.length}}）</view>
-
-        <view class="empty" wx:if="{{!gifts.length}}">暂无兑换商品，请先在上方新增。</view>
-
-        <view class="item" wx:for="{{gifts}}" wx:key="id">
-          <image wx:if="{{item.thumbUrl}}" class="item-thumb" src="{{item.thumbUrl}}" mode="aspectFill" lazy-load="true" />
-
-          <view class="item-main">
-            <view class="item-name">{{item.name}}</view>
-            <view class="item-sub">需要 {{item.points}} 积分</view>
-            <view class="item-desc">{{item.desc}}</view>
-          </view>
-
-          <view class="item-right">
-            <view class="btn" bindtap="onEditGift" data-id="{{item.id}}">编辑</view>
-            <view class="btn btn-danger" bindtap="onDisableGift" data-id="{{item.id}}">删除</view>
-          </view>
-        </view>
-      </view>
-      <view style="height: 140rpx;"></view>
-    </scroll-view>
-  </view>
+  </scroll-view>
 
   <admin-tabbar />
   <canvas canvas-id="image-cropper" style="position:fixed; left:-9999px; width:300px; height:300px;"></canvas>

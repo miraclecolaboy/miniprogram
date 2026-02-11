@@ -1,96 +1,40 @@
-/* packages/admin/pages/orders/index.wxss */
 @import "../../styles/admin.wxss";
 
-.page { padding: 12px; box-sizing: border-box; }
+.page { box-sizing: border-box; min-height: 100vh; padding-bottom: 140rpx; }
+.tabs { margin-top: 24rpx; }
+.tabRow { display: flex; gap: 32rpx; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 16rpx; }
+.tabItem { font-size: 28rpx; color: var(--text-sub); padding-bottom: 8rpx; white-space: nowrap; transition: all 0.2s; }
+.tabActive { color: var(--primary); font-weight: 800; border-bottom: 4rpx solid var(--primary); }
 
-/* ✅ 关键：抵消 .page 的左右 padding，让顶部 tabs 区域横向铺满屏幕 */
-.tabs {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  z-index: 10;
-  padding-bottom: 8px;
+.list { padding: 0 32rpx; margin-top: 8rpx; }
+.order-card { padding: 32rpx; }
 
-  margin-left: -12px;
-  margin-right: -12px;
-  padding-left: 12px;
-  padding-right: 12px;
-}
+.top-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2rpx solid var(--border); padding-bottom: 24rpx; margin-bottom: 24rpx; }
+.order-type { font-weight: 800; font-size: 30rpx; color: var(--text-main); }
+.order-no { color: var(--text-muted); font-size: 24rpx; font-weight: normal; margin-left: 8rpx; }
 
-.tabRow { display: flex; gap: 8px; flex-wrap: nowrap; }
-.tabItem {
-  flex: 1;
-  min-width: 0;
-  text-align: center;
-  padding: 10px 0;
-  border-radius: 14px;
-  background: #f5f5f5;
-  font-size: 13px;
-  color: #333;
-}
-.tabActive { background: #000000; color: #fff; }
+.badge { padding: 8rpx 16rpx; border-radius: 12rpx; font-size: 22rpx; font-weight: 600; }
+.badge-making, .badge-paid, .badge-processing { background: #FEF3C7; color: #D97706; }
+.badge-ready, .badge-delivering { background: #D1FAE5; color: #059669; }
+.badge-done { background: #F3F4F6; color: #6B7280; }
+.badge-refund { background: #FEE2E2; color: #EF4444; }
 
-.list { padding-top: 6px; }
-.card { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
-.row { display: flex; align-items: center; justify-content: space-between; }
-.title { font-size: 15px; font-weight: 600; color: #111; }
-.status { font-size: 13px; color: #000000; }
+.order-info { font-size: 26rpx; color: var(--text-sub); line-height: 1.8; }
+.info-line { word-break: break-all; }
 
-.sub { font-size: 12px; color: #666; margin-top: 6px; }
-.price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-.price-main { color: #111; font-weight: 600; }
-.goods { margin-top: 8px; }
-.goodsLine { font-size: 12px; color: #333; margin-top: 4px; }
+.order-price-row { margin-top: 24rpx; }
+.price-main { font-size: 30rpx; font-weight: 800; color: var(--text-main); }
+.pay-method { font-size: 24rpx; color: var(--text-muted); font-weight: normal; }
+.price-detail { font-size: 22rpx; color: var(--text-muted); margin-top: 4rpx; }
 
-.remark { margin-top: 8px; font-size: 12px; color: #333; background: #fafafa; padding: 8px; border-radius: 8px; }
+.refund-block { margin-top: 24rpx; background: #FFFBF0; border: 2rpx solid #FDE68A; padding: 16rpx 24rpx; border-radius: 16rpx; display: flex; justify-content: space-between; align-items: center; font-size: 24rpx; color: #D97706; }
 
-.btnRow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-.btn { background: #f5f5f5; color: #333; border-radius: 10px; }
-.primary { background: #000000; color: #fff; }
-.danger { background: #ff4d4f; color: #fff; }
+.action-row { display: flex; justify-content: flex-end; gap: 16rpx; margin-top: 32rpx; flex-wrap: wrap; }
+.tip { text-align: center; color: var(--text-muted); font-size: 24rpx; padding: 32rpx 0; }
 
-.tip { text-align: center; color: #999; font-size: 12px; padding: 16px 0; }
-
-.addrBlock { margin-top: 6px; background: #fafafa; padding: 8px; border-radius: 10px; }
-.refund { margin-top: 8px; background: #fff7e6; padding: 8px; border-radius: 10px; }
-
-/* 快递单号弹窗样式 */
-.modalMask {
-  position: fixed;
-  left: 0; right: 0; top: 0; bottom: 0;
-  background: rgba(0,0,0,.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99;
-}
-
-.modalCard {
-  width: 84%;
-  background: #fff;
-  border-radius: 14px;
-  padding: 14px;
-  box-sizing: border-box;
-}
-
-.modalTitle {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111;
-  margin-bottom: 10px;
-}
-
-.modalInput {
-  background: #fafafa;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 13px;
-  color: #111;
-}
-
-.modalBtnRow {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 12px;
-}
+/* 快递弹窗 */
+.modalMask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 99; }
+.modalCard { width: 80%; background: #fff; border-radius: 24rpx; padding: 32rpx; }
+.modalTitle { font-size: 32rpx; font-weight: 800; margin-bottom: 24rpx; }
+.modalInput { background: #f5f5f5; border-radius: 16rpx; padding: 20rpx; font-size: 28rpx; }
+.modalBtnRow { display: flex; justify-content: flex-end; gap: 16rpx; margin-top: 32rpx; }
