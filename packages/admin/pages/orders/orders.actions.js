@@ -9,9 +9,18 @@ module.exports = {
     if (text) wx.setClipboardData({ data: text });
   },
 
-  onCopyPhone(e) {
-    const phone = e.currentTarget.dataset.phone || '';
-    if (phone) wx.setClipboardData({ data: String(phone) });
+  onCallPhone(e) {
+    const phone = String(e.currentTarget.dataset.phone || '').trim();
+    if (!phone) return;
+    wx.makePhoneCall({
+      phoneNumber: phone,
+      fail: (err) => {
+        const msg = String(err?.errMsg || '');
+        if (!msg.includes('cancel')) {
+          wx.showToast({ title: '拨号失败', icon: 'none' });
+        }
+      }
+    });
   },
 
   onOpenExpressModal(e) {
@@ -122,4 +131,3 @@ module.exports = {
 
   noop() {},
 };
-

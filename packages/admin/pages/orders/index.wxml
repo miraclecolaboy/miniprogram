@@ -26,8 +26,9 @@
     <view class="sub" wx:if="{{item.buyerNickName}}">用户：{{item.buyerNickName}}</view>
     <view class="sub price-row">
       <text class="price-main">实付：¥{{item.payAmountText}}</text>
-      <text class="price-detail">（商品{{item.amountGoodsText}} + 运费{{item.amountDeliveryText}} - 会员{{item.amountVipDiscountText}} - 优惠券{{item.amountCouponDiscountText}}）</text>
+      <text>{{item.payMethodText}}</text>
     </view>
+    <view class="sub">金额明细：商品{{item.amountGoodsText}} + 运费{{item.amountDeliveryText}} - 会员{{item.amountVipDiscountText}} - 优惠券{{item.amountCouponDiscountText}}</view>
     <view wx:if="{{item.mode==='ziti' && item.pickupCodeText}}" class="sub">取餐号：{{item.pickupCodeText}}</view>
     <view wx:if="{{item.mode==='ziti' && item.pickupTimeText}}" class="sub">取餐时间：{{item.pickupTimeText}}</view>
     <view wx:if="{{item.mode==='ziti' && item.receiverPhone}}" class="sub">预留电话：{{item.receiverPhoneMasked}}</view>
@@ -39,7 +40,7 @@
 
       <view class="btnRow">
         <button size="mini" class="btn" data-copytext="{{item.addrCopyText}}" bindtap="onCopyAddress">复制地址</button>
-        <button wx:if="{{item.receiverPhone}}" size="mini" class="btn" data-phone="{{item.receiverPhone}}" bindtap="onCopyPhone">复制电话</button>
+        <button wx:if="{{item.receiverPhone}}" size="mini" class="btn" data-phone="{{item.receiverPhone}}" bindtap="onCallPhone">拨打电话</button>
 
         <!-- [修正] 绑定 onOpenExpressModal -->
         <button
@@ -62,7 +63,7 @@
 
     <view class="btnRow">
       <button size="mini" class="btn" data-id="{{item._id}}" bindtap="onPrint">打印小票</button>
-      <button wx:if="{{item.mode==='ziti' && item.receiverPhone}}" size="mini" class="btn" data-phone="{{item.receiverPhone}}" bindtap="onCopyPhone">复制电话</button>
+      <button wx:if="{{item.mode==='ziti' && item.receiverPhone}}" size="mini" class="btn" data-phone="{{item.receiverPhone}}" bindtap="onCallPhone">拨打电话</button>
 
       <!-- [修正] 绑定 onUpdateStatus -->
       <button

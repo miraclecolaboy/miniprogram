@@ -60,6 +60,10 @@ module.exports = {
     const couponDiscountNum = Number(amount.couponDiscount || 0);
     const vipDiscountText = Number.isFinite(vipDiscountNum) ? vipDiscountNum.toFixed(2) : '0.00';
     const couponDiscountText = Number.isFinite(couponDiscountNum) ? couponDiscountNum.toFixed(2) : '0.00';
+    const payMethod = String(o?.payment?.method || '').trim();
+    const payMethodText = payMethod === 'balance'
+      ? '余额支付'
+      : (payMethod === 'free' ? '无需支付' : '微信支付');
 
     // 状态
     const st = String(o.status || '').toLowerCase();
@@ -84,6 +88,7 @@ module.exports = {
       itemsView,
       remarkText: String(o.remark || '').trim(),
       payAmountText,
+      payMethodText,
       amountGoodsText: goodsAmountText,
       amountDeliveryText: deliveryAmountText,
       amountVipDiscountText: vipDiscountText,

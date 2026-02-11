@@ -39,7 +39,6 @@
 .sub { font-size: 12px; color: #666; margin-top: 6px; }
 .price-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .price-main { color: #111; font-weight: 600; }
-.price-detail { color: #999; font-size: 11px; }
 .goods { margin-top: 8px; }
 .goodsLine { font-size: 12px; color: #333; margin-top: 4px; }
 
