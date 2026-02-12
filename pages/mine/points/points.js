@@ -127,10 +127,16 @@ Page({
     const arr = Array.isArray(list) ? list : [];
     return arr.map((g) => {
       const id = String(g.id || g._id || '');
+      const totalQuantity = Math.floor(toNum(g.totalQuantity, 0));
+      const leftQuantity = Number.isFinite(Number(g.leftQuantity))
+        ? Math.floor(toNum(g.leftQuantity, 0))
+        : -1;
       return {
         ...g,
         id,
         points: Math.floor(toNum(g.points, 0)),
+        totalQuantity,
+        leftQuantity: totalQuantity > 0 ? Math.max(0, leftQuantity) : -1,
       };
     }).filter(g => !!g.id);
   },
@@ -209,14 +215,16 @@ Page({
     const id = String(e.currentTarget.dataset.id || '');
     const item = (this.data.gifts || []).find(x => x.id === id);
     if (!item) return;
+    if (item.leftQuantity === 0) return wx.showToast({ title: '\u5e93\u5b58\u4e0d\u8db3', icon: 'none' });
+    if (this.data.points < toNum(item.points, 0)) return wx.showToast({ title: '\u79ef\u5206\u4e0d\u8db3', icon: 'none' });
 
     wx.showModal({
-      title: '确认兑换',
-      content: `兑换「${item.name}」需要消耗 ${toNum(item.points, 0)} 积分，是否继续？`,
+      title: '\u786e\u8ba4\u5151\u6362',
+      content: `\u786e\u8ba4\u5151\u6362${item.name}\uff0c\u5c06\u6d88\u8017 ${toNum(item.points, 0)} \u79ef\u5206\uff0c\u662f\u5426\u7ee7\u7eed\uff1f`,
       success: async (res) => {
         if (!res.confirm) return;
 
-        wx.showLoading({ title: '兑换中', mask: true });
+        wx.showLoading({ title: '\u5151\u6362\u4e2d', mask: true });
         const u = await ensureLogin().catch(() => null);
         if (!u) {
           wx.showToast({ title: '\u8bf7\u5148\u767b\u5f55', icon: 'none' });
@@ -227,36 +235,40 @@ Page({
           const r = await callUser('redeemGift', { giftId: item.id });
 
           if (r?.result?.error === 'not_enough_points') {
-            wx.showToast({ title: '积分不足', icon: 'none' });
+            wx.showToast({ title: '\u79ef\u5206\u4e0d\u8db3', icon: 'none' });
             return;
           }
           if (r?.result?.error === 'gift_offline') {
-            wx.showToast({ title: '该商品已下架', icon: 'none' });
+            wx.showToast({ title: '\u5546\u54c1\u5df2\u4e0b\u67b6', icon: 'none' });
+            return;
+          }
+          if (r?.result?.error === 'gift_sold_out') {
+            wx.showToast({ title: '\u5df2\u5151\u5b8c', icon: 'none' });
+            await this.refreshPage({ forceGifts: true });
             return;
           }
           if (r?.result?.error) throw new Error(r.result.message || r.result.error);
 
           const code = String(r?.result?.data?.code || '');
 
-          // 兑换成功后刷新积分/兑换码，同时后台刷新礼品列表
           await this.refreshPage({ forceGifts: true });
 
           wx.showModal({
-            title: '兑换成功',
-            content: `核销码：\n\n${code}\n\n（交给商家核销）`,
-            confirmText: '复制',
-            cancelText: '关闭',
+            title: '\u5151\u6362\u6210\u529f',
+            content: `\u6838\u9500\u7801\uff1a\n\n${code}\n\n\u8bf7\u5230\u5e97\u51fa\u793a\u7ed9\u5546\u5bb6\u6838\u9500`,
+            confirmText: '\u590d\u5236',
+            cancelText: '\u5173\u95ed',
             success: (rr) => {
               if (!rr.confirm) return;
               wx.setClipboardData({
                 data: code,
-                success: () => wx.showToast({ title: '已复制', icon: 'success' }),
+                success: () => wx.showToast({ title: '\u5df2\u590d\u5236', icon: 'success' }),
               });
             },
           });
         } catch (err) {
           console.error('[points] redeem error', err);
-          wx.showToast({ title: '兑换失败', icon: 'none' });
+          wx.showToast({ title: '\u5151\u6362\u5931\u8d25', icon: 'none' });
         } finally {
           try { wx.hideLoading(); } catch (_) {}
         }
@@ -264,15 +276,15 @@ Page({
     });
   },
 
-  // 核销码：点击整条记录复制
+  // Tap voucher card to copy redeem code
   onVoucherTap(e) {
     const id = String(e.currentTarget.dataset.id || '');
     if (!id) return;
 
     wx.setClipboardData({
       data: id,
-      success: () => wx.showToast({ title: '已复制', icon: 'none', duration: 1200 }),
-      fail: () => wx.showToast({ title: '复制失败', icon: 'none', duration: 1200 }),
+      success: () => wx.showToast({ title: '\u590d\u5236\u6210\u529f', icon: 'none', duration: 1200 }),
+      fail: () => wx.showToast({ title: '\u590d\u5236\u5931\u8d25', icon: 'none', duration: 1200 }),
     });
   },
 });

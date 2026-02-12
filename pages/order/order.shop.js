@@ -14,14 +14,18 @@ module.exports = {
       // Cache for other pages / next entry.
       setShopConfigCache(cfg);
 
+      const waimaiOn = cfg.waimaiOn !== false;
       const kuaidiOn = cfg.kuaidiOn !== false;
-      const nextMode = (!kuaidiOn && this.data.mode === 'kuaidi') ? 'ziti' : this.data.mode;
+      const nextMode = (!waimaiOn && this.data.mode === 'waimai')
+        ? 'ziti'
+        : ((!kuaidiOn && this.data.mode === 'kuaidi') ? 'ziti' : this.data.mode);
 
       this.setData({
         storeName: cfg.storeName || '',
         notice: cfg.notice || '',
         storeLat: toNum(cfg.storeLat, 0),
         storeLng: toNum(cfg.storeLng, 0),
+        waimaiOn,
         kuaidiOn,
         mode: nextMode,
         minOrderMap: {
@@ -37,6 +41,10 @@ module.exports = {
 
   changeMode(e) {
     const mode = e.currentTarget.dataset.mode;
+    if (mode === 'waimai' && this.data.waimaiOn === false) {
+      wx.showToast({ title: '外卖暂未开放', icon: 'none' });
+      return;
+    }
     if (mode === 'kuaidi' && this.data.kuaidiOn === false) {
       wx.showToast({ title: '快递暂未开放', icon: 'none' });
       return;

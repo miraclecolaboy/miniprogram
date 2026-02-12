@@ -10,6 +10,7 @@ const {
   now,
   isCollectionNotExists,
   toNum,
+  toInt,
   getTempUrlMap,
   gen6Code
 } = require('../utils/common');
@@ -17,6 +18,7 @@ const { ensureMemberLevelDefaults } = require('./memberLevelDefaults');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
+const _ = db.command;
 
 async function getShopConfig() {
   const DEFAULT_CFG = { 
@@ -25,6 +27,7 @@ async function getShopConfig() {
     storeLat: 0, 
     storeLng: 0, 
     notice: '', 
+    waimaiOn: true,
     kuaidiOn: true, 
     waimaiMaxKm: 10, 
     minOrderZiti: 0, 
@@ -50,6 +53,7 @@ async function getShopConfig() {
       out[k] = Number.isFinite(n) ? n : DEFAULT_CFG[k];
     });
 
+    out.waimaiOn = out.waimaiOn !== false;
     out.kuaidiOn = out.kuaidiOn !== false;
     
     // [新增] 确保 banners 是数组，供前端首页使用
@@ -111,11 +115,31 @@ async function listPoints(openid) {
 async function listGifts() {
     try {
       const r = await db.collection(COL_SHOP_CONFIG).where({ type: 'points_gift' }).limit(200).get();
-      const raw = (r.data || []).filter(g => g.enabled !== false && Number(g.points) > 0);
-      raw.sort((a, b) => (Number(a.sort || 999) - Number(b.sort || 999)) || (b.updatedAt - a.updatedAt));
+      const raw = (r.data || []).filter((g) => {
+        if (!g || g.enabled === false || Number(g.points) <= 0) return false;
+        const totalQuantity = Math.max(0, toInt(g.totalQuantity, 0));
+        const redeemedQuantity = Math.max(0, toInt(g.redeemedQuantity, 0));
+        return totalQuantity <= 0 || redeemedQuantity < totalQuantity;
+      });
+      raw.sort((a, b) => (Number(b.updatedAt || 0) - Number(a.updatedAt || 0)));
       const fileIds = raw.map(g => g.thumbFileId).filter(Boolean);
       const urlMap = await getTempUrlMap(fileIds);
-      const list = raw.map(g => ({ id: g._id, name: g.name, points: Math.floor(toNum(g.points, 0)), desc: g.desc, imageUrl: urlMap[g.thumbFileId] || '' }));
+      const list = raw.map((g) => {
+        const totalQuantity = Math.max(0, toInt(g.totalQuantity, 0));
+        const redeemedQuantity = Math.max(0, toInt(g.redeemedQuantity, 0));
+        const leftQuantity = totalQuantity > 0
+          ? Math.max(0, totalQuantity - Math.min(totalQuantity, redeemedQuantity))
+          : -1;
+        return {
+          id: g._id,
+          name: g.name,
+          points: Math.floor(toNum(g.points, 0)),
+          desc: g.desc,
+          totalQuantity,
+          leftQuantity,
+          imageUrl: urlMap[g.thumbFileId] || '',
+        };
+      });
       return { data: list };
     } catch (e) { return { data: [] }; }
 }
@@ -133,6 +157,11 @@ async function redeemGift(giftId, openid) {
           if (!g || g.type !== 'points_gift' || g.enabled === false) throw { error: 'gift_offline' };
           const cost = Math.floor(toNum(g.points, 0));
           if (cost <= 0) throw { error: 'gift_offline' };
+
+          const totalQuantity = Math.max(0, toInt(g.totalQuantity, 0));
+          const redeemedQuantity = Math.max(0, toInt(g.redeemedQuantity, 0));
+          if (totalQuantity > 0 && redeemedQuantity >= totalQuantity) throw { error: 'gift_sold_out' };
+
           const userRef = t.collection(COL_USERS).doc(openid);
           const u = (await userRef.get()).data;
           if (!u) throw { error: 'user_not_found' };
@@ -143,6 +172,7 @@ async function redeemGift(giftId, openid) {
           if (exists && exists.data) throw new Error('CODE_EXISTS');
           const nextPoints = Math.max(0, curPoints - cost);
           await userRef.update({ data: { points: nextPoints, updatedAt: nowTs } });
+          await giftRef.update({ data: { redeemedQuantity: _.inc(1), updatedAt: nowTs } });
           await recRef.set({ data: { type: 'redeem_code', code, openid, giftId, giftName: g.name || '积分兑换', costPoints: cost, createdAt: nowTs } });
           return { data: { points: nextPoints, code } };
         });

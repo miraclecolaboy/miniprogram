@@ -24,6 +24,8 @@ Page(Object.assign({
     
     // 基础数据
     storeName: CACHED_SHOP_CFG.storeName || '',
+    waimaiOn: CACHED_SHOP_CFG.waimaiOn !== false,
+    kuaidiOn: CACHED_SHOP_CFG.kuaidiOn !== false,
     storeAddress: '', 
     address: null,
     distance: '',

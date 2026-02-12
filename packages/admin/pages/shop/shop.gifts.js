@@ -4,11 +4,27 @@ const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
 const { safeStr } = require('../../../../utils/common');
 const { getTempUrlMap } = require('../../../../utils/cloudFile');
-const { uploadAndReplace, generateThumbnail } = require('../../../../utils/uploader');
+const { generateThumbnail } = require('../../../../utils/uploader');
 const { toInt } = require('./shop.helpers');
 
+function emptyGiftForm() {
+  return {
+    name: '',
+    points: '',
+    quantity: '',
+    desc: '',
+    thumbFileId: '',
+    thumbPreview: '',
+    thumbLocalPath: '',
+  };
+}
+
+function buildGiftCloudPath() {
+  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  return `redeem_gifts/${suffix}.jpg`;
+}
+
 module.exports = {
-  // ===== 积分兑换商品（shop_config: points_gift）=====
   async loadGifts() {
     const session = getSession();
     if (!session?.token) return;
@@ -31,14 +47,20 @@ module.exports = {
   onGiftNameInput(e) {
     this.setData({ giftForm: { ...this.data.giftForm, name: safeStr(e.detail.value) } });
   },
+
   onGiftPointsInput(e) {
     this.setData({ giftForm: { ...this.data.giftForm, points: safeStr(e.detail.value) } });
   },
-  onGiftDescInput(e) {
-    this.setData({ giftForm: { ...this.data.giftForm, desc: safeStr(e.detail.value) } });
+
+  onGiftQuantityInput(e) {
+    this.setData({ giftForm: { ...this.data.giftForm, quantity: safeStr(e.detail.value) } });
   },
 
-  // 积分礼品图片上传 - 强制生成 300x300 缩略图
+  onGiftDescInput(e) {
+    const desc = safeStr(e.detail.value).slice(0, 20);
+    this.setData({ giftForm: { ...this.data.giftForm, desc } });
+  },
+
   async onUploadGiftThumb() {
     try {
       const r = await wx.chooseMedia({
@@ -52,26 +74,23 @@ module.exports = {
       if (!rawPath) return;
 
       wx.showLoading({ title: '生成缩略图...', mask: true });
-
-      // 1. 核心：生成 300x300 缩略图 (依赖 WXML 中的 canvas)
       const thumbPath = await generateThumbnail(rawPath);
 
-      wx.showLoading({ title: '上传中...', mask: true });
-
-      // 2. 上传 (只存这一张图)
-      const fileID = await uploadAndReplace(thumbPath, this.data.giftForm.thumbFileId, 'redeem_gifts');
-
       this.setData({
-        giftForm: { ...this.data.giftForm, thumbFileId: fileID, thumbPreview: thumbPath },
+        giftForm: {
+          ...this.data.giftForm,
+          thumbPreview: thumbPath,
+          thumbLocalPath: thumbPath,
+        },
       });
 
       wx.hideLoading();
-      wx.showToast({ title: '已上传', icon: 'success' });
+      wx.showToast({ title: '已选择', icon: 'success' });
     } catch (e) {
       if ((e?.errMsg || '').includes('cancel')) return;
-      console.error('[shop] upload gift thumb error', e);
+      console.error('[shop] choose gift thumb error', e);
       wx.hideLoading();
-      wx.showToast({ title: '上传失败', icon: 'none' });
+      wx.showToast({ title: '选择图片失败', icon: 'none' });
     }
   },
 
@@ -86,9 +105,11 @@ module.exports = {
       giftForm: {
         name: g.name,
         points: String(g.points || ''),
+        quantity: g.totalQuantity > 0 ? String(g.totalQuantity) : '',
         desc: g.desc || '',
         thumbFileId: safeStr(g.thumbFileId),
         thumbPreview: safeStr(g.thumbUrl),
+        thumbLocalPath: '',
       },
     });
   },
@@ -97,7 +118,7 @@ module.exports = {
     this.setData({
       editingGiftId: '',
       editingGiftName: '',
-      giftForm: { name: '', points: '', desc: '', thumbFileId: '', thumbPreview: '' },
+      giftForm: emptyGiftForm(),
     });
   },
 
@@ -107,34 +128,72 @@ module.exports = {
 
     const name = safeStr(this.data.giftForm.name);
     const points = toInt(this.data.giftForm.points, 0);
+    const totalQuantity = toInt(this.data.giftForm.quantity, 0);
     const desc = safeStr(this.data.giftForm.desc);
-    const thumbFileId = safeStr(this.data.giftForm.thumbFileId);
+    const oldThumbFileId = safeStr(this.data.giftForm.thumbFileId);
+    const thumbLocalPath = safeStr(this.data.giftForm.thumbLocalPath);
 
     if (!name) return wx.showToast({ title: '请输入商品名字', icon: 'none' });
     if (!points || points <= 0) return wx.showToast({ title: '所需积分必须大于0', icon: 'none' });
-    if (desc.length > 200) return wx.showToast({ title: '描述最多200字', icon: 'none' });
+    if (!totalQuantity || totalQuantity <= 0) return wx.showToast({ title: '数量必须大于0', icon: 'none' });
+    if (desc.length > 20) return wx.showToast({ title: '描述最多20字', icon: 'none' });
 
-    const r = await call('admin', {
-      action: 'redeem_gifts_upsert',
-      token: session.token,
-      id: this.data.editingGiftId || '',
-      name,
-      points,
-      desc,
-      thumbFileId,
-    }, { loadingTitle: '保存中' }).catch(() => null);
+    let nextThumbFileId = oldThumbFileId;
+    let uploadedThumbFileId = '';
+    const isEditing = !!safeStr(this.data.editingGiftId);
+    let giftSaved = false;
 
-    if (!r?.ok) return wx.showToast({ title: r?.message || '保存失败', icon: 'none' });
+    try {
+      wx.showLoading({ title: '保存中...', mask: true });
 
-    wx.showToast({ title: '已保存', icon: 'success' });
+      if (thumbLocalPath) {
+        const uploadRes = await wx.cloud.uploadFile({
+          cloudPath: buildGiftCloudPath(),
+          filePath: thumbLocalPath,
+        });
+        uploadedThumbFileId = safeStr(uploadRes?.fileID);
+        if (!uploadedThumbFileId) throw new Error('上传图片失败');
+        nextThumbFileId = uploadedThumbFileId;
+      }
 
-    this.setData({
-      editingGiftId: '',
-      editingGiftName: '',
-      giftForm: { name: '', points: '', desc: '', thumbFileId: '', thumbPreview: '' },
-    });
+      const r = await call('admin', {
+        action: 'redeem_gifts_upsert',
+        token: session.token,
+        id: this.data.editingGiftId || '',
+        name,
+        points,
+        totalQuantity,
+        desc,
+        thumbFileId: nextThumbFileId,
+      }).catch(() => null);
 
-    await this.loadGifts();
+      if (!r?.ok) throw new Error(r?.message || '保存失败');
+      giftSaved = true;
+
+      if (isEditing && oldThumbFileId && nextThumbFileId && oldThumbFileId !== nextThumbFileId && oldThumbFileId.startsWith('cloud://')) {
+        wx.cloud.deleteFile({ fileList: [oldThumbFileId] }).catch((e) => {
+          console.error('[shop] delete old gift thumb error', e);
+        });
+      }
+
+      wx.showToast({ title: '已保存', icon: 'success' });
+      this.setData({
+        editingGiftId: '',
+        editingGiftName: '',
+        giftForm: emptyGiftForm(),
+      });
+
+      await this.loadGifts();
+    } catch (e) {
+      if (!giftSaved && uploadedThumbFileId) {
+        wx.cloud.deleteFile({ fileList: [uploadedThumbFileId] }).catch((err) => {
+          console.error('[shop] rollback uploaded gift thumb error', err);
+        });
+      }
+      wx.showToast({ title: e?.message || '保存失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   async onDisableGift(e) {
@@ -154,7 +213,11 @@ module.exports = {
     });
     if (!ok) return;
 
-    const r = await call('admin', { action: 'redeem_gifts_disable', token: session.token, id }, { loadingTitle: '处理中' }).catch(() => null);
+    const r = await call('admin', {
+      action: 'redeem_gifts_disable',
+      token: session.token,
+      id,
+    }, { loadingTitle: '处理中' }).catch(() => null);
     if (!r?.ok) return wx.showToast({ title: r?.message || '操作失败', icon: 'none' });
 
     wx.showToast({ title: '已删除', icon: 'success' });

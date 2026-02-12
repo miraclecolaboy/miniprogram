@@ -1,5 +1,4 @@
 // packages/admin/pages/shop/index.js
-// 店铺设置页：按客户端页面的方式拆分 methods，降低单文件复杂度
 const { emptyServiceHoursRange } = require('./shop.helpers');
 
 const coreMethods = require('./shop.core');
@@ -14,23 +13,22 @@ const couponMethods = require('./shop.coupons');
 
 Page(Object.assign({
   data: {
-    // 分组折叠
     sectionOpen: {
-      consume: true,
-      shopInfo: true,
+      consume: false,
+      shopInfo: false,
       deliveryPay: false,
       coupons: false,
       gifts: false,
     },
 
-    // 公告
     notice: '',
     noticeChanged: false,
 
-    // 轮播图
-    banners: [], // { fileId, preview }
+    // { key, fileId, preview, localPath? }
+    banners: [],
+    removedBannerFileIds: [],
 
-    // 配送
+    waimaiOn: true,
     waimaiMaxKm: 10,
     waimaiDeliveryFee: '8',
     kuaidiOn: true,
@@ -39,11 +37,10 @@ Page(Object.assign({
     minOrderKuaidi: '88',
     configChanged: false,
 
-    // 微信支付（子商户号）
+    // hidden in UI, retained for compatibility with existing methods
     subMchId: '',
     payChanged: false,
 
-    // 客服信息
     phone: '',
     serviceHours: '',
     serviceHoursOriginal: '',
@@ -51,9 +48,10 @@ Page(Object.assign({
     serviceHoursEdited: false,
     kefuQrFileId: '',
     kefuQrPreview: '',
+    kefuQrLocalPath: '',
+    kefuQrRemoved: false,
     contactChanged: false,
 
-    // 云打印配置
     cloudPrinterSn: '',
     cloudPrinterUser: '',
     cloudPrinterKey: '',
@@ -63,20 +61,26 @@ Page(Object.assign({
     cloudPrintStatusText: '待检测',
     cloudPrintStatusLoading: false,
 
-    // 礼品
-    giftForm: { name: '', points: '', desc: '', thumbFileId: '', thumbPreview: '' },
+    giftForm: {
+      name: '',
+      points: '',
+      quantity: '',
+      desc: '',
+      thumbFileId: '',
+      thumbPreview: '',
+      thumbLocalPath: '',
+    },
     gifts: [],
     editingGiftId: '',
     editingGiftName: '',
 
-    // 核销
     consumeCode: '',
     consumeTip: '',
-     // 优惠券管理 
-     coupons: [],
-     couponSaving: false,
-     editingCouponId: '',
-     editingCouponTitle: '', 
+
+    coupons: [],
+    couponSaving: false,
+    editingCouponId: '',
+    editingCouponTitle: '',
     couponForm: {
       title: '',
       minSpend: '',

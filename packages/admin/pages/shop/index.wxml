@@ -44,7 +44,7 @@
             <view class="card-title">基础外观</view>
             <view class="form-group">
               <view class="label">下单页公告</view>
-              <textarea class="textarea" maxlength="200" value="{{notice}}" placeholder="输入公告（最多200字）" bindinput="onNoticeInput"></textarea>
+              <textarea class="textarea" maxlength="20" value="{{notice}}" placeholder="输入公告（最多20字）" bindinput="onNoticeInput"></textarea>
               <view class="card-action">
                 <view class="btn {{noticeChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSaveNotice">保存公告</view>
               </view>
@@ -54,7 +54,7 @@
               <view class="label">店铺首页轮播图</view>
               <view class="hint">展示在客户端首页顶部，比例 4:3，建议尺寸 750x300。</view>
               <view class="banner-list">
-                <view class="banner-item" wx:for="{{banners}}" wx:key="fileId">
+                <view class="banner-item" wx:for="{{banners}}" wx:key="key">
                   <image src="{{item.preview}}" mode="aspectFill" class="banner-img" />
                   <view catchtap="onRemoveBanner" data-index="{{index}}" class="banner-del">×</view>
                 </view>
@@ -74,7 +74,7 @@
             </view>
             <view class="form-group" style="margin-top: 24rpx;">
               <view class="label" style="margin-bottom: 8rpx;">营业时段</view>
-              <view class="hint">留空则默认 10:00-22:00；多时段例如 10:00-14:00, 17:00-22:00</view>
+              <view class="hint">留空则默认 10:00-22:00；营业时间最多两段</view>
               <view class="time-range-row" wx:for="{{serviceHoursRanges}}" wx:key="index">
                 <input class="time-input" type="number" maxlength="2" value="{{item.sh}}" placeholder="10" data-index="{{index}}" data-field="sh" bindinput="onServiceHourPartInput" />
                 <text class="time-sep">:</text>
@@ -85,7 +85,7 @@
                 <input class="time-input" type="number" maxlength="2" value="{{item.em}}" placeholder="00" data-index="{{index}}" data-field="em" bindinput="onServiceHourPartInput" />
                 <view wx:if="{{serviceHoursRanges.length > 1}}" class="btn btn-danger btn-mini" style="margin-left: 12rpx;" data-index="{{index}}" bindtap="onRemoveServiceHoursRange">删除</view>
               </view>
-              <view class="card-action" style="justify-content: flex-start;">
+              <view class="card-action" style="justify-content: flex-start;" wx:if="{{serviceHoursRanges.length < 2}}">
                 <view class="btn btn-outline btn-mini" bindtap="onAddServiceHoursRange">+ 添加时段</view>
               </view>
             </view>
@@ -96,6 +96,9 @@
                 <view class="btn btn-outline btn-mini" bindtap="onUploadKefuQr">上传二维码</view>
               </view>
               <image wx:if="{{kefuQrPreview}}" class="qr-preview" src="{{kefuQrPreview}}" mode="aspectFill" lazy-load="true" />
+              <view class="card-action" style="justify-content: flex-start;" wx:if="{{kefuQrPreview}}">
+                <view class="btn btn-danger btn-mini" bindtap="onRemoveKefuQr">删除图片</view>
+              </view>
             </view>
             <view class="card-action">
               <view class="btn {{contactChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSaveContact">保存客服信息</view>
@@ -142,14 +145,18 @@
       <view class="fold-card {{sectionOpen.deliveryPay ? 'is-open' : ''}}">
         <view class="fold-head" bindtap="toggleSection" data-key="deliveryPay">
           <view class="fold-head-main">
-            <view class="fold-title">配送与支付</view>
-            <view class="fold-sub">外卖/同城快递 + 微信支付子商户</view>
+            <view class="fold-title">配送配置</view>
+            <view class="fold-sub">外卖/同城快递配置</view>
           </view>
           <view class="fold-arrow">{{sectionOpen.deliveryPay ? '收起' : '展开'}}</view>
         </view>
         <view class="fold-body" wx:if="{{sectionOpen.deliveryPay}}">
           <view class="card compact-card">
             <view class="card-title">配送与起送</view>
+            <view class="list-row">
+              <view class="row-label">开启外卖</view>
+              <switch checked="{{waimaiOn}}" bindchange="onWaimaiOnChange" color="#10B981" />
+            </view>
             <view class="list-row">
               <view class="row-label">外卖最大距离 (km)</view>
               <input class="input-inline" type="number" value="{{waimaiMaxKm}}" bindinput="onWaimaiMaxKmInput" placeholder="0" />
@@ -180,17 +187,6 @@
             </view>
           </view>
 
-          <view class="card compact-card">
-            <view class="card-title">微信支付配置</view>
-            <view class="hint" style="margin-bottom: 24rpx;">配置子商户号后，用户端充值及下单微信支付才可用</view>
-            <view class="list-row">
-              <view class="row-label">子商户号 subMchId</view>
-              <input class="input-inline" style="width: 300rpx;" type="text" value="{{subMchId}}" bindinput="onSubMchIdInput" placeholder="选填" />
-            </view>
-            <view class="card-action">
-              <view class="btn {{payChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSavePayConfig">保存支付配置</view>
-            </view>
-          </view>
         </view>
       </view>
 
@@ -198,7 +194,7 @@
         <view class="fold-head" bindtap="toggleSection" data-key="coupons">
           <view class="fold-head-main">
             <view class="fold-title">优惠券管理</view>
-            <view class="fold-sub">新增/编辑/上下架（{{coupons.length}}）</view>
+            <view class="fold-sub">新增/编辑/删除（{{coupons.length}}）</view>
           </view>
           <view class="fold-arrow">{{sectionOpen.coupons ? '收起' : '展开'}}</view>
         </view>
@@ -243,8 +239,8 @@
               </view>
               <view class="data-side">
                 <view class="btn btn-mini btn-outline" bindtap="openEditCoupon" data-id="{{item._id}}">编辑</view>
-                <view class="btn btn-mini {{item.status === 'active' ? 'btn-danger' : 'btn-primary'}}" bindtap="toggleCouponStatus" data-id="{{item._id}}" data-status="{{item.status}}">
-                  {{item.status === 'active' ? '下架' : '上架'}}
+                <view class="btn btn-mini btn-danger" bindtap="deleteCoupon" data-id="{{item._id}}">
+                  删除
                 </view>
               </view>
             </view>
@@ -272,9 +268,13 @@
               <view class="row-label">所需积分</view>
               <input class="input-inline" type="number" value="{{giftForm.points}}" bindinput="onGiftPointsInput" placeholder="必填" />
             </view>
+            <view class="list-row">
+              <view class="row-label">数量(库存)</view>
+              <input class="input-inline" type="number" value="{{giftForm.quantity}}" bindinput="onGiftQuantityInput" placeholder="必填" />
+            </view>
             <view class="form-group" style="margin-top: 24rpx;">
               <view class="label">描述信息</view>
-              <textarea class="textarea" style="min-height: 100rpx;" value="{{giftForm.desc}}" bindinput="onGiftDescInput" placeholder="选填，最多200字"></textarea>
+              <textarea class="textarea" style="min-height: 100rpx;" maxlength="20" value="{{giftForm.desc}}" bindinput="onGiftDescInput" placeholder="选填，最多20字"></textarea>
             </view>
             <view class="form-group">
               <view class="row-between">
@@ -297,6 +297,7 @@
               <view class="data-main">
                 <view class="data-title">{{item.name}}</view>
                 <view class="data-sub" style="color: var(--warning); font-weight: 600;">所需积分: {{item.points}}</view>
+                <view class="data-sub">库存: {{item.totalQuantity > 0 ? (item.leftQuantity + ' / ' + item.totalQuantity) : '不限'}}</view>
                 <view class="data-sub" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{item.desc}}</view>
               </view>
               <view class="data-side">

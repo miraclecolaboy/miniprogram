@@ -10,6 +10,7 @@ Page({
   data: {
     showUI: true, // 控制动画重置
     storeName: CACHED_SHOP_CFG.storeName || '',
+    waimaiOn: CACHED_SHOP_CFG.waimaiOn !== false,
     kuaidiOn: CACHED_SHOP_CFG.kuaidiOn !== false,
     loading: true,
     banners: [], // [新增] 轮播图 URL 列表
@@ -71,6 +72,7 @@ Page({
 
       const patch = { 
         storeName: data.storeName || '',
+        waimaiOn: data.waimaiOn !== false,
         kuaidiOn: data.kuaidiOn !== false,
         banners // 设置转换后的图片链接
       };
@@ -111,6 +113,9 @@ Page({
     if (!mode) return;
     wx.vibrateShort({ type: 'light' });
     
+    if (mode === 'waimai' && !this.data.waimaiOn) {
+      return wx.showToast({ title: '外卖业务暂未开放', icon: 'none' });
+    }
     if (mode === 'kuaidi' && !this.data.kuaidiOn) {
       return wx.showToast({ title: '快递业务暂未开放', icon: 'none' });
     }

@@ -116,6 +116,8 @@ exports.main = async (event) => {
         return await shopService.listCoupons();
       case 'coupons_upsert':
         return await shopService.upsertCoupon(event.data);
+      case 'coupons_delete':
+        return await shopService.deleteCoupon(event.id);
       case 'coupons_toggle_status':
         return await shopService.toggleCouponStatus(event.id, event.status);
 

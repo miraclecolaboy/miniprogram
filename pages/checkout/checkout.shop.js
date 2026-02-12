@@ -22,6 +22,7 @@ module.exports = {
         storeLat: Number(cfg.storeLat || 0),
         storeLng: Number(cfg.storeLng || 0),
         serviceHours: String(cfg.serviceHours || '').trim(),
+        waimaiOn: cfg.waimaiOn !== false,
         kuaidiOn: cfg.kuaidiOn !== false,
         waimaiMaxKm: Math.max(0, toNum(cfg.waimaiMaxKm, DEFAULT_WAIMAI_MAX_KM)),
         waimaiDeliveryFee: Math.max(0, toNum(cfg.waimaiDeliveryFee, 8)),
@@ -29,6 +30,11 @@ module.exports = {
         minOrderWaimai: Math.max(0, toNum(cfg.minOrderWaimai, 88)),
         minOrderKuaidi: Math.max(0, toNum(cfg.minOrderKuaidi, 88)),
       }, () => {
+        if (this.data.mode === 'waimai' && this.data.waimaiOn === false) {
+          wx.showToast({ title: '外卖暂未开放', icon: 'none' });
+          setTimeout(() => wx.navigateBack(), 300);
+          return;
+        }
         if (this.data.mode === 'kuaidi' && this.data.kuaidiOn === false) {
           wx.showToast({ title: '快递暂未开放', icon: 'none' });
           setTimeout(() => wx.navigateBack(), 300);

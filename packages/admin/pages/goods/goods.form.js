@@ -245,6 +245,8 @@ module.exports = {
 
     this.setData({ saving: true });
     wx.showLoading({ title: '保存中...', mask: true });
+    let uploadedFileIDs = [];
+    let productSaved = false;
 
     try {
       const uploadTasks = [];
@@ -270,6 +272,7 @@ module.exports = {
       }
 
       const uploadResults = await Promise.all(uploadTasks);
+      uploadedFileIDs = uploadResults.map((res) => safeStr(res.fileID)).filter(Boolean);
 
       const newImageFileIDs = uploadResults.filter((res) => res.type === 'image').map((res) => res.fileID);
       const thumbResult = uploadResults.find((res) => res.type === 'thumb');
@@ -314,12 +317,18 @@ module.exports = {
         deletedFileIDs: this.data.deletedFileIDs,
         token: getSession().token,
       });
+      productSaved = true;
 
       wx.hideLoading();
       wx.showToast({ title: '已保存', icon: 'success' });
       this.setData({ showForm: false });
       await this.fetchList(true);
     } catch (e) {
+      if (!productSaved && uploadedFileIDs.length) {
+        wx.cloud.deleteFile({ fileList: uploadedFileIDs }).catch((err) => {
+          console.error('rollback uploaded files error', err);
+        });
+      }
       if (e?.code === 'AUTH_EXPIRED') return;
       wx.hideLoading();
       console.error('saveForm error', e);

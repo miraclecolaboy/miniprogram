@@ -32,20 +32,28 @@ async function listGifts() {
       .get();
 
     const list = (r.data || [])
-      .map(g => ({
-        id: g._id,
-        name: safeStr(g.name),
-        points: Math.floor(toNum(g.points, 0)),
-        desc: safeStr(g.desc),
-        thumbFileId: safeStr(g.thumbFileId),
-        enabled: g.enabled !== false,
-        sort: Math.floor(toNum(g.sort, 9999)),
-        updatedAt: Number(g.updatedAt || 0),
-      }))
+      .map((g) => {
+        const totalQuantity = Math.max(0, toInt(g.totalQuantity, 0));
+        const redeemedQuantity = Math.max(0, toInt(g.redeemedQuantity, 0));
+        const leftQuantity = totalQuantity > 0
+          ? Math.max(0, totalQuantity - Math.min(totalQuantity, redeemedQuantity))
+          : 0;
+        return {
+          id: g._id,
+          name: safeStr(g.name),
+          points: Math.floor(toNum(g.points, 0)),
+          totalQuantity,
+          redeemedQuantity,
+          leftQuantity,
+          desc: safeStr(g.desc),
+          thumbFileId: safeStr(g.thumbFileId),
+          enabled: g.enabled !== false,
+          updatedAt: Number(g.updatedAt || 0),
+        };
+      })
       .filter(x => x.name && x.points > 0)
       .sort((a, b) =>
         (a.enabled === b.enabled ? 0 : (a.enabled ? -1 : 1)) ||
-        (a.sort - b.sort) ||
         (b.updatedAt - a.updatedAt)
       );
 
@@ -61,11 +69,13 @@ async function upsertGift(data) {
   const name = safeStr(data.name);
   const desc = safeStr(data.desc);
   const points = Math.floor(toNum(data.points, 0));
+  const totalQuantity = Math.floor(toNum(data.totalQuantity, 0));
   const thumbFileId = safeStr(data.thumbFileId);
 
   if (!name) return { ok: false, message: '商品名字不能为空' };
   if (!points || points <= 0) return { ok: false, message: '所需积分不合法' };
-  if (desc.length > 200) return { ok: false, message: '描述最多200字' };
+  if (!totalQuantity || totalQuantity <= 0) return { ok: false, message: '数量必须大于0' };
+  if (desc.length > 20) return { ok: false, message: '描述最多20字' };
 
   const tNow = now();
 
@@ -73,19 +83,27 @@ async function upsertGift(data) {
     const ref = db.collection(COL_SHOP_CONFIG).doc(id);
     const got = await ref.get().catch(() => null);
     if (!got || !got.data || got.data.type !== 'points_gift') return { ok: false, message: '商品不存在' };
-    
-    // 如果替换了图片，需要删除旧图（前端已做，但后端兜底是个好习惯，此处暂略保持前端一致性）
+
+    const redeemedQuantity = Math.max(0, toInt(got.data.redeemedQuantity, 0));
+    if (totalQuantity < redeemedQuantity) return { ok: false, message: '数量不能小于已兑换数量' };
+
+    const oldThumbFileId = safeStr(got.data.thumbFileId);
+    const nextThumbFileId = thumbFileId || oldThumbFileId;
 
     await ref.update({
       data: {
         name, desc, points,
-        ...(thumbFileId ? { thumbFileId } : {}),
+        totalQuantity,
+        redeemedQuantity,
+        thumbFileId: nextThumbFileId,
         enabled: true,
-        // Inventory is no longer used; remove legacy fields to avoid confusion.
         stock: _.remove(),
         updatedAt: tNow,
       }
     });
+    if (oldThumbFileId && nextThumbFileId && oldThumbFileId !== nextThumbFileId) {
+      await deleteFileSafe(oldThumbFileId);
+    }
     return { ok: true, id };
   }
 
@@ -93,6 +111,8 @@ async function upsertGift(data) {
     type: 'points_gift',
     enabled: true,
     name, desc, points,
+    totalQuantity,
+    redeemedQuantity: 0,
     thumbFileId: thumbFileId || '',
     sort: 0,
     createdAt: tNow,
@@ -102,7 +122,6 @@ async function upsertGift(data) {
   return { ok: true, id: addRes._id };
 }
 
-// [修改] 完善删除逻辑：先删文件，再删记录
 async function disableGift(id) {
   if (!id) return { ok: false, message: '缺少ID' };
   
@@ -177,6 +196,7 @@ async function getConfig() {
 
       waimaiMaxKm: toNum(cfg && cfg.waimaiMaxKm, 10),
       waimaiDeliveryFee: toNum(cfg && cfg.waimaiDeliveryFee, 8),
+      waimaiOn: cfg ? (cfg.waimaiOn !== false) : true,
       kuaidiOn: cfg ? (cfg.kuaidiOn !== false) : true,
       kuaidiDeliveryFee: toNum(cfg && cfg.kuaidiDeliveryFee, 10),
       minOrderWaimai: toNum(cfg && cfg.minOrderWaimai, 88),
@@ -195,13 +215,15 @@ async function getConfig() {
 }
 
 async function setNotice(notice) {
-  if (!notice) return { ok: false, message: '公告不能为空' };
+  const noticeText = safeStr(notice);
+  if (!noticeText) return { ok: false, message: '公告不能为空' };
+  if (noticeText.length > 20) return { ok: false, message: '公告最多20字' };
   const docId = 'main';
   const ref = db.collection(COL_SHOP_CONFIG).doc(docId);
   const got = await ref.get().catch(() => null);
   const cfg = got?.data || null;
 
-  const patch = { notice: safeStr(notice), updatedAt: now() };
+  const patch = { notice: noticeText, updatedAt: now() };
   if (!cfg || cfg.storeAddress === undefined) patch.storeAddress = '';
 
   if (cfg) await ref.update({ data: patch });
@@ -216,7 +238,11 @@ async function setConfig(data) {
     patch.banners = data.banners.map(safeStr).filter(Boolean);
   }
 
-  if (data.notice !== undefined) patch.notice = safeStr(data.notice);
+  if (data.notice !== undefined) {
+    const notice = safeStr(data.notice);
+    if (notice.length > 20) return { ok: false, message: '公告最多20字' };
+    patch.notice = notice;
+  }
   if (data.pointsNotice !== undefined) patch.pointsNotice = safeStr(data.pointsNotice);
   
   if (data.storeName !== undefined) patch.storeName = safeStr(data.storeName);
@@ -224,15 +250,28 @@ async function setConfig(data) {
   if (data.storeLat !== undefined) patch.storeLat = toNum(data.storeLat, 0);
   if (data.storeLng !== undefined) patch.storeLng = toNum(data.storeLng, 0);
 
+  if (data.waimaiOn !== undefined) patch.waimaiOn = String(data.waimaiOn) === 'false' ? false : !!data.waimaiOn;
   if (data.kuaidiOn !== undefined) patch.kuaidiOn = String(data.kuaidiOn) === 'false' ? false : !!data.kuaidiOn;
 
   ['waimaiMaxKm', 'waimaiDeliveryFee', 'kuaidiDeliveryFee', 'minOrderWaimai', 'minOrderKuaidi'].forEach(k => {
     if (data[k] !== undefined) patch[k] = toNum(data[k], 0);
   });
   
-  ['phone', 'serviceHours', 'kefuQrUrl'].forEach(k => {
-    if (data[k] !== undefined) patch[k] = safeStr(data[k]);
-  });
+  if (data.phone !== undefined) patch.phone = safeStr(data.phone);
+  if (data.serviceHours !== undefined) {
+    const serviceHours = safeStr(data.serviceHours);
+    if (!serviceHours) {
+      patch.serviceHours = '';
+    } else {
+      const ranges = serviceHours
+        .split(/[;,，；]/)
+        .map(s => safeStr(s).trim())
+        .filter(Boolean);
+      if (ranges.length > 2) return { ok: false, message: '营业时间最多两段' };
+      patch.serviceHours = ranges.join(';');
+    }
+  }
+  if (data.kefuQrUrl !== undefined) patch.kefuQrUrl = safeStr(data.kefuQrUrl);
 
   if (data.cloudPrinterSn !== undefined) patch.cloudPrinterSn = safeStr(data.cloudPrinterSn);
   if (data.cloudPrinterUser !== undefined) patch.cloudPrinterUser = safeStr(data.cloudPrinterUser);
@@ -243,8 +282,22 @@ async function setConfig(data) {
   const ref = db.collection(COL_SHOP_CONFIG).doc(docId);
   const got = await ref.get().catch(() => null);
   
+  const oldCfg = got?.data || {};
   if (got && got.data) await ref.update({ data: patch });
   else await ref.set({ data: patch });
+
+  if (Array.isArray(data.banners)) {
+    const oldBanners = Array.isArray(oldCfg.banners) ? oldCfg.banners.map(safeStr).filter(Boolean) : [];
+    const newBanners = patch.banners || [];
+    const removedBannerIds = oldBanners.filter((id) => !newBanners.includes(id));
+    if (removedBannerIds.length) await deleteFileSafe(removedBannerIds);
+  }
+
+  if (data.kefuQrUrl !== undefined) {
+    const oldKefuQr = safeStr(oldCfg.kefuQrUrl);
+    const newKefuQr = safeStr(patch.kefuQrUrl);
+    if (oldKefuQr && oldKefuQr !== newKefuQr) await deleteFileSafe(oldKefuQr);
+  }
   
   return { ok: true };
 }
@@ -321,7 +374,24 @@ async function upsertCoupon(data) {
   }
 }
 
+async function deleteCoupon(id) {
+  if (!id) return { ok: false, message: '缺少ID' };
+
+  const ref = db.collection(COL_SHOP_CONFIG).doc(id);
+  const got = await ref.get().catch(() => null);
+  if (!got || !got.data || got.data.type !== 'coupon_template') {
+    return { ok: false, message: '优惠券不存在或类型错误' };
+  }
+  if (got.data.claimable === false) {
+    return { ok: false, message: '会员模板优惠券不可删除' };
+  }
+
+  await ref.remove();
+  return { ok: true };
+}
+
 async function toggleCouponStatus(id, newStatus) {
+
   if (!id) return { ok: false, message: '缺少ID' };
   const status = newStatus ? 'active' : 'inactive';
   const got = await db.collection(COL_SHOP_CONFIG).doc(id).get().catch(() => null);
@@ -348,4 +418,5 @@ module.exports = {
   listCoupons,
   upsertCoupon,
   toggleCouponStatus,
+  deleteCoupon,
 };

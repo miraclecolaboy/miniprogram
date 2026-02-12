@@ -6,24 +6,20 @@ const { safeStr, toNum } = require('../../../../utils/common');
 const { toInt } = require('./shop.helpers');
 
 module.exports = {
-  // ===== 优惠券管理 =====
   async loadCoupons() {
     const session = getSession();
     if (!session?.token) return;
     try {
       const res = await call('admin', { action: 'coupons_list', token: session.token });
-      if (res && res.ok) {
-        this.setData({ coupons: res.list || [] });
-      }
+      if (res?.ok) this.setData({ coupons: res.list || [] });
     } catch (e) {
       console.error('[shop] loadCoupons failed', e);
     }
   },
 
-  // 点击“编辑”按钮
   openEditCoupon(e) {
     const id = e.currentTarget.dataset.id;
-    const coupon = this.data.coupons.find((c) => c._id === id);
+    const coupon = (this.data.coupons || []).find((c) => c._id === id);
     if (!coupon) return;
 
     this.setData({
@@ -36,11 +32,9 @@ module.exports = {
         totalQuantity: String(coupon.totalQuantity),
       },
     });
-    // 滚动到页面顶部，方便编辑
     wx.pageScrollTo({ scrollTop: 0, duration: 300 });
   },
 
-  // 点击“取消编辑”
   cancelCouponEdit() {
     this.setData({
       editingCouponId: '',
@@ -51,9 +45,7 @@ module.exports = {
 
   onCouponFormInput(e) {
     const field = e.currentTarget.dataset.field;
-    this.setData({
-      [`couponForm.${field}`]: e.detail.value,
-    });
+    this.setData({ [`couponForm.${field}`]: e.detail.value });
   },
 
   async saveCouponForm() {
@@ -80,13 +72,13 @@ module.exports = {
       const res = await call('admin', {
         action: 'coupons_upsert',
         token: getSession().token,
-        data: data,
+        data,
       }, { loadingTitle: '保存中' });
 
-      if (!res.ok) throw new Error(res.message || '保存失败');
+      if (!res?.ok) throw new Error(res?.message || '保存失败');
 
       wx.showToast({ title: '已保存', icon: 'success' });
-      this.cancelCouponEdit(); // 保存成功后清空表单
+      this.cancelCouponEdit();
       await this.loadCoupons();
     } catch (e) {
       wx.showToast({ title: e.message || '保存失败', icon: 'none' });
@@ -95,34 +87,34 @@ module.exports = {
     }
   },
 
-  async toggleCouponStatus(e) {
-    const { id, status } = e.currentTarget.dataset;
-    const newStatus = status !== 'active';
-    const confirmText = newStatus ? '上架' : '下架';
+  async deleteCoupon(e) {
+    const id = safeStr(e.currentTarget.dataset.id);
+    if (!id) return;
 
-    const { confirm } = await new Promise((resolve) => wx.showModal({
-      title: `确认${confirmText}？`,
-      content: newStatus ? '上架后用户即可领取。' : '下架后用户将无法领取。',
-      success: resolve,
-    }));
-
-    if (!confirm) return;
+    const ok = await new Promise((resolve) => {
+      wx.showModal({
+        title: '删除优惠券',
+        content: '删除后不可恢复，用户将无法再领取。',
+        success: (r) => resolve(!!r.confirm),
+        fail: () => resolve(false),
+      });
+    });
+    if (!ok) return;
 
     try {
-      await call('admin', {
-        action: 'coupons_toggle_status',
+      const res = await call('admin', {
+        action: 'coupons_delete',
         token: getSession().token,
         id,
-        status: newStatus,
-      }, { loadingTitle: '处理中' });
+      }, { loadingTitle: '删除中' });
 
-      wx.showToast({ title: `已${confirmText}`, icon: 'success' });
+      if (!res?.ok) throw new Error(res?.message || '删除失败');
+      wx.showToast({ title: '已删除', icon: 'success' });
       await this.loadCoupons();
     } catch (e) {
-      wx.showToast({ title: e.message || '操作失败', icon: 'none' });
+      wx.showToast({ title: e.message || '删除失败', icon: 'none' });
     }
   },
 
   noop() {},
 };
-

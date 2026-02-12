@@ -150,6 +150,9 @@ async function createOrder(event, openid) {
         throw { error: 'reserve_phone_required', message: '请输入11位预留电话' };
       }
 
+      if (mode === 'waimai' && shopConfig.waimaiOn === false) {
+        throw { error: 'waimai_disabled', message: '外卖暂未开放' };
+      }
       if (mode === 'kuaidi' && shopConfig.kuaidiOn === false) {
         throw { error: 'kuaidi_disabled', message: '快递暂未开放' };
       }

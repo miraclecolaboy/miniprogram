@@ -21,6 +21,7 @@
           class="mode-pill {{mode=='waimai'?'active':''}}"
           data-mode="waimai"
           bindtap="changeMode"
+          wx:if="{{waimaiOn}}"
           hover-class="hover-scale-sm"
         >外卖</view>
         <view

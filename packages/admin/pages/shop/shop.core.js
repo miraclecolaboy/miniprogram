@@ -3,7 +3,7 @@
 const { requireLogin, getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
 const { safeStr } = require('../../../../utils/common');
-const { parseServiceHoursRanges } = require('../../../../utils/serviceHours');
+const { parseServiceHoursRanges, fmtMinOfDay } = require('../../../../utils/serviceHours');
 const { getTempUrlMap } = require('../../../../utils/cloudFile');
 const { emptyServiceHoursRange, rangeToServiceHoursInput } = require('./shop.helpers');
 
@@ -62,16 +62,23 @@ module.exports = {
     const urlMap = await getTempUrlMap(allIds);
 
     const kefuQrPreview = kefuQrFileId ? (urlMap[kefuQrFileId] || '') : '';
-    const banners = bannerIds.map((fid) => ({
+    const banners = bannerIds.map((fid, idx) => ({
+      key: `remote_${idx}_${fid}`,
       fileId: fid,
       preview: urlMap[fid] || '',
     }));
 
     const serviceHoursText = safeStr(cfg.serviceHours);
     const parsedServiceRanges = parseServiceHoursRanges(serviceHoursText);
-    const serviceHoursRanges = (parsedServiceRanges && parsedServiceRanges.length)
-      ? parsedServiceRanges.map(rangeToServiceHoursInput)
+    const normalizedServiceRanges = (parsedServiceRanges && parsedServiceRanges.length)
+      ? parsedServiceRanges.slice(0, 2)
+      : null;
+    const serviceHoursRanges = normalizedServiceRanges
+      ? normalizedServiceRanges.map(rangeToServiceHoursInput)
       : [emptyServiceHoursRange()];
+    const serviceHoursForSave = normalizedServiceRanges
+      ? normalizedServiceRanges.map((r) => `${fmtMinOfDay(r.start)}-${fmtMinOfDay(r.end)}`).join(' ')
+      : serviceHoursText;
 
     this.setData({
       notice: safeStr(cfg.notice),
@@ -79,6 +86,7 @@ module.exports = {
 
       banners,
 
+      waimaiOn: cfg.waimaiOn !== false,
       waimaiMaxKm: Number(cfg.waimaiMaxKm ?? 10),
       waimaiDeliveryFee: String(cfg.waimaiDeliveryFee ?? 8),
       kuaidiOn: cfg.kuaidiOn !== false,
@@ -86,17 +94,20 @@ module.exports = {
       minOrderWaimai: String(cfg.minOrderWaimai ?? 88),
       minOrderKuaidi: String(cfg.minOrderKuaidi ?? 88),
       configChanged: false,
+      removedBannerFileIds: [],
 
       subMchId: safeStr(cfg.subMchId),
       payChanged: false,
 
       phone: safeStr(cfg.phone),
-      serviceHours: serviceHoursText,
-      serviceHoursOriginal: serviceHoursText,
+      serviceHours: serviceHoursForSave,
+      serviceHoursOriginal: serviceHoursForSave,
       serviceHoursRanges,
       serviceHoursEdited: false,
       kefuQrFileId,
       kefuQrPreview,
+      kefuQrLocalPath: '',
+      kefuQrRemoved: false,
       contactChanged: false,
 
       cloudPrinterSn: safeStr(cfg.cloudPrinterSn),
@@ -107,8 +118,8 @@ module.exports = {
 
       // 默认展开与操作高频相关的区域
       sectionOpen: {
-        consume: true,
-        shopInfo: true,
+        consume: false,
+        shopInfo: false,
         deliveryPay: false,
         coupons: false,
         gifts: false,

@@ -17,6 +17,7 @@ const shopMethods = require('./order.shop');
 Page(Object.assign({
   data: {
     mode: 'ziti',
+    waimaiOn: CACHED_SHOP_CFG.waimaiOn !== false,
     kuaidiOn: CACHED_SHOP_CFG.kuaidiOn !== false,
     storeName: CACHED_SHOP_CFG.storeName || '',
     notice: CACHED_SHOP_CFG.notice || '',
@@ -68,6 +69,10 @@ Page(Object.assign({
     if (!nextMode || nextMode === this.data.mode) return;
 
     wx.removeStorageSync(KEY_ORDER_MODE);
+    if (nextMode === 'waimai' && this.data.waimaiOn === false) {
+      wx.showToast({ title: '外卖暂未开放', icon: 'none' });
+      return;
+    }
     if (nextMode === 'kuaidi' && this.data.kuaidiOn === false) {
       wx.showToast({ title: '快递暂未开放', icon: 'none' });
       return;

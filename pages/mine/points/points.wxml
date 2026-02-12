@@ -45,13 +45,14 @@
               <text class="gift-points">{{item.points}}</text>
               <text class="gift-unit">积分</text>
             </view>
-            
-            <view 
-              class="btn-redeem {{points < item.points ? 'disabled' : ''}}" 
-              bindtap="onRedeem" 
+            <view class="gift-desc" wx:if="{{item.totalQuantity > 0}}">剩余 {{item.leftQuantity}} 件</view>
+
+            <view
+              class="btn-redeem {{(points < item.points || item.leftQuantity === 0) ? 'disabled' : ''}}"
+              bindtap="onRedeem"
               data-id="{{item.id}}"
             >
-              {{points < item.points ? '不足' : '兑换'}}
+              {{item.leftQuantity === 0 ? '兑完' : (points < item.points ? '不足' : '兑换')}}
             </view>
           </view>
         </view>
