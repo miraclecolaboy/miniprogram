@@ -3,7 +3,7 @@
 
 const { toNum, pickImg } = require('../../utils/common');
 const { groupCouponInstancesForCheckout, buildCouponGroupKey } = require('../../utils/coupon');
-const { computeDeliveryFee } = require('./checkout.helpers');
+const { computeDeliveryFee, computeFreeDeliveryLine } = require('./checkout.helpers');
 
 module.exports = {
   recalcCart() {
@@ -41,7 +41,9 @@ module.exports = {
       couponDiscount = toNum(selectedCoupon.discount, 0);
     }
 
-    const deliveryFeeNum = computeDeliveryFee(this.data.mode, goodsTotal, this.data);
+    const deliveryFeeNum = computeDeliveryFee(this.data.mode, goodsTotal, this.data, {
+      address: this.data.address,
+    });
     const deliveryFeeFen = Math.round(toNum(deliveryFeeNum, 0) * 100);
     const payableFen = goodsTotalFen + deliveryFeeFen;
 
@@ -54,9 +56,9 @@ module.exports = {
     const discountTotalFen = Math.min(payableFen, vipDiscountFen + couponAppliedFen);
     const finalPayNum = finalPayFen / 100;
 
-    let freeLine = 0;
-    if (this.data.mode === 'waimai') freeLine = toNum(this.data.minOrderWaimai, 0);
-    if (this.data.mode === 'kuaidi') freeLine = toNum(this.data.minOrderKuaidi, 0);
+    const freeLine = computeFreeDeliveryLine(this.data.mode, this.data, {
+      address: this.data.address,
+    });
     const freeLineFen = Math.round(toNum(freeLine, 0) * 100);
     const needMoreFen = (freeLineFen > 0 && goodsTotalFen < freeLineFen) ? (freeLineFen - goodsTotalFen) : 0;
 

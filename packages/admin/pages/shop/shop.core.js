@@ -92,7 +92,10 @@ module.exports = {
       kuaidiOn: cfg.kuaidiOn !== false,
       kuaidiDeliveryFee: String(cfg.kuaidiDeliveryFee ?? 10),
       minOrderWaimai: String(cfg.minOrderWaimai ?? 88),
-      minOrderKuaidi: String(cfg.minOrderKuaidi ?? 88),
+      minOrderKuaidi: String(cfg.minOrderKuaidi ?? 100),
+      kuaidiOutProvinceDistanceKm: String(cfg.kuaidiOutProvinceDistanceKm ?? 300),
+      kuaidiOutDeliveryFee: String(cfg.kuaidiOutDeliveryFee ?? 25),
+      minOrderKuaidiOut: String(cfg.minOrderKuaidiOut ?? 140),
       configChanged: false,
       removedBannerFileIds: [],
 

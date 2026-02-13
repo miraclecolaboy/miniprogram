@@ -22,16 +22,62 @@ async function _getPayConfig() {
   return { subMchId };
 }
 
-function computeDeliveryFee(mode, goodsTotal, cfg) {
+function rad(x) { return (x * Math.PI) / 180; }
+
+function calcDistanceKm(lat1, lon1, lat2, lon2) {
+  if (!Number.isFinite(lat1) || !Number.isFinite(lon1) || !Number.isFinite(lat2) || !Number.isFinite(lon2)) return NaN;
+  const R = 6371;
+  const dLat = rad(lat2 - lat1);
+  const dLon = rad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function pickAddressLngLat(addr) {
+  if (!addr || typeof addr !== 'object') return null;
+  const lat = Number(addr.lat ?? addr.latitude ?? addr.location?.lat ?? addr.location?.latitude);
+  const lng = Number(addr.lng ?? addr.longitude ?? addr.location?.lng ?? addr.location?.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
+}
+
+function resolveKuaidiRule(cfg, opts = {}) {
+  const inFee = Math.max(0, toNum(cfg?.kuaidiDeliveryFee, 10));
+  const inLine = Math.max(0, toNum(cfg?.minOrderKuaidi, 100));
+  const outDistanceKm = Math.max(0, toNum(cfg?.kuaidiOutProvinceDistanceKm, 300));
+  const outFee = Math.max(0, toNum(cfg?.kuaidiOutDeliveryFee, 25));
+  const outLine = Math.max(0, toNum(cfg?.minOrderKuaidiOut, 140));
+
+  let km = Number(opts?.distanceKm);
+  if (!Number.isFinite(km)) {
+    const ll = pickAddressLngLat(opts?.address);
+    const storeLat = Number(cfg?.storeLat);
+    const storeLng = Number(cfg?.storeLng);
+    if (ll && Number.isFinite(storeLat) && Number.isFinite(storeLng) && storeLat && storeLng) {
+      km = calcDistanceKm(ll.lat, ll.lng, storeLat, storeLng);
+    }
+  }
+
+  const isOutProvince = Number.isFinite(km) && outDistanceKm > 0 && km > outDistanceKm;
+  return {
+    fee: isOutProvince ? outFee : inFee,
+    freeLine: isOutProvince ? outLine : inLine,
+  };
+}
+
+function computeDeliveryFee(mode, goodsTotal, cfg, opts = {}) {
   const m = String(mode || 'ziti');
   const gt = Number(goodsTotal || 0);
   const wFee = Number(cfg?.waimaiDeliveryFee || 0);
-  const kFee = Number(cfg?.kuaidiDeliveryFee || 0);
   const wLine = Number(cfg?.minOrderWaimai || 0);
-  const kLine = Number(cfg?.minOrderKuaidi || 0);
 
   if (m === 'waimai' && wFee > 0 && (wLine <= 0 || gt < wLine)) return wFee;
-  if (m === 'kuaidi' && kFee > 0 && (kLine <= 0 || gt < kLine)) return kFee;
+  if (m === 'kuaidi') {
+    const rule = resolveKuaidiRule(cfg, opts);
+    if (rule.fee > 0 && (rule.freeLine <= 0 || gt < rule.freeLine)) return rule.fee;
+  }
   return 0;
 }
 
@@ -157,7 +203,12 @@ async function createOrder(event, openid) {
         throw { error: 'kuaidi_disabled', message: '快递暂未开放' };
       }
       
-      const deliveryFee = computeDeliveryFee(mode, goodsTotal, shopConfig);
+      const address = mode !== 'ziti' ? (user.addresses || []).find(a => a.id === addressId) || null : null;
+      if (mode !== 'ziti' && !address) {
+        throw { error: 'address_required', message: '请选择收货地址' };
+      }
+
+      const deliveryFee = computeDeliveryFee(mode, goodsTotal, shopConfig, { address });
       const deliveryFeeFen = Math.round(Number(deliveryFee || 0) * 100);
       const payableFen = goodsTotalFen + deliveryFeeFen;
       const memberLevel = Number(user.memberLevel || 0);
@@ -200,7 +251,6 @@ async function createOrder(event, openid) {
         });
       }
       
-      const address = mode !== 'ziti' ? (user.addresses || []).find(a => a.id === addressId) || null : null;
       orderNo = genOrderNo();
       
       const orderDoc = {

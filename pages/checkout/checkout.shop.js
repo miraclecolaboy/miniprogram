@@ -28,7 +28,10 @@ module.exports = {
         waimaiDeliveryFee: Math.max(0, toNum(cfg.waimaiDeliveryFee, 8)),
         kuaidiDeliveryFee: Math.max(0, toNum(cfg.kuaidiDeliveryFee, 10)),
         minOrderWaimai: Math.max(0, toNum(cfg.minOrderWaimai, 88)),
-        minOrderKuaidi: Math.max(0, toNum(cfg.minOrderKuaidi, 88)),
+        minOrderKuaidi: Math.max(0, toNum(cfg.minOrderKuaidi, 100)),
+        kuaidiOutProvinceDistanceKm: Math.max(0, toNum(cfg.kuaidiOutProvinceDistanceKm, 300)),
+        kuaidiOutDeliveryFee: Math.max(0, toNum(cfg.kuaidiOutDeliveryFee, 25)),
+        minOrderKuaidiOut: Math.max(0, toNum(cfg.minOrderKuaidiOut, 140)),
       }, () => {
         if (this.data.mode === 'waimai' && this.data.waimaiOn === false) {
           wx.showToast({ title: '外卖暂未开放', icon: 'none' });

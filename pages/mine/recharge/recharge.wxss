@@ -56,7 +56,7 @@ page {
 /* 核心修改：恢复清晰、精致的衬线体水印 */
 .card-decoration {
   position: absolute;
-  top: -10%; 
+  top: -5%; 
   right: -8%;
   /* 使用衬线体，更有杂志感 */
   font-family: 'Didot', 'Times New Roman', serif; 
@@ -201,8 +201,8 @@ page {
   width: 100%;
   text-align: center;
   font-family: 'DIN Alternate', sans-serif;
-  font-size: 30rpx;
-  font-weight: 800;
+  font-size: 40rpx;
+  font-weight: 700;
   color: var(--text-main);
   line-height: 1;
   background: transparent;

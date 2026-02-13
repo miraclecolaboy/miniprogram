@@ -30,6 +30,9 @@ Page(Object.assign({
     address: null,
     distance: '',
     distanceUnit: 'km',
+    kuaidiOutProvinceDistanceKm: Number(CACHED_SHOP_CFG.kuaidiOutProvinceDistanceKm ?? 300),
+    kuaidiOutDeliveryFee: Number(CACHED_SHOP_CFG.kuaidiOutDeliveryFee ?? 25),
+    minOrderKuaidiOut: Number(CACHED_SHOP_CFG.minOrderKuaidiOut ?? 140),
     
     // 购物车与费用
     cart: [],

@@ -88,8 +88,8 @@
           <view class="hint" wx:if="{{form.hasSpecs}}" style="text-align: right; margin-top: -12rpx; margin-bottom: 16rpx;">由SKU最低价自动计算</view>
 
           <view class="list-row">
-            <view class="row-label">排序权重</view>
-            <input class="input-inline" type="number" value="{{form.sort}}" bindinput="onFormInput" data-field="sort" placeholder="数字越大越靠前" />
+            <view class="row-label">排序</view>
+            <input class="input-inline" type="number" value="{{form.sort}}" bindinput="onFormInput" data-field="sort" placeholder="数字越小越靠前" />
           </view>
 
           <view class="list-row">
@@ -230,8 +230,8 @@
         </view>
 
         <view class="form-group" style="margin-top: 24rpx;">
-          <view class="label">排序权重</view>
-          <input class="input-full" placeholder="数字越大越靠前" type="number" value="{{categoryForm.sort}}" bindinput="onCategoryInput" data-field="sort" />
+          <view class="label">排序</view>
+          <input class="input-full" placeholder="数字越小越靠前" type="number" value="{{categoryForm.sort}}" bindinput="onCategoryInput" data-field="sort" />
         </view>
 
         <view class="row-between" style="margin-top: 32rpx;">

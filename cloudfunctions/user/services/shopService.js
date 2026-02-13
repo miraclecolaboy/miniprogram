@@ -171,6 +171,9 @@ async function getShopConfig() {
     minOrderZiti: 0,
     minOrderWaimai: 88,
     minOrderKuaidi: 100,
+    kuaidiOutProvinceDistanceKm: 300,
+    kuaidiOutDeliveryFee: 25,
+    minOrderKuaidiOut: 140,
     waimaiDeliveryFee: 8,
     kuaidiDeliveryFee: 10,
     updatedAt: now(),
@@ -184,7 +187,7 @@ async function getShopConfig() {
     const cfg = (got && got.data) ? got.data : {};
     const out = { ...DEFAULT_CFG, ...cfg };
 
-    ['waimaiMaxKm', 'waimaiDeliveryFee', 'kuaidiDeliveryFee', 'minOrderZiti', 'minOrderWaimai', 'minOrderKuaidi', 'storeLat', 'storeLng'].forEach((k) => {
+    ['waimaiMaxKm', 'waimaiDeliveryFee', 'kuaidiDeliveryFee', 'minOrderZiti', 'minOrderWaimai', 'minOrderKuaidi', 'kuaidiOutProvinceDistanceKm', 'kuaidiOutDeliveryFee', 'minOrderKuaidiOut', 'storeLat', 'storeLng'].forEach((k) => {
       const n = Number(out[k]);
       out[k] = Number.isFinite(n) ? n : DEFAULT_CFG[k];
     });

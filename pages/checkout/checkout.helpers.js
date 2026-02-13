@@ -18,13 +18,50 @@ function calcDistanceKm(lat1, lon1, lat2, lon2) {
 
 function round2(n) { const x = Number(n || 0); return Math.round(x * 100) / 100; }
 
-function computeDeliveryFee(mode, goodsTotal, cfg) {
+function pickAddressLngLat(addr) {
+  if (!addr || typeof addr !== 'object') return null;
+  const lat = Number(addr.lat ?? addr.latitude ?? addr.location?.lat ?? addr.location?.latitude);
+  const lng = Number(addr.lng ?? addr.longitude ?? addr.location?.lng ?? addr.location?.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
+}
+
+function resolveKuaidiRule(cfg, opts = {}) {
+  const inFee = round2(cfg?.kuaidiDeliveryFee ?? 10);
+  const inLine = Number(cfg?.minOrderKuaidi ?? 100);
+  const outDistanceKm = Number(cfg?.kuaidiOutProvinceDistanceKm ?? 300);
+  const outFee = round2(cfg?.kuaidiOutDeliveryFee ?? 25);
+  const outLine = Number(cfg?.minOrderKuaidiOut ?? 140);
+
+  let km = Number(opts?.distanceKm);
+  if (!Number.isFinite(km)) {
+    const ll = pickAddressLngLat(opts?.address);
+    const storeLat = Number(cfg?.storeLat);
+    const storeLng = Number(cfg?.storeLng);
+    if (ll && Number.isFinite(storeLat) && Number.isFinite(storeLng) && storeLat && storeLng) {
+      km = calcDistanceKm(ll.lat, ll.lng, storeLat, storeLng);
+    }
+  }
+
+  const limitKm = Number.isFinite(outDistanceKm) ? Math.max(0, outDistanceKm) : 300;
+  const isOutProvince = Number.isFinite(km) && limitKm > 0 && km > limitKm;
+  const fee = Math.max(0, isOutProvince ? outFee : inFee);
+  const freeLineRaw = isOutProvince ? outLine : inLine;
+  const freeLine = Number.isFinite(freeLineRaw) ? Math.max(0, freeLineRaw) : 0;
+
+  return {
+    isOutProvince,
+    distanceKm: Number.isFinite(km) ? km : NaN,
+    fee,
+    freeLine,
+  };
+}
+
+function computeDeliveryFee(mode, goodsTotal, cfg, opts = {}) {
   const m = String(mode || 'ziti');
   const gt = round2(goodsTotal);
   const wFee = round2(cfg?.waimaiDeliveryFee);
-  const kFee = round2(cfg?.kuaidiDeliveryFee);
   const wLine = Number(cfg?.minOrderWaimai ?? 0);
-  const kLine = Number(cfg?.minOrderKuaidi ?? 0);
 
   if (m === 'waimai') {
     if (wFee <= 0) return 0;
@@ -32,9 +69,23 @@ function computeDeliveryFee(mode, goodsTotal, cfg) {
     return wFee;
   }
   if (m === 'kuaidi') {
-    if (kFee <= 0) return 0;
-    if (Number.isFinite(kLine) && kLine > 0 && gt >= kLine) return 0;
-    return kFee;
+    const rule = resolveKuaidiRule(cfg, opts);
+    if (rule.fee <= 0) return 0;
+    if (rule.freeLine > 0 && gt >= rule.freeLine) return 0;
+    return rule.fee;
+  }
+  return 0;
+}
+
+function computeFreeDeliveryLine(mode, cfg, opts = {}) {
+  const m = String(mode || 'ziti');
+  if (m === 'waimai') {
+    const line = Number(cfg?.minOrderWaimai ?? 0);
+    return Number.isFinite(line) ? Math.max(0, line) : 0;
+  }
+  if (m === 'kuaidi') {
+    const rule = resolveKuaidiRule(cfg, opts);
+    return Number.isFinite(rule.freeLine) ? Math.max(0, rule.freeLine) : 0;
   }
   return 0;
 }
@@ -129,6 +180,7 @@ function genPickupTimeSlotsByServiceHours(serviceHours) {
 
 module.exports = {
   calcDistanceKm,
+  computeFreeDeliveryLine,
   computeDeliveryFee,
   genPickupTimeSlotsByServiceHours,
   getSystemLocationFlags,

@@ -36,11 +36,20 @@ module.exports = {
   onKuaidiDeliveryFeeInput(e) {
     this.setData({ kuaidiDeliveryFee: safeStr(e.detail.value), configChanged: true });
   },
+  onKuaidiOutProvinceDistanceKmInput(e) {
+    this.setData({ kuaidiOutProvinceDistanceKm: safeStr(e.detail.value), configChanged: true });
+  },
+  onKuaidiOutDeliveryFeeInput(e) {
+    this.setData({ kuaidiOutDeliveryFee: safeStr(e.detail.value), configChanged: true });
+  },
   onMinOrderWaimaiInput(e) {
     this.setData({ minOrderWaimai: safeStr(e.detail.value), configChanged: true });
   },
   onMinOrderKuaidiInput(e) {
     this.setData({ minOrderKuaidi: safeStr(e.detail.value), configChanged: true });
+  },
+  onMinOrderKuaidiOutInput(e) {
+    this.setData({ minOrderKuaidiOut: safeStr(e.detail.value), configChanged: true });
   },
 
   async onUploadBanner() {
@@ -153,8 +162,11 @@ module.exports = {
         waimaiDeliveryFee: safeStr(this.data.waimaiDeliveryFee),
         kuaidiOn: !!this.data.kuaidiOn,
         kuaidiDeliveryFee: safeStr(this.data.kuaidiDeliveryFee),
+        kuaidiOutProvinceDistanceKm: safeStr(this.data.kuaidiOutProvinceDistanceKm),
+        kuaidiOutDeliveryFee: safeStr(this.data.kuaidiOutDeliveryFee),
         minOrderWaimai: safeStr(this.data.minOrderWaimai),
         minOrderKuaidi: safeStr(this.data.minOrderKuaidi),
+        minOrderKuaidiOut: safeStr(this.data.minOrderKuaidiOut),
       }).catch(() => null);
       if (!r?.ok) throw new Error(r?.message || '保存失败');
       configSaved = true;

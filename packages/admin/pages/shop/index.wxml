@@ -166,7 +166,7 @@
               <input class="input-inline" type="digit" value="{{waimaiDeliveryFee}}" bindinput="onWaimaiDeliveryFeeInput" placeholder="0.00" />
             </view>
             <view class="list-row">
-              <view class="row-label">外卖起送价 (元)</view>
+              <view class="row-label">外卖免配送门槛 (元)</view>
               <input class="input-inline" type="digit" value="{{minOrderWaimai}}" bindinput="onMinOrderWaimaiInput" placeholder="0.00" />
             </view>
             <view class="divider" style="margin: 10rpx 0;"></view>
@@ -179,8 +179,20 @@
               <input class="input-inline" type="digit" value="{{kuaidiDeliveryFee}}" bindinput="onKuaidiDeliveryFeeInput" placeholder="0.00" />
             </view>
             <view class="list-row">
-              <view class="row-label">快递起送价 (元)</view>
+              <view class="row-label">省内快递免配送门槛 (元)</view>
               <input class="input-inline" type="digit" value="{{minOrderKuaidi}}" bindinput="onMinOrderKuaidiInput" placeholder="0.00" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">省外判定距离 (km)</view>
+              <input class="input-inline" type="digit" value="{{kuaidiOutProvinceDistanceKm}}" bindinput="onKuaidiOutProvinceDistanceKmInput" placeholder="300" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">省外配送费 (元)</view>
+              <input class="input-inline" type="digit" value="{{kuaidiOutDeliveryFee}}" bindinput="onKuaidiOutDeliveryFeeInput" placeholder="0.00" />
+            </view>
+            <view class="list-row">
+              <view class="row-label">省外快递免配送门槛 (元)</view>
+              <input class="input-inline" type="digit" value="{{minOrderKuaidiOut}}" bindinput="onMinOrderKuaidiOutInput" placeholder="140" />
             </view>
             <view class="card-action">
               <view class="btn {{configChanged ? 'btn-primary' : 'btn-disabled'}}" bindtap="onSaveConfig">保存配送配置</view>

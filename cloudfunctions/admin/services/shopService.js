@@ -284,8 +284,11 @@ async function getConfig() {
       waimaiOn: cfg ? (cfg.waimaiOn !== false) : true,
       kuaidiOn: cfg ? (cfg.kuaidiOn !== false) : true,
       kuaidiDeliveryFee: toNum(cfg && cfg.kuaidiDeliveryFee, 10),
+      kuaidiOutProvinceDistanceKm: toNum(cfg && cfg.kuaidiOutProvinceDistanceKm, 300),
+      kuaidiOutDeliveryFee: toNum(cfg && cfg.kuaidiOutDeliveryFee, 25),
       minOrderWaimai: toNum(cfg && cfg.minOrderWaimai, 88),
-      minOrderKuaidi: toNum(cfg && cfg.minOrderKuaidi, 88),
+      minOrderKuaidi: toNum(cfg && cfg.minOrderKuaidi, 100),
+      minOrderKuaidiOut: toNum(cfg && cfg.minOrderKuaidiOut, 140),
       phone: safeStr(cfg && cfg.phone),
       serviceHours: safeStr(cfg && cfg.serviceHours),
       kefuQrUrl: safeStr(cfg && cfg.kefuQrUrl),
@@ -337,7 +340,7 @@ async function setConfig(data) {
   if (data.waimaiOn !== undefined) patch.waimaiOn = String(data.waimaiOn) === 'false' ? false : !!data.waimaiOn;
   if (data.kuaidiOn !== undefined) patch.kuaidiOn = String(data.kuaidiOn) === 'false' ? false : !!data.kuaidiOn;
 
-  ['waimaiMaxKm', 'waimaiDeliveryFee', 'kuaidiDeliveryFee', 'minOrderWaimai', 'minOrderKuaidi'].forEach((k) => {
+  ['waimaiMaxKm', 'waimaiDeliveryFee', 'kuaidiDeliveryFee', 'kuaidiOutProvinceDistanceKm', 'kuaidiOutDeliveryFee', 'minOrderWaimai', 'minOrderKuaidi', 'minOrderKuaidiOut'].forEach((k) => {
     if (data[k] !== undefined) patch[k] = toNum(data[k], 0);
   });
 

@@ -34,7 +34,10 @@ Page(Object.assign({
     kuaidiOn: true,
     kuaidiDeliveryFee: '10',
     minOrderWaimai: '88',
-    minOrderKuaidi: '88',
+    minOrderKuaidi: '100',
+    kuaidiOutProvinceDistanceKm: '300',
+    kuaidiOutDeliveryFee: '25',
+    minOrderKuaidiOut: '140',
     configChanged: false,
 
     // hidden in UI, retained for compatibility with existing methods

@@ -63,7 +63,10 @@ module.exports = {
       return;
     }
 
-    this.setData({ address: addr });
+    this.setData({ address: addr }, () => {
+      this.recalcCart();
+      if (typeof this.applyDefaultPayMethod === 'function') this.applyDefaultPayMethod();
+    });
   },
 
   async syncUserAndCoupons() {
@@ -153,7 +156,11 @@ module.exports = {
           if (this.data.mode === 'waimai' && !this.validateWaimaiAddress(addr, true, 'modal')) return;
 
           this._chooseAddrEventToken = this._chooseAddrToken;
-          this.setData({ address: addr }, () => wx.navigateBack());
+          this.setData({ address: addr }, () => {
+            this.recalcCart();
+            if (typeof this.applyDefaultPayMethod === 'function') this.applyDefaultPayMethod();
+            wx.navigateBack();
+          });
         }
       },
       success: (res) => {
