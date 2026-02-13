@@ -15,9 +15,8 @@ function giftSig(list) {
     const id = String(x?.id || x?._id || '');
     const points = Math.floor(toNum(x?.points, 0));
     const left = Math.floor(toNum(x?.leftQuantity, -1));
-    const total = Math.floor(toNum(x?.totalQuantity, 0));
     const imageUrl = String(x?.imageUrl || x?.thumbUrl || x?.thumb || x?.img || '');
-    return `${id}|${points}|${left}|${total}|${imageUrl}`;
+    return `${id}|${points}|${left}|${imageUrl}`;
   }).join(',');
   return `${list.length}:${head}`;
 }
@@ -131,12 +130,23 @@ Page({
     const arr = Array.isArray(list) ? list : [];
     return arr.map((g) => {
       const id = String(g.id || g._id || '');
-      const totalQuantity = Math.max(0, Math.floor(toNum(g.totalQuantity, 0)));
-      const redeemedQuantity = Math.max(0, Math.floor(toNum(g.redeemedQuantity, 0)));
+
+      const stockField = g && g.stock;
+      const stockLeftRaw = (stockField && typeof stockField === 'object')
+        ? (
+          stockField.leftQuantity !== undefined ? stockField.leftQuantity
+            : (stockField.left !== undefined ? stockField.left
+              : (stockField.available !== undefined ? stockField.available : stockField.current))
+        )
+        : stockField;
       const rawLeft = toNum(g.leftQuantity, NaN);
-      const leftQuantity = Number.isFinite(rawLeft)
-        ? Math.floor(rawLeft)
-        : (totalQuantity > 0 ? Math.max(0, totalQuantity - Math.min(totalQuantity, redeemedQuantity)) : -1);
+      const stockLeft = toNum(stockLeftRaw, NaN);
+      let leftQuantity = -1;
+      if (Number.isFinite(rawLeft)) {
+        leftQuantity = Math.max(-1, Math.floor(rawLeft));
+      } else if (Number.isFinite(stockLeft)) {
+        leftQuantity = Math.max(0, Math.floor(stockLeft));
+      }
 
       return {
         ...g,
@@ -145,8 +155,7 @@ Page({
         desc: String(g.desc || g.description || ''),
         imageUrl: String(g.imageUrl || g.thumbUrl || g.thumb || g.img || '').trim(),
         points: Math.floor(toNum(g.points, 0)),
-        totalQuantity,
-        leftQuantity: totalQuantity > 0 ? Math.max(0, leftQuantity) : -1,
+        leftQuantity: leftQuantity < 0 ? -1 : leftQuantity,
       };
     }).filter((g) => !!g.id);
   },
@@ -162,6 +171,10 @@ Page({
       .then((res) => {
         if (!this._alive) return;
         if (token !== this._giftsReqToken) return;
+        if (res?.result?.error) {
+          console.error('[points] listGifts api error', res.result.error, res.result.message || '');
+          return;
+        }
 
         const raw = pickArray(res?.result);
         const gifts = this.normalizeGifts(raw);

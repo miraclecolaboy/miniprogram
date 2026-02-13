@@ -47,7 +47,7 @@
               <text class="gift-points">{{item.points}}</text>
               <text class="gift-unit">积分</text>
             </view>
-            <view class="gift-desc" wx:if="{{item.totalQuantity > 0}}">剩余 {{item.leftQuantity}} 件</view>
+            <view class="gift-desc" wx:if="{{item.leftQuantity >= 0}}">剩余 {{item.leftQuantity}} 件</view>
 
             <view
               class="btn-redeem {{(points < item.points || item.leftQuantity === 0) ? 'disabled' : ''}}"

@@ -12,6 +12,11 @@ function toNum(v, d = 0) {
   return Number.isFinite(n) ? n : d;
 }
 
+function toInt(v, d = 0) {
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.floor(n) : d;
+}
+
 function isCollectionNotExists(err) {
   return err && err.errCode === -502005;
 }
@@ -74,6 +79,7 @@ async function getTempUrlMap(fileIds) {
 module.exports = {
   now,
   toNum,
+  toInt,
   isCollectionNotExists,
   normPointsEarn,
   normCount,
