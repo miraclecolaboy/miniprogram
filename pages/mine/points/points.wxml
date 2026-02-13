@@ -28,11 +28,13 @@
     <block wx:if="{{gifts && gifts.length}}">
       <view class="gift-card" wx:for="{{gifts}}" wx:key="id">
         <image
+          wx:if="{{item.imageUrl}}"
           class="gift-img"
           src="{{item.imageUrl}}"
           mode="aspectFill"
           lazy-load="true"
         ></image>
+        <view wx:else class="gift-img gift-img-placeholder">暂无图片</view>
         
         <view class="gift-content">
           <view class="gift-main">

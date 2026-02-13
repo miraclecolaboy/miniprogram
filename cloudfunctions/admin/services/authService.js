@@ -1,5 +1,6 @@
 const cloud = require('wx-server-sdk');
 const crypto = require('crypto');
+const initService = require('./initService');
 const {
   COL_USERS,
   COL_SESS
@@ -50,16 +51,22 @@ async function ensureDefaultAdmin() {
 async function createSession(openid, user) {
   const token = randomToken();
   const expiresAt = now() + SESSION_TTL_MS;
+  const data = {
+    token,
+    openid,
+    username: user.username,
+    createdAt: now(),
+    expiresAt
+  };
 
-  await db.collection(COL_SESS).add({
-    data: {
-      token,
-      openid,
-      username: user.username,
-      createdAt: now(),
-      expiresAt
-    }
-  });
+  try {
+    await db.collection(COL_SESS).add({ data });
+  } catch (e) {
+    if (!isCollectionNotExists(e)) throw e;
+    // First login bootstrap: auto-create missing session collection.
+    await initService.ensureCollectionExists(COL_SESS);
+    await db.collection(COL_SESS).add({ data });
+  }
 
   return { token, expiresAt };
 }

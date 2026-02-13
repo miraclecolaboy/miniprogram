@@ -7,7 +7,35 @@ function now() {
 
 // 检查集合不存在错误
 function isCollectionNotExists(err) {
-  return err && err.errCode === -502005;
+  if (!err) return false;
+
+  const maybeCodes = [
+    err.errCode,
+    err.code,
+    err?.original?.errCode,
+    err?.original?.code
+  ].map(v => Number(v));
+
+  if (maybeCodes.some(code => Number.isFinite(code) && code === -502005)) {
+    return true;
+  }
+
+  const msg = String(
+    err.errMsg ||
+    err.message ||
+    err?.original?.errMsg ||
+    err?.original?.message ||
+    ''
+  ).toLowerCase();
+
+  return (
+    msg.includes('collection') &&
+    (
+      msg.includes('not exist') ||
+      msg.includes('does not exist') ||
+      msg.includes('not found')
+    )
+  );
 }
 
 // SHA256 加密

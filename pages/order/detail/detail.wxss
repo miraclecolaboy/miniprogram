@@ -60,6 +60,18 @@ page {
 .img-swiper {
   overflow: hidden;
 }
+.img-swiper .wx-swiper-dots {
+  bottom: 18rpx;
+}
+.img-swiper .wx-swiper-dot {
+  width: 10rpx;
+  height: 10rpx;
+  margin: 0 6rpx;
+}
+.img-swiper .wx-swiper-dot-active {
+  width: 18rpx;
+  border-radius: 999rpx;
+}
 
 .img-swiper-item {
   height: 100%;

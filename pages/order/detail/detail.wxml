@@ -7,19 +7,17 @@
         <swiper
           wx:if="{{imgList.length > 1}}"
           class="img-layer img-swiper"
-          bindchange="onSwiperChange"
           circular="true"
-          current="{{swiperCurrent}}"
-          indicator-dots="{{true}}"
+          indicator-dots
           indicator-color="rgba(255,255,255,0.45)"
-          indicator-active-color="rgba(255,255,255,0.9)"
-          autoplay="{{swiperAutoplay}}"
-          interval="3000"
-          duration="300"
+          indicator-active-color="rgba(255,255,255,0.95)"
+          autoplay
+          interval="5000"
+          duration="800"
         >
           <block wx:for="{{imgList}}" wx:key="*this">
             <swiper-item class="img-swiper-item">
-              <image class="img-media" src="{{item}}" mode="aspectFill" lazy-load="true" />
+              <image class="img-media" src="{{item}}" mode="aspectFill" />
             </swiper-item>
           </block>
         </swiper>
@@ -29,7 +27,6 @@
           class="img-layer img-media"
           src="{{imgList[0] || product.img}}"
           mode="aspectFill"
-          lazy-load="true"
         />
       </view>
     </view>

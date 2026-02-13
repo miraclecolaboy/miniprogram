@@ -257,6 +257,34 @@
 }
 .modal-header { padding: 32rpx 32rpx 24rpx; border-bottom: 1rpx solid var(--border); }
 
+.category-list {
+  max-height: 320rpx;
+  overflow-y: auto;
+  border: 1rpx solid var(--border);
+  border-radius: 16rpx;
+  background: var(--bg);
+  padding: 0 20rpx;
+}
+.category-row {
+  min-height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  border-bottom: 1rpx solid var(--border);
+}
+.category-row:last-child {
+  border-bottom: none;
+}
+.category-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  flex: 1;
+  min-width: 0;
+  word-break: break-all;
+}
+
 /* SKU 列表样式 */
 .sku-item {
   display: flex; align-items: center; justify-content: space-between; padding: 20rpx 0; border-bottom: 1rpx solid var(--border);

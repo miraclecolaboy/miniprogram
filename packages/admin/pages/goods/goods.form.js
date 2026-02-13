@@ -8,7 +8,13 @@ const { compressImage, generateThumbnail: generateThumbnailUtil } = require('../
 
 module.exports = {
   openAdd() {
-    const cat = this.data.categories[1] || this.data.categories[0];
+    const defaultCategoryIndex = this.data.categories.findIndex((c) => c && c._id !== 'all');
+    if (defaultCategoryIndex < 0) {
+      wx.showToast({ title: '请先新增商品分组', icon: 'none' });
+      return;
+    }
+
+    const cat = this.data.categories[defaultCategoryIndex];
     const tempId = `temp_${Date.now()}`;
 
     this.setData({
@@ -16,7 +22,7 @@ module.exports = {
       editingId: tempId,
       saving: false,
       deletedFileIDs: [],
-      formCategoryIndex: this.data.categories.length > 1 ? 1 : 0,
+      formCategoryIndex: defaultCategoryIndex,
       formModesMap: { ziti: true, waimai: true, kuaidi: true },
       form: {
         name: '',
@@ -102,6 +108,11 @@ module.exports = {
 
   onFormCategoryChange(e) {
     const idx = Number(e.detail.value || 0);
+    const chosen = this.data.categories[idx];
+    if (!chosen || chosen._id === 'all') {
+      wx.showToast({ title: '请选择商品分组', icon: 'none' });
+      return;
+    }
     this.setData({ formCategoryIndex: idx, 'form.categoryId': this.data.categories[idx]?._id || '' });
   },
 
@@ -239,7 +250,7 @@ module.exports = {
     if (this.data.saving) return;
 
     const f = this.data.form;
-    if (!safeStr(f.name) || !f.categoryId) {
+    if (!safeStr(f.name) || !f.categoryId || f.categoryId === 'all') {
       return wx.showToast({ title: '请填写商品名和分类', icon: 'none' });
     }
 

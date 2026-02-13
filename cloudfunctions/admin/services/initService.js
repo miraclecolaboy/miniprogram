@@ -89,6 +89,6 @@ async function ensureCollections() {
 }
 
 module.exports = {
+  ensureCollectionExists,
   ensureCollections,
 };
-

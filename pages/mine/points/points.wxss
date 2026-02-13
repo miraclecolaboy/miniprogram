@@ -161,6 +161,13 @@ page {
   margin-right: 24rpx;
   flex-shrink: 0;
 }
+.gift-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #B6BAC2;
+  font-size: 22rpx;
+}
 
 .gift-content {
   flex: 1;

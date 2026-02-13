@@ -219,7 +219,7 @@
   <view class="mask" wx:if="{{showCategoryForm}}" catchtouchmove="true">
     <view class="modal-center" catchtap="noop">
       <view class="modal-header row-between">
-        <view class="page-title" style="font-size: 32rpx;">新增分组</view>
+        <view class="page-title" style="font-size: 32rpx;">分组管理</view>
         <view class="btn btn-mini btn-outline" bindtap="closeCategoryForm">关闭</view>
       </view>
 
@@ -234,16 +234,39 @@
           <input class="input-full" placeholder="数字越大越靠前" type="number" value="{{categoryForm.sort}}" bindinput="onCategoryInput" data-field="sort" />
         </view>
 
-        <view class="row-between" style="margin-top: 40rpx;">
-          <view class="btn btn-outline" style="width: 45%; text-align: center;" bindtap="closeCategoryForm">取消</view>
-          <view class="btn btn-primary {{categorySaving ? 'btn-disabled' : ''}}" style="width: 45%; text-align: center;" bindtap="saveCategory">
-            {{categorySaving ? '保存中...' : '保存'}}
+        <view class="row-between" style="margin-top: 32rpx;">
+          <view class="btn btn-primary {{categorySaving ? 'btn-disabled' : ''}}" style="width: 100%; text-align: center;" bindtap="saveCategory">
+            {{categorySaving ? '保存中...' : '新增分组'}}
           </view>
+        </view>
+
+        <view class="form-group" style="margin-top: 32rpx;">
+          <view class="label">已有分组</view>
+          <view class="category-list" wx:if="{{categories.length > 1}}">
+            <block wx:for="{{categories}}" wx:key="_id">
+              <view class="category-row" wx:if="{{item._id !== 'all'}}">
+                <view class="category-name">{{item.name}}</view>
+                <view
+                  class="btn btn-danger btn-mini {{categoryDeletingId === item._id ? 'btn-disabled' : ''}}"
+                  data-id="{{item._id}}"
+                  data-name="{{item.name}}"
+                  bindtap="removeCategory"
+                >
+                  {{categoryDeletingId === item._id ? '删除中...' : '删除'}}
+                </view>
+              </view>
+            </block>
+          </view>
+          <view class="empty-hint" style="padding: 20rpx 0 0;" wx:else>暂无分组</view>
+          <view class="hint">删除前请先将该分组商品移走，否则会提示无法删除。</view>
+        </view>
+
+        <view class="row-between" style="margin-top: 40rpx;">
+          <view class="btn btn-outline" style="width: 100%; text-align: center;" bindtap="closeCategoryForm">关闭</view>
         </view>
       </view>
     </view>
   </view>
 
 </view>
-
 <admin-tabbar wx:if="{{!showForm}}" />

@@ -36,12 +36,25 @@ module.exports = {
 
   async fetchCategories() {
     try {
+      const prevFilterId = this.data.categories[this.data.filterCategoryIndex]?._id;
+      const prevFormId = this.data.categories[this.data.formCategoryIndex]?._id;
       const res = await call('admin', { action: 'categories_list', token: getSession().token });
       if (!res?.ok) return;
 
       const cats = (res.list || []).filter((c) => c && (c.status == null || c.status === 1));
       const categories = [{ _id: 'all', name: '全部分类' }, ...cats];
-      this.setData({ categories });
+
+      let filterCategoryIndex = categories.findIndex((c) => c._id === prevFilterId);
+      if (filterCategoryIndex < 0) filterCategoryIndex = 0;
+
+      let formCategoryIndex = categories.findIndex((c) => c._id === prevFormId);
+      if (formCategoryIndex < 0) formCategoryIndex = categories.length > 1 ? 1 : 0;
+
+      const patch = { categories, filterCategoryIndex, formCategoryIndex };
+      if (this.data.showForm) {
+        patch['form.categoryId'] = categories[formCategoryIndex]?._id || '';
+      }
+      this.setData(patch);
     } catch (e) {
       if (e?.code === 'AUTH_EXPIRED') return;
       console.error('[goods] fetchCategories error', e);
@@ -92,4 +105,3 @@ module.exports = {
     }
   },
 };
-

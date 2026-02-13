@@ -43,6 +43,7 @@ Page(Object.assign({
     skuBulkPrice: '',
     showCategoryForm: false,
     categorySaving: false,
+    categoryDeletingId: '',
     categoryForm: { name: '', sort: '0' }
   },
 
