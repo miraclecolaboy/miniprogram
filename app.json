@@ -23,7 +23,7 @@
   },
   "permission": {
     "scope.userLocation": {
-      "desc": "用于计算您到门店的距离和地址自动填写"
+      "desc": "用于自动填写地址"
     }
   },
   "requiredPrivateInfos": [

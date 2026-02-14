@@ -89,9 +89,10 @@ function getReceiver(order) {
   const shipping = order?.shippingInfo || order?.address || null;
   const name = String(shipping?.name || '').trim();
   const phone = String(shipping?.phone || '').trim();
+  const fullAddress = String(shipping?.address || shipping?.fullAddress || '').trim();
   const region = String(shipping?.region || '').trim();
   const detail = String(shipping?.detail || '').trim();
-  const addressText = String(shipping?.address || '').trim() || `${region}${detail}`.trim();
+  const addressText = fullAddress || `${region}${detail}`.trim();
   return { name, phone, addrText: addressText };
 }
 

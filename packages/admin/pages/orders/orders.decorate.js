@@ -37,7 +37,8 @@ module.exports = {
     const pickupPhone = String(pickupInfo.phone || o.reservePhone || o.receiverPhone || '').trim();
     const receiverName = o.mode === 'ziti' ? '' : (addr.name || '');
     const receiverPhone = o.mode === 'ziti' ? pickupPhone : (addr.phone || '');
-    const addrText = `${addr.region || ''}${addr.detail || ''}`;
+    const addrText = String(addr.address || addr.fullAddress || '').trim()
+      || `${addr.region || ''}${addr.detail || ''}`;
     const addrCopyText = (o.mode !== 'ziti')
       ? `${[receiverName, receiverPhone].filter(Boolean).join(' ')}\n${addrText}`.trim()
       : '';

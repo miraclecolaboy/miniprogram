@@ -1,307 +1,510 @@
+﻿// cloudfunctions/user/services/tradeService.js
 const cloud = require('wx-server-sdk');
-const { COL_USERS, COL_ORDERS } = require('../config/constants');
-const { now, isCollectionNotExists } = require('../utils/common');
+const {
+  COL_ORDERS, COL_USERS, COL_PRODUCTS,
+  COL_SHOP_CONFIG, WX_PAY_CALLBACK_FN, FORCE_ENV_ID
+} = require('../config/constants');
+const { now, toNum } = require('../utils/common');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
+const _ = db.command;
 
-// --- 内部辅助 ---
+// --- 内部辅助函数 ---
 
-// 格式化地址列表
-async function _listAddresses(openid, limit = 50) {
-  let gotU = null;
-  try {
-    gotU = await db.collection(COL_USERS).doc(openid).get();
-  } catch (e) {
-    return [];
-  }
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, Math.max(0, Number(ms) || 0))); }
 
-  const u = gotU?.data || {};
-  const defaultId = String(u.defaultAddressId || '').trim();
-
-  let list = Array.isArray(u.addresses) ? u.addresses : [];
-  list = list
-    .filter(x => x && typeof x === 'object')
-    .map(x => {
-      const id = String(x.id || x._id || '').trim();
-      const region = String(x.region || '').trim();
-      const detail = String(x.detail || '').trim();
-      const addressText = String(x.address || '').trim() || (region && detail ? `${region} ${detail}` : (region || detail));
-      const lat = Number(x.lat ?? x.latitude);
-      const lng = Number(x.lng ?? x.longitude);
-      const hasLL = Number.isFinite(lat) && Number.isFinite(lng);
-
-      return {
-        id,
-        name: String(x.name || '').trim(),
-        phone: String(x.phone || '').trim(),
-        address: addressText,
-        region,
-        detail,
-        ...(hasLL ? { lat, lng } : {}),
-        createdAt: Number(x.createdAt || 0),
-        updatedAt: Number(x.updatedAt || 0),
-        isDefault: defaultId ? (id === defaultId) : !!x.isDefault,
-      };
-    })
-    .filter(x => !!x.id);
-
-  list.sort((a, b) => {
-    const d = Number(!!b.isDefault) - Number(!!a.isDefault);
-    if (d !== 0) return d;
-    return Number(b.updatedAt || 0) - Number(a.updatedAt || 0);
-  });
-
-  return list.slice(0, limit);
+async function _getPayConfig() {
+  const got = await db.collection(COL_SHOP_CONFIG).doc('main').get().catch(() => null);
+  const cfg = got?.data || {};
+  const subMchId = String(cfg.subMchId || '').trim();
+  if (!subMchId) throw new Error('请先在商家端配置微信支付子商户号(subMchId)');
+  return { subMchId };
 }
 
-// 统计订单数据
-async function getOrderStats(openid) {
-  try {
-    const countRes = await db.collection(COL_ORDERS).where({ openid }).count();
-    const count = Number(countRes.total || 0);
-    const lastRes = await db.collection(COL_ORDERS).where({ openid }).orderBy('createdAt', 'desc').limit(1).get();
-    const last = (lastRes.data && lastRes.data[0]) || null;
-    return {
-      count,
-      lastOrderAt: last ? Number(last.createdAt || 0) : 0,
-      lastOrderId: last ? String(last._id || '') : '',
-    };
-  } catch (e) {
-    return { count: 0, lastOrderAt: 0, lastOrderId: '' };
-  }
+function rad(x) { return (x * Math.PI) / 180; }
+
+function calcDistanceKm(lat1, lon1, lat2, lon2) {
+  if (!Number.isFinite(lat1) || !Number.isFinite(lon1) || !Number.isFinite(lat2) || !Number.isFinite(lon2)) return NaN;
+  const R = 6371;
+  const dLat = rad(lat2 - lat1);
+  const dLon = rad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
 
-function normalizeMemberCouponTitle(title) {
-  const t = String(title || '').trim();
-  if (!t) return '';
-  return t.replace(/^等级会员无门槛/, '会员无门槛');
+function pickAddressLngLat(addr) {
+  if (!addr || typeof addr !== 'object') return null;
+  const lat = Number(addr.lat ?? addr.latitude ?? addr.location?.lat ?? addr.location?.latitude);
+  const lng = Number(addr.lng ?? addr.longitude ?? addr.location?.lng ?? addr.location?.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
 }
 
-function normalizeUserCoupons(list) {
-  const arr = Array.isArray(list) ? list : [];
-  return arr.map((c) => {
-    if (!c || typeof c !== 'object') return c;
-    const couponId = String(c.couponId || '').trim();
-    const title = String(c.title || '').trim();
-    if (couponId.startsWith('coupon_member_') && title.startsWith('等级会员无门槛')) {
-      return { ...c, title: normalizeMemberCouponTitle(title) };
+function resolveKuaidiRule(cfg, opts = {}) {
+  const inFee = Math.max(0, toNum(cfg?.kuaidiDeliveryFee, 10));
+  const inLine = Math.max(0, toNum(cfg?.minOrderKuaidi, 100));
+  const outDistanceKm = Math.max(0, toNum(cfg?.kuaidiOutProvinceDistanceKm, 300));
+  const outFee = Math.max(0, toNum(cfg?.kuaidiOutDeliveryFee, 25));
+  const outLine = Math.max(0, toNum(cfg?.minOrderKuaidiOut, 140));
+
+  let km = Number(opts?.distanceKm);
+  if (!Number.isFinite(km)) {
+    const ll = pickAddressLngLat(opts?.address);
+    const storeLat = Number(cfg?.storeLat);
+    const storeLng = Number(cfg?.storeLng);
+    if (ll && Number.isFinite(storeLat) && Number.isFinite(storeLng) && storeLat && storeLng) {
+      km = calcDistanceKm(ll.lat, ll.lng, storeLat, storeLng);
     }
-    return c;
-  });
+  }
+
+  const isOutProvince = Number.isFinite(km) && outDistanceKm > 0 && km > outDistanceKm;
+  return {
+    fee: isOutProvince ? outFee : inFee,
+    freeLine: isOutProvince ? outLine : inLine,
+  };
 }
 
-function normalizeReservePhone(v) {
+function computeDeliveryFee(mode, goodsTotal, cfg, opts = {}) {
+  const m = String(mode || 'ziti');
+  const gt = Number(goodsTotal || 0);
+  const wFee = Number(cfg?.waimaiDeliveryFee || 0);
+  const wLine = Number(cfg?.minOrderWaimai || 0);
+
+  if (m === 'waimai' && wFee > 0 && (wLine <= 0 || gt < wLine)) return wFee;
+  if (m === 'kuaidi') {
+    const rule = resolveKuaidiRule(cfg, opts);
+    if (rule.fee > 0 && (rule.freeLine <= 0 || gt < rule.freeLine)) return rule.fee;
+  }
+  return 0;
+}
+
+function genOrderNo() {
+  const d = new Date();
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const rnd = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+  return `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}${rnd}`;
+}
+
+function genPickupCode4() {
+  return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+function normalizePhone(v) {
   return String(v == null ? '' : v).replace(/\D+/g, '').slice(0, 11);
 }
 
-// 确保用户存在 (核心登录逻辑)
-async function ensureUser(openid, profile = null) {
-  try {
-    // 尝试获取用户
-    const got = await db.collection(COL_USERS).doc(openid).get();
-    const u = got.data || {};
-    const patch = { openid, lastLoginAt: now(), updatedAt: now() };
-    
-    // [重构] 登录时不再依赖前端传来的微信信息，只更新登录时间
-    await db.collection(COL_USERS).doc(openid).update({ data: patch });
-    return { ...u, ...patch, _id: openid };
+function isValidPhone(v) {
+  return /^1\d{10}$/.test(String(v || ''));
+}
 
+// --- 订单服务 ---
+
+async function createOrder(event, openid) {
+  const { mode, items, addressId, remark, pickupTime, paymentMethod, userCouponId, storeSubMode, reservePhone } = event;
+  const reservePhoneInput = normalizePhone(reservePhone);
+
+  const rawStoreSubMode = String(storeSubMode || '').trim();
+  const storeSubModeFinal = mode === 'ziti'
+    ? (['tangshi', 'ziti'].includes(rawStoreSubMode) ? rawStoreSubMode : 'ziti')
+    : '';
+
+  // Be tolerant to older/buggy clients: default to wechat when missing/invalid.
+  let payMethod = String(paymentMethod || '').trim();
+  if (!['wechat', 'balance'].includes(payMethod)) payMethod = 'wechat';
+
+  if (!['ziti', 'waimai', 'kuaidi'].includes(mode)) return { error: 'invalid_mode' };
+  if (!Array.isArray(items) || items.length === 0) return { error: 'cart_empty' };
+  if (mode !== 'ziti' && !addressId) return { error: 'address_required' };
+
+  const nowTs = now();
+  let orderId = '';
+  let finalPayAmount = 0;
+  let orderNo = '';
+
+  try {
+    // [修复] 事务偶发冲突/抖动：自动重试一次，避免用户必须点两次下单
+    let txResult;
+    const maxAttempts = 2;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        txResult = await db.runTransaction(async tx => {
+      const productIds = [...new Set(items.map(it => it.productId))];
+
+      const productsRes = await tx.collection(COL_PRODUCTS).where({ _id: _.in(productIds) }).get();
+      const productMap = new Map(productsRes.data.map(p => [p._id, p]));
+      
+      const skuMap = new Map();
+      productsRes.data.forEach(p => {
+        if (p.hasSpecs && Array.isArray(p.skuList)) {
+          p.skuList.forEach(sku => {
+            if (sku.skuKey) {
+              skuMap.set(sku.skuKey, {
+                ...sku,
+                productId: p._id,
+                productName: p.name,
+                thumbFileID: p.thumbFileID || (p.imgs && p.imgs[0]) || ''
+              });
+            }
+          });
+        }
+      });
+
+      let goodsTotalFen = 0;
+      const orderItems = [];
+
+      for (const item of items) {
+        const product = productMap.get(item.productId);
+        if (!product || product.status !== 1) throw { error: 'product_unavailable', message: `商品「${product?.name || '未知'}」已下架` };
+        
+        let price = 0, specText = '';
+        if (item.skuId) {
+          const sku = skuMap.get(item.skuId);
+          if (!sku) throw { error: 'sku_unavailable', message: `商品「${product.name}」的规格已失效` };
+          price = sku.price;
+          specText = sku.specText;
+
+        } else {
+          if (product.hasSpecs) throw { error: 'missing_sku', message: `「${product.name}」是多规格商品` };
+          price = product.price;
+        }
+
+        const count = Number(item.count || 0);
+        goodsTotalFen += Math.round(Number(price || 0) * 100) * count;
+        orderItems.push({
+          productId: product._id, skuId: item.skuId || '', productName: product.name,
+          specText, image: product.thumbFileID || (product.imgs && product.imgs[0]) || '',
+          count, price: Number(price || 0)
+        });
+      }
+
+      const goodsTotal = Number((goodsTotalFen / 100).toFixed(2));
+
+      const [shopConfigRes, userRes] = await Promise.all([
+        tx.collection(COL_SHOP_CONFIG).doc('main').get(),
+        tx.collection(COL_USERS).doc(openid).get()
+      ]);
+      const shopConfig = shopConfigRes.data || {};
+      const user = userRes.data || {};
+      const storedReservePhone = normalizePhone(user.reservePhone || '');
+      const reservePhoneFinal = mode === 'ziti'
+        ? (isValidPhone(reservePhoneInput) ? reservePhoneInput : storedReservePhone)
+        : '';
+      if (mode === 'ziti' && !isValidPhone(reservePhoneFinal)) {
+        throw { error: 'reserve_phone_required', message: '请输入11位预留电话' };
+      }
+
+      if (mode === 'waimai' && shopConfig.waimaiOn === false) {
+        throw { error: 'waimai_disabled', message: '外卖暂未开放' };
+      }
+      if (mode === 'kuaidi' && shopConfig.kuaidiOn === false) {
+        throw { error: 'kuaidi_disabled', message: '快递暂未开放' };
+      }
+      
+      const address = mode !== 'ziti' ? (user.addresses || []).find(a => a.id === addressId) || null : null;
+      if (mode !== 'ziti' && !address) {
+        throw { error: 'address_required', message: '请选择收货地址' };
+      }
+
+      const deliveryFee = computeDeliveryFee(mode, goodsTotal, shopConfig, { address });
+      const deliveryFeeFen = Math.round(Number(deliveryFee || 0) * 100);
+      const payableFen = goodsTotalFen + deliveryFeeFen;
+      const memberLevel = Number(user.memberLevel || 0);
+      const isVip = memberLevel >= 4; // Lv4: permanent 95% price (5% off)
+      const vipDiscountFen = isVip ? Math.round(payableFen * 0.05) : 0;
+      const vipDiscount = Number((vipDiscountFen / 100).toFixed(2));
+
+      let couponDiscountFaceFen = 0;
+      if (userCouponId) {
+        const coupon = (user.coupons || []).find(c => c.userCouponId === userCouponId);
+        if (!coupon) throw new Error('优惠券无效');
+        if (goodsTotal < toNum(coupon.minSpend, 0)) throw new Error('未达到优惠券使用门槛');
+        couponDiscountFaceFen = Math.round(toNum(coupon.discount, 0) * 100);
+      }
+      
+      const afterVipFen = Math.max(0, payableFen - vipDiscountFen);
+      const couponDiscountFen = Math.min(couponDiscountFaceFen, afterVipFen);
+      const couponDiscount = Number((couponDiscountFen / 100).toFixed(2));
+
+      finalPayAmount = Math.max(0, Number(((afterVipFen - couponDiscountFen) / 100).toFixed(2)));
+      const paidImmediately = payMethod === 'balance' || finalPayAmount <= 0;
+      const paymentMethodFinal = finalPayAmount <= 0 ? 'free' : payMethod;
+
+      if (payMethod === 'balance') {
+        if (user.balance < finalPayAmount) throw { error: 'insufficient_balance', message: '余额不足' };
+        await tx.collection(COL_USERS).doc(openid).update({ data: { balance: _.inc(-finalPayAmount) } });
+      }
+      
+      if (userCouponId) {
+        await tx.collection(COL_USERS).doc(openid).update({
+          data: {
+            coupons: _.pull({ userCouponId })
+          }
+        });
+      }
+
+      if (mode === 'ziti' && reservePhoneFinal && reservePhoneFinal !== storedReservePhone) {
+        await tx.collection(COL_USERS).doc(openid).update({
+          data: { reservePhone: reservePhoneFinal }
+        });
+      }
+      
+      orderNo = genOrderNo();
+      
+      const orderDoc = {
+        _openid: openid, orderNo,
+        status: paidImmediately ? 'processing' : 'pending_payment',
+        statusText: paidImmediately ? '准备中' : '待支付',
+        mode,
+        storeSubMode: storeSubModeFinal,
+        items: orderItems,
+        amount: {
+          goods: Number((goodsTotalFen / 100).toFixed(2)),
+          delivery: Number((deliveryFeeFen / 100).toFixed(2)),
+          // legacy alias used by some order detail UIs ("会员折扣")
+          discount: vipDiscount,
+          vipDiscount,
+          couponDiscount,
+          total: Number(finalPayAmount.toFixed(2))
+        },
+        payment: { method: paymentMethodFinal, status: paidImmediately ? 'paid' : 'pending', paidAt: paidImmediately ? nowTs : 0 },
+        userCouponId: userCouponId || '',
+        shippingInfo: address,
+        receiverPhone: mode === 'ziti' ? reservePhoneFinal : '',
+        reservePhone: mode === 'ziti' ? reservePhoneFinal : '',
+        pickupInfo: {
+          code: mode === 'ziti' ? genPickupCode4() : '',
+          time: mode === 'ziti' ? pickupTime : '',
+          phone: mode === 'ziti' ? reservePhoneFinal : ''
+        },
+        remark: remark || '', isVip, memberLevel, pointsEarn: Math.floor(finalPayAmount),
+        createdAt: nowTs, updatedAt: nowTs, paidAt: paidImmediately ? nowTs : 0,
+        storeName: shopConfig.storeName || '',
+        buyerNickName: String(user.nickName || '').trim(),
+      };
+      const addRes = await tx.collection('orders').add({ data: orderDoc });
+      return { orderId: addRes._id, orderNo };
+        });
+        break;
+      } catch (e) {
+        // 业务异常不重试
+        if (e && typeof e === 'object' && e.error) throw e;
+        if (attempt >= maxAttempts) throw e;
+        await sleep(120);
+      }
+    }
+
+    orderId = txResult.orderId;
+    orderNo = txResult.orderNo;
+
+    if (payMethod === 'wechat' && finalPayAmount > 0) {
+      try {
+        const { subMchId } = await _getPayConfig();
+        const payRes = await cloud.cloudPay.unifiedOrder({
+          body: '订单支付', outTradeNo: orderNo, totalFee: Math.round(finalPayAmount * 100),
+          tradeType: 'JSAPI', openid, spbillCreateIp: '127.0.0.1', subMchId,
+          functionName: WX_PAY_CALLBACK_FN, envId: FORCE_ENV_ID || cloud.getWXContext().ENV
+        });
+        await db.collection('orders').doc(orderId).update({ data: { 'payment.outTradeNo': orderNo } });
+        return { ok: true, data: { orderId, payment: payRes.payment, paid: false } };
+      } catch (e) {
+        await db.collection('orders').doc(orderId).remove().catch(()=>{});
+        return { error: 'wxpay_failed', message: e.message || '无法发起微信支付' };
+      }
+    }
+
+    return { ok: true, data: { orderId, paid: true } };
   } catch (e) {
-    if (isCollectionNotExists(e)) throw e; // 如果是其他错误，则抛出
+    return { error: e.error || 'transaction_failed', message: e.message || '订单创建失败，请重试' };
+  }
+}
 
-    // [重构] 捕获 "document not exists" 错误，说明是新用户，执行创建
-    // 1. 生成随机昵称
-    const randomSuffix = Math.random().toString().slice(-6);
-    const defaultNickName = `用户${randomSuffix}`;
+async function sysHandlePaySuccess(payEvent) {
+    const outTradeNo = payEvent.outTradeNo || payEvent.out_trade_no;
+    if (!outTradeNo) return { errcode: 0, errmsg: 'OK' };
+  
+    const orderRes = await db.collection('orders').where({ 'payment.outTradeNo': outTradeNo }).limit(1).get();
+    const order = orderRes.data[0];
+    if (!order) return { errcode: 0, errmsg: 'OK' };
+    if (order.payment.status === 'paid') return { errcode: 0, errmsg: 'OK' };
+  
+    const nowTs = now();
+    const openid = order._openid;
     
-    // 2. 创建新用户文档
-    const user = {
-      openid,
-      nickName: defaultNickName,
-      avatarUrl: '', // 头像默认为空
-      gender: 0,
-      balance: 0,
-      points: 0,
-      // Level-based membership (cumulative recharge). Lv4 gets permanent discount.
-      memberLevel: 0,
-      totalRecharge: 0,
-      reservePhone: '',
-      defaultAddressId: '',
-      addresses: [],
-      coupons: [],
-      orderStats: { count: 0, lastOrderAt: 0, lastOrderId: '' },
-      createdAt: now(),
-      updatedAt: now(),
-      lastLoginAt: now(),
-    };
-
-    await db.collection(COL_USERS).doc(openid).set({ data: user });
-    return { ...user, _id: openid };
-  }
+    await db.collection('orders').doc(order._id).update({
+      data: {
+        status: 'processing', statusText: '准备中', paidAt: nowTs,
+        'payment.status': 'paid', 'payment.paidAt': nowTs,
+        'payment.transactionId': payEvent.transactionId || payEvent.transaction_id || ''
+      }
+    });
+    
+    if (order.pointsEarn > 0 && openid) {
+      await db.collection('users').doc(openid).update({
+        data: { points: _.inc(order.pointsEarn) }
+      }).catch(console.error);
+    }
+    
+    return { errcode: 0, errmsg: 'OK' };
 }
 
-// --- 导出接口 ---
+async function sysHandleRefundSuccess(refundEvent) {
+    const outRefundNo = refundEvent.out_refund_no || refundEvent.outRefundNo;
+    const refundStatus = refundEvent.refund_status || refundEvent.refundStatus;
 
-async function loginOrRegister(event, openid) {
-  const src = (event && event.userInfo) || event || {};
-  const { nickName, avatarUrl, gender } = src;
+    if (!outRefundNo) {
+        console.warn('[sysHandleRefundSuccess] Callback is missing out_refund_no', refundEvent);
+        return { errcode: 0, errmsg: 'OK' };
+    }
+
+    try {
+        const orderRes = await db.collection(COL_ORDERS).where({
+            'refund.outRefundNo': outRefundNo
+        }).limit(1).get();
+
+        const order = orderRes.data[0];
+        if (!order) {
+            console.error(`[sysHandleRefundSuccess] Order not found for outRefundNo: ${outRefundNo}`);
+            return { errcode: 0, errmsg: 'OK' };
+        }
+
+        if (order.refund && order.refund.status === 'success') {
+            console.log(`[sysHandleRefundSuccess] Refund for ${outRefundNo} already marked as success. Skipping.`);
+            return { errcode: 0, errmsg: 'OK' };
+        }
+
+        const nowTs = now();
+        let updateData = {};
+        const successTime = refundEvent.success_time || '';
+
+        if (refundStatus === 'SUCCESS') {
+            updateData = {
+                'refund.status': 'success',
+                'refund.statusText': '退款成功',
+                'refund.refundedAt': nowTs,
+                'refund.logs': _.push({
+                    ts: nowTs,
+                    text: `微信支付退款已到账。${successTime ? `到账时间: ${successTime}` : ''}`
+                })
+            };
+        } else {
+            updateData = {
+                'refund.status': 'failed',
+                'refund.statusText': '退款失败',
+                'refund.logs': _.push({
+                    ts: nowTs,
+                    text: `微信支付退款失败，微信返回状态: ${refundStatus}`
+                })
+            };
+        }
+
+        await db.collection(COL_ORDERS).doc(order._id).update({
+            data: { ...updateData, updatedAt: nowTs }
+        });
+
+        console.log(`[sysHandleRefundSuccess] Processed callback for outRefundNo: ${outRefundNo}, status: ${refundStatus}`);
+        return { errcode: 0, errmsg: 'OK' };
+
+    } catch (e) {
+        console.error(`[sysHandleRefundSuccess] CRITICAL ERROR processing outRefundNo: ${outRefundNo}`, e);
+        return { errcode: 0, errmsg: 'OK' };
+    }
+}
+
+
+async function cancelUnpaidOrder(orderId, openid) {
+    const orderRes = await db.collection('orders').doc(orderId).get();
+    const order = orderRes.data;
+    if (order && order._openid === openid && order.status === 'pending_payment') {
+        await db.collection('orders').doc(orderId).update({
+            data: { status: 'cancelled', statusText: '用户取消' }
+        });
+        return { ok: true };
+    }
+    return { ok: false, message: '订单状态不符或无权限' };
+}
+
+async function applyRefund(orderId, openid, reason, remark) {
+  if (!orderId) throw new Error('缺少订单ID');
+  if (!reason) throw new Error('缺少退款原因');
+
+  const orderRes = await db.collection(COL_ORDERS).doc(orderId).get();
+  const order = orderRes.data;
+
+  if (!order || order._openid !== openid) {
+    throw new Error('订单不存在或无权限');
+  }
+
+  const isPaid = order.payment?.status === 'paid';
+  const isCancelled = order.status === 'cancelled';
+  const doneAt = order.doneAt || 0;
+  const isDone = order.status === 'done';
+  const over3Days = isDone && doneAt > 0 && (now() - doneAt) > 3 * 24 * 60 * 60 * 1000;
+
+  const refund = order.refund || null;
+  const refundStatus = refund ? (refund.status || 'pending').toLowerCase() : '';
+  const canReapplyRefund = refund && ['rejected', 'cancelled'].includes(refundStatus);
+
+  const canApply = isPaid && !isCancelled && !over3Days && (!refund || canReapplyRefund);
+
+  if (!canApply) {
+    throw new Error('当前订单状态不支持申请售后');
+  }
   
-  const hasNick = nickName && nickName !== '微信用户';
-  const hasAvatar = avatarUrl && !avatarUrl.includes('icTdbqWNOwNR');
-  const hasGender = typeof gender === 'number';
-
-  const profile = (hasNick || hasAvatar || hasGender) ? { nickName, avatarUrl, gender } : null;
-  const user = await ensureUser(openid, profile);
-  return { data: user };
-}
-
-async function getMe(openid) {
-  let me;
-  try {
-    const got = await db.collection(COL_USERS).doc(openid).get();
-    me = got.data;
-  } catch (e) {
-    if (isCollectionNotExists(e)) return { error: 'collection_not_exists', collection: 'users' };
-    return { error: 'not_found' };
-  }
-
-  const addresses = await _listAddresses(openid);
-  const orderStats = await getOrderStats(openid);
-  const coupons = normalizeUserCoupons(me && me.coupons);
-
-  // 异步更新统计信息，不阻塞返回
-  db.collection(COL_USERS).doc(openid).update({ data: { orderStats, updatedAt: now() } }).catch(() => {});
-
-  return { data: { ...me, coupons, _id: openid, addresses, orderStats } };
-}
-
-async function updateProfile(event, openid) {
-  await ensureUser(openid, null);
-  
-  // 获取旧头像以便清理
-  let oldAvatar = '';
-  try {
-    const old = await db.collection(COL_USERS).doc(openid).get();
-    oldAvatar = old.data?.avatarUrl || '';
-  } catch (_) {}
-
-  const patch = { updatedAt: now() };
-  if (event.nickName) patch.nickName = String(event.nickName).trim();
-  if (event.avatarUrl) patch.avatarUrl = String(event.avatarUrl).trim();
-  if (typeof event.gender === 'number') patch.gender = event.gender;
-  if (Object.prototype.hasOwnProperty.call(event || {}, 'reservePhone')) {
-    patch.reservePhone = normalizeReservePhone(event.reservePhone);
-  }
-
-  await db.collection(COL_USERS).doc(openid).update({ data: patch });
-
-  // 清理旧头像文件
-  if (oldAvatar && patch.avatarUrl && oldAvatar !== patch.avatarUrl && oldAvatar.startsWith('cloud://')) {
-    cloud.deleteFile({ fileList: [oldAvatar] }).catch(() => {});
-  }
-
-  return await getMe(openid);
-}
-
-async function listAddresses(openid) {
-  const list = await _listAddresses(openid);
-  return { data: list };
-}
-
-function genAddrId() {
-  return `a_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-}
-
-async function upsertAddress(event, openid) {
-  await ensureUser(openid, null);
-  const addr = event.address || {};
-  let id = String(addr.id || addr._id || '').trim();
-  if (!id) id = genAddrId();
-
-  const users = db.collection(COL_USERS);
-  const ref = users.doc(openid);
-  const gotU = await ref.get().catch(() => null);
-  const u = gotU?.data || {};
-
-  let addresses = Array.isArray(u.addresses) ? u.addresses : [];
-  let defaultId = String(u.defaultAddressId || '').trim();
-  const tNow = now();
-
-  // 构建新地址对象
-  const lat = Number(addr.lat ?? addr.latitude ?? addr.location?.lat);
-  const lng = Number(addr.lng ?? addr.longitude ?? addr.location?.lng);
-  const hasLL = Number.isFinite(lat) && Number.isFinite(lng);
-
-  const nextItem = {
-    id, 
-    name: String(addr.name || '').trim(), 
-    phone: String(addr.phone || '').trim(),
-    region: String(addr.region || '').trim(),
-    detail: String(addr.detail || '').trim(),
-    address: String(addr.address || '').trim(),
-    ...(hasLL ? { lat, lng } : {}),
-    createdAt: tNow, 
-    updatedAt: tNow
+  const nowTs = now();
+  const refundDoc = {
+    status: 'applied',
+    statusText: '审核中',
+    reason: reason,
+    remark: remark || '',
+    source: 'customer',
+    appliedAt: nowTs,
+    logs: [{ ts: nowTs, text: '用户发起售后申请' }]
   };
 
-  // 更新数组
-  const idx = addresses.findIndex(x => String(x.id || x._id) === id);
-  if (idx >= 0) {
-    nextItem.createdAt = addresses[idx].createdAt || tNow; // 保持创建时间
-    addresses[idx] = { ...addresses[idx], ...nextItem };
-  } else {
-    addresses.unshift(nextItem);
-  }
-
-  if (addr.isDefault || !defaultId) defaultId = id;
-
-  // 排序与截断
-  addresses.sort((a, b) => {
-    const isDefA = String(a.id) === defaultId;
-    const isDefB = String(b.id) === defaultId;
-    return (isDefB - isDefA) || (b.updatedAt - a.updatedAt);
-  });
-  if (addresses.length > 50) addresses = addresses.slice(0, 50);
-
-  await ref.update({
-    data: { addresses, defaultAddressId: defaultId, updatedAt: tNow }
+  await db.collection(COL_ORDERS).doc(orderId).update({
+    data: {
+      refund: refundDoc,
+      updatedAt: nowTs
+    }
   });
 
-  return { data: { ...nextItem, isDefault: String(id) === defaultId } };
+  return { ok: true, data: { orderId } };
 }
 
-async function deleteAddress(event, openid) {
-  await ensureUser(openid, null);
-  const id = String(event.id || '').trim();
-  if (!id) return { error: 'invalid_id' };
+async function cancelRefund(orderId, openid) {
+  if (!orderId) throw new Error('缺少订单ID');
 
-  const ref = db.collection(COL_USERS).doc(openid);
-  const gotU = await ref.get().catch(() => null);
-  const u = gotU?.data || {};
+  const order = await db.collection(COL_ORDERS).doc(orderId).get().then(r => r.data);
 
-  let addresses = (u.addresses || []).filter(x => String(x.id || x._id) !== id);
-  let defaultId = u.defaultAddressId;
-
-  // 如果删的是默认地址，重置默认
-  if (defaultId === id) {
-    addresses.sort((a, b) => b.updatedAt - a.updatedAt);
-    defaultId = addresses[0] ? String(addresses[0].id || addresses[0]._id) : '';
+  if (!order || order._openid !== openid) {
+    throw new Error('订单不存在或无权限');
   }
 
-  await ref.update({
-    data: { addresses, defaultAddressId: defaultId, updatedAt: now() }
+  if (order.refund?.status !== 'applied') {
+    throw new Error('当前状态无法取消售后');
+  }
+
+  const nowTs = now();
+  await db.collection(COL_ORDERS).doc(orderId).update({
+    data: {
+      // Remove after-sale info so the order returns to normal "doing/done" tabs.
+      refund: _.remove(),
+      updatedAt: nowTs
+    }
   });
 
-  return { data: true };
+  return { ok: true };
 }
+
 
 module.exports = {
-  ensureUser,
-  loginOrRegister,
-  getMe,
-  updateProfile,
-  listAddresses,
-  upsertAddress,
-  deleteAddress
+  createOrder,
+  cancelUnpaidOrder,
+  sysHandlePaySuccess,
+  sysHandleRefundSuccess,
+  applyRefund,
+  cancelRefund,
 };

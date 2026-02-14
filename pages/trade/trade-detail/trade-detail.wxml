@@ -48,7 +48,7 @@
           <text class="addr-text">{{shopCfg.storeAddress || '请在后台配置门店地址'}}</text>
         </block>
         <block wx:else>
-          <view class="addr-text">{{order.shippingInfo.region}}{{order.shippingInfo.detail}}</view>
+          <view class="addr-text">{{order.shippingInfo.address || order.shippingInfo.fullAddress || ((order.shippingInfo.region || '') + (order.shippingInfo.detail || ''))}}</view>
           <view class="addr-user">{{order.shippingInfo.name}} {{order.shippingInfo.phone}}</view>
         </block>
       </view>

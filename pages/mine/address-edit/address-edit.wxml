@@ -32,22 +32,22 @@
   </view>
 
 
-<!-- 合并：所在地区（点击地图定位后直接写在这一行） -->
+<!-- 地图定位 -->
 <view class="form-item" bindtap="chooseLocation">
-  <view class="form-label">所在地区</view>
-  <view class="form-value {{form.poiAddress ? '' : 'placeholder'}}">
-    {{form.poiAddress || '点击地图选择定位'}}
+  <view class="form-label">地图定位</view>
+  <view class="form-value {{form.address ? '' : 'placeholder'}}">
+    {{form.address || '点击地图选择定位'}}
   </view>
 </view>
 
 
   <view class="form-item">
-    <view class="form-label">详细地址</view>
+    <view class="form-label">完整地址</view>
     <input
       class="form-input"
-      placeholder="单元楼、门牌号等"
-      value="{{form.detail}}"
-      bindinput="onInputDetail"
+      placeholder="可手动补充完整地址"
+      value="{{form.address}}"
+      bindinput="onInputAddress"
     />
   </view>
 

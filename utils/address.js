@@ -11,6 +11,8 @@ function buildFullAddress(addr) {
   if (!addr) return '';
   const a = safeStr(addr.address);
   if (a) return a;
+  const f = safeStr(addr.fullAddress);
+  if (f) return f;
   return [safeStr(addr.region), safeStr(addr.detail)].filter(Boolean).join(' ');
 }
 
@@ -49,8 +51,6 @@ function pickAddressForUpsert(addr) {
     id,
     name: addr.name,
     phone: addr.phone,
-    region: addr.region,
-    detail: addr.detail,
     address: buildFullAddress(addr),
     lat: ll ? ll.lat : undefined,
     lng: ll ? ll.lng : undefined,
