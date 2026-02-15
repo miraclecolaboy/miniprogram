@@ -119,6 +119,19 @@ page {
   transform: translateY(-8rpx); /* 微调对齐 */
 }
 
+.btn-history {
+  margin-left: 24rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  padding: 0 24rpx;
+  background: var(--black);
+  color: #FFFFFF;
+  font-size: 22rpx;
+  border-radius: 24rpx;
+  font-weight: 600;
+  transform: translateY(-10rpx);
+}
+
 /* ============================
    2. 内容区域 (列表)
    ============================ */

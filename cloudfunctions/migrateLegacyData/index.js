@@ -125,12 +125,33 @@ function normalizeRefund(refund) {
   if (!isObj(refund)) return null;
   const out = { ...refund };
   const st = toStr(out.status).toLowerCase();
-  if (st === 'pending' || st === 'request' || st === 'requested') out.status = 'applied';
-  else if (st === 'approve' || st === 'approved' || st === 'refund_success' || st === 'refunded') out.status = 'success';
-  else if (st === 'approving') out.status = 'processing';
-  else if (st === 'approve_failed') out.status = 'failed';
-  else if (st === 'reject') out.status = 'rejected';
-  else if (st === 'cancel' || st === 'canceled') out.status = 'cancelled';
+  const gatewayState = toStr(
+    out.refundStatus ||
+    out.refund_status ||
+    out.resultCode ||
+    out.tradeState ||
+    out.trade_state
+  ).toUpperCase();
+
+  if (st === 'pending' || st === 'request' || st === 'requested' || st === 'applied') {
+    out.status = 'applied';
+  } else if (st === 'approve' || st === 'approved' || st === 'approving' || st === 'processing') {
+    if (gatewayState === 'SUCCESS') out.status = 'success';
+    else if (!gatewayState || gatewayState === 'PROCESSING' || gatewayState === 'PENDING') out.status = 'processing';
+    else out.status = 'rejected';
+  } else if (st === 'refund_success' || st === 'refunded' || st === 'success') {
+    out.status = 'success';
+  } else if (st === 'approve_failed' || st === 'failed') {
+    out.status = 'rejected';
+  } else if (st === 'reject' || st === 'rejected') {
+    out.status = 'rejected';
+  } else if (st === 'cancel' || st === 'canceled' || st === 'cancelled') {
+    out.status = 'cancelled';
+  } else if (!st && gatewayState) {
+    if (gatewayState === 'SUCCESS') out.status = 'success';
+    else if (gatewayState === 'PROCESSING' || gatewayState === 'PENDING') out.status = 'processing';
+    else out.status = 'rejected';
+  }
 
   if (!toNum(out.appliedAt, 0) && toNum(out.applyAt, 0) > 0) out.appliedAt = toNum(out.applyAt, 0);
   if (!toNum(out.refundedAt, 0) && toNum(out.handleAt, 0) > 0 && toStr(out.status).toLowerCase() === 'success') {
