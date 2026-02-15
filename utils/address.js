@@ -13,7 +13,9 @@ function buildFullAddress(addr) {
   if (a) return a;
   const f = safeStr(addr.fullAddress);
   if (f) return f;
-  return [safeStr(addr.region), safeStr(addr.detail)].filter(Boolean).join(' ');
+  const base = safeStr(addr.baseAddress || addr.poiAddress || addr.region);
+  const detail = safeStr(addr.detail);
+  return [base, detail].filter(Boolean).join(' ');
 }
 
 function normalizeAddress(addr) {

@@ -48,6 +48,15 @@ function pickFullAddressFromLocation(res) {
   return s([addr, name].filter(Boolean).join(' ')) || addr || name;
 }
 
+function removeSuffix(text, suffix) {
+  const t = s(text);
+  const sfx = s(suffix);
+  if (!t || !sfx) return t;
+  if (t === sfx) return '';
+  if (!t.endsWith(sfx)) return t;
+  return s(t.slice(0, t.length - sfx.length));
+}
+
 Page({
   data: {
     pageTitle: '新增地址',
@@ -55,7 +64,8 @@ Page({
       id: null,
       name: '',
       phone: '',
-      address: '',
+      baseAddress: '',
+      detail: '',
       isDefault: false,
       lat: null,
       lng: null,
@@ -73,7 +83,15 @@ Page({
       const legacyRegion = s(a.region);
       const legacyDetail = s(a.detail);
       const legacyFull = s([legacyRegion, legacyDetail].filter(Boolean).join(' '));
-      const address = s(a.address || a.fullAddress || a.poiAddress || a.baseAddress || legacyFull);
+      const fullAddress = s(a.address || a.fullAddress || a.poiAddress || a.baseAddress || legacyFull);
+      const detail = s(a.detail);
+      const baseAddress = s(
+        a.baseAddress
+          || a.poiAddress
+          || a.region
+          || removeSuffix(fullAddress, detail)
+          || fullAddress
+      );
 
       this.setData({
         pageTitle: '编辑地址',
@@ -81,7 +99,8 @@ Page({
           id: a.id || a._id || null,
           name: s(a.name),
           phone: s(a.phone),
-          address,
+          baseAddress,
+          detail,
           isDefault: !!a.isDefault,
           lat: toNum(a.lat ?? a.latitude ?? a.location?.lat, null),
           lng: toNum(a.lng ?? a.longitude ?? a.location?.lng, null),
@@ -98,8 +117,8 @@ Page({
     this.setData({ 'form.phone': e.detail.value });
   },
 
-  onInputAddress(e) {
-    this.setData({ 'form.address': e.detail.value });
+  onInputDetail(e) {
+    this.setData({ 'form.detail': e.detail.value });
   },
 
   onToggleDefault(e) {
@@ -134,9 +153,9 @@ Page({
       return;
     }
 
-    const address = pickFullAddressFromLocation(res);
+    const baseAddress = pickFullAddressFromLocation(res);
     const patch = {
-      'form.address': address,
+      'form.baseAddress': baseAddress,
     };
 
     const lat = toNum(res && res.latitude, null);
@@ -156,15 +175,17 @@ Page({
     const id = this.data.form.id || genId();
     const name = s(this.data.form.name);
     const phone = s(this.data.form.phone);
-    const address = s(this.data.form.address);
+    const baseAddress = s(this.data.form.baseAddress);
+    const detail = s(this.data.form.detail);
+    const address = s([baseAddress, detail].filter(Boolean).join(' '));
 
     if (!name || !phone) {
       wx.showToast({ title: '请填写收货人和手机号', icon: 'none' });
       this._saving = false;
       return;
     }
-    if (!address) {
-      wx.showToast({ title: '请填写完整地址', icon: 'none' });
+    if (!baseAddress) {
+      wx.showToast({ title: '请先选择定位位置', icon: 'none' });
       this._saving = false;
       return;
     }

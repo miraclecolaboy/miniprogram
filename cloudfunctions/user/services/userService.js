@@ -36,8 +36,6 @@ async function _listAddresses(openid, limit = 50) {
         name: String(x.name || '').trim(),
         phone: String(x.phone || '').trim(),
         address: addressText,
-        region,
-        detail,
         ...(hasLL ? { lat, lng } : {}),
         createdAt: Number(x.createdAt || 0),
         updatedAt: Number(x.updatedAt || 0),
@@ -237,8 +235,6 @@ async function upsertAddress(event, openid) {
     id, 
     name: String(addr.name || '').trim(), 
     phone: String(addr.phone || '').trim(),
-    region: String(addr.region || '').trim(),
-    detail: String(addr.detail || '').trim(),
     address: String(addr.address || '').trim(),
     ...(hasLL ? { lat, lng } : {}),
     createdAt: tNow, 
@@ -249,7 +245,13 @@ async function upsertAddress(event, openid) {
   const idx = addresses.findIndex(x => String(x.id || x._id) === id);
   if (idx >= 0) {
     nextItem.createdAt = addresses[idx].createdAt || tNow; // 保持创建时间
-    addresses[idx] = { ...addresses[idx], ...nextItem };
+    const oldItem = addresses[idx] || {};
+    const { region: _region, detail: _detail, baseAddress: _baseAddress, poiAddress: _poiAddress, ...rest } = oldItem;
+    void _region;
+    void _detail;
+    void _baseAddress;
+    void _poiAddress;
+    addresses[idx] = { ...rest, ...nextItem };
   } else {
     addresses.unshift(nextItem);
   }

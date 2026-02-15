@@ -35,19 +35,19 @@
 <!-- 地图定位 -->
 <view class="form-item" bindtap="chooseLocation">
   <view class="form-label">地图定位</view>
-  <view class="form-value {{form.address ? '' : 'placeholder'}}">
-    {{form.address || '点击地图选择定位'}}
+  <view class="form-value {{form.baseAddress ? '' : 'placeholder'}}">
+    {{form.baseAddress || '点击地图选择定位'}}
   </view>
 </view>
 
 
   <view class="form-item">
-    <view class="form-label">完整地址</view>
+    <view class="form-label">补充信息</view>
     <input
       class="form-input"
-      placeholder="可手动补充完整地址"
-      value="{{form.address}}"
-      bindinput="onInputAddress"
+      placeholder="楼栋、门牌号等"
+      value="{{form.detail}}"
+      bindinput="onInputDetail"
     />
   </view>
 
