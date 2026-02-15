@@ -118,9 +118,18 @@ Page({
 
   // 复制订单号
   copyOrderId() {
-    if (this.data.order?.orderNo) {
-      wx.setClipboardData({ data: this.data.order.orderNo });
+    const orderNo = String(this.data.order?.orderNo || '').trim();
+    if (!orderNo) return;
+    wx.setClipboardData({ data: orderNo });
+  },
+
+  copyExpressNo() {
+    const expressNo = String(this.data.order?.expressNo || '').trim();
+    if (!expressNo) {
+      wx.showToast({ title: '暂无快递单号', icon: 'none' });
+      return;
     }
+    wx.setClipboardData({ data: expressNo });
   },
 
   // 联系商家/客服

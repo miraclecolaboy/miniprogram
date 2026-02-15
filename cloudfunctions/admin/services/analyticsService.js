@@ -92,6 +92,20 @@ function isBalanceOrder(order) {
   return safeStr(order?.payment?.method).toLowerCase() === 'balance';
 }
 
+function normalizeRechargeScene(recharge) {
+  const scene = safeStr(recharge?.scene).toLowerCase();
+  if (scene === 'recharge' || scene === 'order_pay' || scene === 'refund_balance') {
+    return scene;
+  }
+  const amount = toNum(recharge?.amount, 0);
+  if (amount < 0) return 'order_pay';
+  return 'recharge';
+}
+
+function isRechargeTopup(recharge) {
+  return normalizeRechargeScene(recharge) === 'recharge';
+}
+
 function resolveOrderTimeWindow(input = {}) {
   const nowTs = now();
   const todayStart = dayStart(nowTs);
@@ -268,6 +282,7 @@ async function getOverview(input = {}) {
         _id: true,
         openid: true,
         status: true,
+        scene: true,
         amount: true,
       },
     }),
@@ -318,6 +333,7 @@ async function getOverview(input = {}) {
   const paidRechargeByOpenid = new Map();
   for (const recharge of rechargesResult.list) {
     if (safeStr(recharge?.status).toLowerCase() !== 'paid') continue;
+    if (!isRechargeTopup(recharge)) continue;
     const openid = safeStr(recharge?.openid);
     if (!openid) continue;
     const amount = Math.max(0, toNum(recharge?.amount, 0));
@@ -336,7 +352,9 @@ async function getOverview(input = {}) {
       toNum(user?.totalRecharge, toNum(user?.totalRechargeAmount, 0))
     );
     const totalRechargeFromLogs = Math.max(0, toNum(paidRechargeByOpenid.get(openid), 0));
-    const totalRecharge = round2(Math.max(totalRechargeFromUser, totalRechargeFromLogs));
+    const totalRecharge = totalRechargeFromLogs > 0
+      ? round2(totalRechargeFromLogs)
+      : round2(totalRechargeFromUser);
 
     if (totalRecharge <= 0) continue;
 
@@ -440,6 +458,7 @@ async function getBalanceLogs(openidInput, limitInput) {
         _id: true,
         outTradeNo: true,
         status: true,
+        scene: true,
         amount: true,
         createdAt: true,
         paidAt: true,
@@ -456,6 +475,7 @@ async function getBalanceLogs(openidInput, limitInput) {
 
   for (const recharge of rechargesResult.list) {
     if (safeStr(recharge?.status).toLowerCase() !== 'paid') continue;
+    if (!isRechargeTopup(recharge)) continue;
     const amount = round2(Math.max(0, toNum(recharge?.amount, 0)));
     if (amount <= 0) continue;
 

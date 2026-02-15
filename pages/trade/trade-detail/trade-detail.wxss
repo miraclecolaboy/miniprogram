@@ -137,6 +137,21 @@ page {
 .addr-detail-box { margin-top: 12rpx; }
 .addr-detail, .addr-text { font-size: 26rpx; color: #666; line-height: 1.5; }
 .addr-user { margin-top: 8rpx; font-size: 26rpx; color: #333; font-weight: 600; }
+.addr-express-row {
+  margin-top: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.addr-express-label {
+  font-size: 24rpx;
+  color: #999;
+}
+.addr-express-no {
+  font-size: 24rpx;
+  color: #333;
+  font-weight: 600;
+}
 
 /* C. 商品列表 */
 .goods-item { display: flex; margin-bottom: 32rpx; }

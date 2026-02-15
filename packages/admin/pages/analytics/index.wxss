@@ -263,9 +263,14 @@
   color: var(--text-main);
 }
 
+.metric-col-action {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: var(--primary);
+}
+
 .row-right {
-  display: flex;
-  justify-content: flex-end;
+  display: none;
   margin-top: 22rpx;
 }
 

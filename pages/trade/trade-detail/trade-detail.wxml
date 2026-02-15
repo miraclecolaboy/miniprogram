@@ -50,6 +50,13 @@
         <block wx:else>
           <view class="addr-text">{{order.shippingInfo.address || order.shippingInfo.fullAddress || ((order.shippingInfo.region || '') + (order.shippingInfo.detail || ''))}}</view>
           <view class="addr-user">{{order.shippingInfo.name}} {{order.shippingInfo.phone}}</view>
+          <view class="addr-express-row" wx:if="{{order.mode === 'kuaidi' && order.expressNo}}">
+            <text class="addr-express-label">快递单号</text>
+            <view class="info-right" catchtap="copyExpressNo">
+              <text class="addr-express-no">{{order.expressNo}}</text>
+              <text class="copy-btn">复制</text>
+            </view>
+          </view>
         </block>
       </view>
     </view>

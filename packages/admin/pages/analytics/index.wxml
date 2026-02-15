@@ -3,8 +3,8 @@
 
     <view class="page-header row-between">
       <view class="header-left">
-        <view class="page-title">店铺数据</view>
-        <view class="page-sub">按标签查看店铺数据、充值用户和订单数据</view>
+        <view class="page-title">数据统计</view>
+        <view class="page-sub">按标签查看充值用户和订单数据</view>
       </view>
       <view class="btn btn-outline btn-mini {{loading ? 'btn-disabled' : ''}}" bindtap="onReloadTap">
         {{loading ? '加载中...' : '刷新数据'}}
@@ -77,6 +77,14 @@
               <view class="metric-col">
                 <view class="metric-col-label">余额</view>
                 <view class="metric-col-value">{{item.balanceText}}</view>
+                <view
+                  class="metric-col-action"
+                  data-openid="{{item.openid}}"
+                  data-name="{{item.userName}}"
+                  bindtap="onBalanceQueryTap"
+                >
+                  查询余额流水
+                </view>
               </view>
             </view>
 

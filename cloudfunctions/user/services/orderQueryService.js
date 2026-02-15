@@ -114,6 +114,7 @@ async function _mapOrderForView(order) {
     refund: refundView,
     pickupInfo: order.pickupInfo || {},
     shippingInfo: order.shippingInfo || {},
+    expressNo: String(order.expressNo || '').trim(),
     remark: order.remark || '',
     storeName: order.storeName || '',
     pointsEarn: order.pointsEarn || 0,

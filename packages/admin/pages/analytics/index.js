@@ -2,7 +2,6 @@ const { requireLogin } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
 
 const TAB_OPTIONS = [
-  { key: 'store', label: '店铺数据' },
   { key: 'recharge', label: '充值用户' },
   { key: 'order', label: '订单数据' },
 ];
@@ -44,7 +43,7 @@ function todayText() {
 Page({
   data: {
     tabOptions: TAB_OPTIONS,
-    activeTab: 'store',
+    activeTab: 'recharge',
 
     orderTimeOptions: ORDER_TIME_OPTIONS,
     orderTimeType: 'today',
@@ -247,12 +246,13 @@ Page({
   _formatRechargeUsers(list) {
     const arr = Array.isArray(list) ? list : [];
     return arr.map((item) => ({
+      memberLevel: Math.max(0, Number(item?.memberLevel || 0)),
       openid: String(item?.openid || ''),
       userName: String(item?.userName || '未知用户'),
       phone: String(item?.phone || '-'),
       totalRechargeText: `¥${formatNumber(item?.totalRecharge, 2)}`,
       balanceText: `¥${formatNumber(item?.balance, 2)}`,
-      memberLevelText: String(item?.memberLevelLabel || '普通会员'),
+      memberLevelText: `lv.${Math.max(0, Number(item?.memberLevel || 0))}会员`,
     }));
   },
 
@@ -304,9 +304,10 @@ Page({
       const data = res.data;
       const user = data.user || {};
       const logs = Array.isArray(data.logs) ? data.logs : [];
+      const memberLevel = Math.max(0, Number(user.memberLevel || 0));
 
       this.setData({
-        balancePopupMeta: `${user.memberLevelLabel || '普通会员'} · 当前余额 ¥${formatNumber(user.balance, 2)}`,
+        balancePopupMeta: `lv.${memberLevel}会员 · 当前余额 ¥${formatNumber(user.balance, 2)}`,
         balanceLogs: logs.map((item) => {
           const delta = Number(item?.delta || 0);
           const absText = formatNumber(Math.abs(delta), 2);
