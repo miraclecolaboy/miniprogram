@@ -93,7 +93,8 @@ Page({
           scene: it.scene,
           sceneText: sceneText(it.scene),
           timeText: fmtTime(it.createdAt),
-          amountText: `${amt >= 0 ? '+' : ''}${fmtMoney(amt)}`,
+          amount: amt,
+          amountText: amt < 0 ? `-${fmtMoney(Math.abs(amt))}` : fmtMoney(amt),
           amountClass: amt >= 0 ? 'plus' : 'minus',
         };
       });

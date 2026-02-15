@@ -3,6 +3,7 @@ const cloud = require('wx-server-sdk');
 const {
   COL_USERS,
   COL_SHOP_CONFIG,
+  COL_ORDERS,
   COL_RECHARGES,
   WX_PAY_CALLBACK_FN,
   FORCE_ENV_ID,
@@ -21,6 +22,51 @@ function toInt(v, d = 0) {
 
 function safeStr(v) {
   return String(v == null ? '' : v).trim();
+}
+
+function round2(v) {
+  const n = Number(v || 0);
+  if (!Number.isFinite(n)) return 0;
+  return Number(n.toFixed(2));
+}
+
+function isPaidOrder(order) {
+  return safeStr(order && order.payment && order.payment.status).toLowerCase() === 'paid';
+}
+
+function isBalanceOrder(order) {
+  return safeStr(order && order.payment && order.payment.method).toLowerCase() === 'balance';
+}
+
+function isRefundSuccess(order) {
+  const st = safeStr(order && order.refund && order.refund.status).toLowerCase();
+  return st === 'success' || st === 'refunded';
+}
+
+async function scanByOpenid(collectionName, openid, options = {}) {
+  const oid = safeStr(openid);
+  if (!oid) return [];
+
+  const pageSize = Math.min(100, Math.max(1, toInt(options.pageSize, 100)));
+  const maxDocs = Math.min(5000, Math.max(pageSize, toInt(options.maxDocs, 2000)));
+  const field = options.field && typeof options.field === 'object' ? options.field : null;
+
+  const out = [];
+  let skip = 0;
+  while (skip < maxDocs) {
+    let q = db.collection(collectionName).where({ openid: oid });
+    if (field) q = q.field(field);
+
+    const limit = Math.min(pageSize, maxDocs - skip);
+    const res = await q.skip(skip).limit(limit).get();
+    const list = Array.isArray(res && res.data) ? res.data : [];
+    if (!list.length) break;
+
+    out.push(...list);
+    skip += list.length;
+    if (list.length < limit) break;
+  }
+  return out;
 }
 
 function yuanToFen(amountYuan) {
@@ -348,17 +394,111 @@ async function confirmRechargePaid(rechargeId, openid) {
 }
 
 async function listRecharges(openid, event = {}) {
-  const scene = safeStr(event.scene);
-  const limit = Math.min(200, Math.max(1, toInt(event.limit, 50)));
-  // Only show settled logs by default.
-  const where = { openid: safeStr(openid), status: 'paid' };
-  if (scene) where.scene = scene;
-  if (event && event.includeAll) delete where.status;
+  const oid = safeStr(openid);
+  if (!oid) return { data: [] };
+
+  const sceneRaw = safeStr(event && event.scene);
+  const scene = ['recharge', 'order_pay', 'refund_balance'].includes(sceneRaw) ? sceneRaw : '';
+  const limit = Math.min(200, Math.max(1, toInt(event && event.limit, 50)));
+  const includeAll = !!(event && event.includeAll);
+
+  const needRecharge = scene === '' || scene === 'recharge';
+  const needOrderPay = scene === '' || scene === 'order_pay';
+  const needRefund = scene === '' || scene === 'refund_balance';
+
+  const logs = [];
 
   try {
-    const r = await db.collection(COL_RECHARGES).where(where).orderBy('createdAt', 'desc').limit(limit).get();
-    return { data: r.data || [] };
-  } catch (_) {
+    if (needRecharge) {
+      const rechargeDocs = await scanByOpenid(COL_RECHARGES, oid, {
+        field: {
+          _id: true,
+          openid: true,
+          outTradeNo: true,
+          amount: true,
+          scene: true,
+          status: true,
+          createdAt: true,
+          paidAt: true,
+          updatedAt: true,
+        },
+      });
+
+      rechargeDocs.forEach((doc) => {
+        const status = safeStr(doc && doc.status).toLowerCase();
+        if (!includeAll && status !== 'paid') return;
+
+        const amount = round2(Math.max(0, toNum(doc && doc.amount, 0)));
+        if (amount <= 0) return;
+
+        logs.push({
+          _id: safeStr(doc && doc._id) || `recharge_${logs.length + 1}`,
+          scene: 'recharge',
+          amount,
+          createdAt: Number(doc && (doc.paidAt || doc.createdAt || doc.updatedAt) || 0),
+          outTradeNo: safeStr(doc && doc.outTradeNo),
+          status,
+        });
+      });
+    }
+
+    if (needOrderPay || needRefund) {
+      const orderDocs = await scanByOpenid(COL_ORDERS, oid, {
+        field: {
+          _id: true,
+          openid: true,
+          orderNo: true,
+          amount: true,
+          payment: true,
+          refund: true,
+          createdAt: true,
+          paidAt: true,
+          updatedAt: true,
+        },
+      });
+
+      orderDocs.forEach((order) => {
+        if (!isBalanceOrder(order)) return;
+        const orderNo = safeStr(order && order.orderNo);
+        const total = round2(Math.max(0, toNum(order && order.amount && order.amount.total, 0)));
+        if (total <= 0) return;
+
+        if (needOrderPay && (includeAll || isPaidOrder(order))) {
+          logs.push({
+            _id: `order_pay_${safeStr(order && order._id) || orderNo || logs.length + 1}`,
+            scene: 'order_pay',
+            amount: -total,
+            createdAt: Number(order && (order.payment && order.payment.paidAt || order.paidAt || order.createdAt || order.updatedAt) || 0),
+            orderNo,
+            status: isPaidOrder(order) ? 'paid' : safeStr(order && order.status),
+          });
+        }
+
+        if (needRefund && isRefundSuccess(order)) {
+          const refundAmount = round2(Math.max(0, toNum(order && order.refund && order.refund.amount, total)));
+          if (refundAmount <= 0) return;
+          logs.push({
+            _id: `refund_balance_${safeStr(order && order._id) || orderNo || logs.length + 1}`,
+            scene: 'refund_balance',
+            amount: refundAmount,
+            createdAt: Number(order && (order.refund && (order.refund.refundedAt || order.refund.handleAt) || order.updatedAt || order.createdAt) || 0),
+            orderNo,
+            status: safeStr(order && order.refund && order.refund.status),
+          });
+        }
+      });
+    }
+
+    logs.sort((a, b) => {
+      const t1 = Number(a && a.createdAt || 0);
+      const t2 = Number(b && b.createdAt || 0);
+      if (t2 !== t1) return t2 - t1;
+      return Number(b && b.amount || 0) - Number(a && a.amount || 0);
+    });
+
+    return { data: logs.slice(0, limit) };
+  } catch (e) {
+    console.error('[recharge] listRecharges error', e);
     return { data: [] };
   }
 }
