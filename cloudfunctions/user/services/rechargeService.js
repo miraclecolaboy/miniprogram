@@ -405,11 +405,12 @@ async function listRecharges(openid, event = {}) {
   const needRecharge = scene === '' || scene === 'recharge';
   const needOrderPay = scene === '' || scene === 'order_pay';
   const needRefund = scene === '' || scene === 'refund_balance';
+  const needRechargeDocScan = needRecharge || needOrderPay || needRefund;
 
   const logs = [];
 
   try {
-    if (needRecharge) {
+    if (needRechargeDocScan) {
       const rechargeDocs = await scanByOpenid(COL_RECHARGES, oid, {
         field: {
           _id: true,
@@ -425,15 +426,25 @@ async function listRecharges(openid, event = {}) {
       });
 
       rechargeDocs.forEach((doc) => {
-        const status = safeStr(doc && doc.status).toLowerCase();
-        if (!includeAll && status !== 'paid') return;
+        const amountRaw = round2(toNum(doc && doc.amount, 0));
+        if (!amountRaw) return;
 
-        const amount = round2(Math.max(0, toNum(doc && doc.amount, 0)));
-        if (amount <= 0) return;
+        const status = safeStr(doc && doc.status).toLowerCase();
+        if (!includeAll && status && status !== 'paid') return;
+
+        let docScene = safeStr(doc && doc.scene).toLowerCase();
+        if (!['recharge', 'order_pay', 'refund_balance'].includes(docScene)) {
+          docScene = amountRaw < 0 ? 'order_pay' : 'recharge';
+        }
+        if (scene && docScene !== scene) return;
+
+        let amount = amountRaw;
+        if (docScene === 'order_pay') amount = -Math.abs(amountRaw);
+        else amount = Math.abs(amountRaw);
 
         logs.push({
           _id: safeStr(doc && doc._id) || `recharge_${logs.length + 1}`,
-          scene: 'recharge',
+          scene: docScene,
           amount,
           createdAt: Number(doc && (doc.paidAt || doc.createdAt || doc.updatedAt) || 0),
           outTradeNo: safeStr(doc && doc.outTradeNo),

@@ -125,8 +125,17 @@ function normalizeRefund(refund) {
   if (!isObj(refund)) return null;
   const out = { ...refund };
   const st = toStr(out.status).toLowerCase();
-  if (st === 'pending') out.status = 'applied';
+  if (st === 'pending' || st === 'request' || st === 'requested') out.status = 'applied';
+  else if (st === 'approve' || st === 'approved' || st === 'refund_success' || st === 'refunded') out.status = 'success';
+  else if (st === 'approving') out.status = 'processing';
+  else if (st === 'approve_failed') out.status = 'failed';
+  else if (st === 'reject') out.status = 'rejected';
+  else if (st === 'cancel' || st === 'canceled') out.status = 'cancelled';
+
   if (!toNum(out.appliedAt, 0) && toNum(out.applyAt, 0) > 0) out.appliedAt = toNum(out.applyAt, 0);
+  if (!toNum(out.refundedAt, 0) && toNum(out.handleAt, 0) > 0 && toStr(out.status).toLowerCase() === 'success') {
+    out.refundedAt = toNum(out.handleAt, 0);
+  }
   return out;
 }
 
@@ -179,13 +188,19 @@ function buildOrderPayment(doc, nextAmount, nextStatus) {
   if (method === 'wxpay' || method === 'wechatpay') method = 'wechat';
   if (!method) {
     if (toNum(nextAmount.total, 0) <= 0) method = 'free';
-    else if (toStr(legacy.type).toLowerCase() === 'balance' || toStr(doc.payMethod).toLowerCase() === 'balance') method = 'balance';
+    else if (
+      toStr(legacy.type).toLowerCase() === 'balance' ||
+      toStr(doc.payMethod).toLowerCase() === 'balance' ||
+      Number.isFinite(Number(doc.balanceBeforePay)) ||
+      Number.isFinite(Number(doc.balanceAfterPay))
+    ) method = 'balance';
     else method = 'wechat';
   }
 
   let status = toStr(current.status || legacy.status).toLowerCase();
   if (status === 'created') status = 'pending';
   if (status === 'success') status = 'paid';
+  if (status === 'done' || status === 'completed') status = 'paid';
   if (!status) status = ORDER_STATUS_PAID_LIKE.has(nextStatus) || toNum(doc.paidAt, 0) > 0 ? 'paid' : 'pending';
 
   const paidAt = toNum(current.paidAt, 0) || toNum(legacy.paidAt, 0) || toNum(doc.paidAt, 0);
@@ -371,18 +386,33 @@ function buildRechargePatch(doc, nowTs) {
   );
   if (openid && openid !== toStr(doc.openid)) patch.openid = openid;
 
+  const rawScene = toStr(doc.scene).toLowerCase();
+  const amount0 = pickFiniteNum(doc.amount, doc.amountExpected, doc.totalAmount, doc.value);
+  const amountAbs = Number.isFinite(amount0) ? round2(Math.abs(amount0)) : NaN;
+  const amountSigned = Number.isFinite(amount0) ? round2(amount0) : NaN;
+
+  let scene = rawScene;
+  if (!scene || !['recharge', 'order_pay', 'refund_balance'].includes(scene)) {
+    if (Number.isFinite(amountSigned) && amountSigned < 0) scene = 'order_pay';
+    else scene = 'recharge';
+  }
+  if (scene !== rawScene) patch.scene = scene;
+
   const status = toStr(doc.status).toLowerCase();
-  if (status === 'success') patch.status = 'paid';
+  let nextStatus = status;
+  if (status === 'success' || status === 'approved' || status === 'done') nextStatus = 'paid';
+  if (!nextStatus) nextStatus = 'paid';
+  if (nextStatus !== status) patch.status = nextStatus;
 
   const outTradeNo = toStr(doc.outTradeNo || doc.bizId);
   if (outTradeNo && outTradeNo !== toStr(doc.outTradeNo)) patch.outTradeNo = outTradeNo;
 
-  const amount = Number.isFinite(Number(doc.amount)) ? Number(doc.amount) : Number(doc.amountExpected);
-  if (Number.isFinite(amount) && Number(doc.amount) !== Number(amount.toFixed(2))) {
-    patch.amount = Number(amount.toFixed(2));
+  if (Number.isFinite(amountAbs) && round2(doc.amount) !== amountAbs) {
+    patch.amount = amountAbs;
   }
 
-  if (toStr((patch.status || status)) === 'paid') {
+  const finalStatus = toStr(patch.status || status).toLowerCase();
+  if (finalStatus === 'paid') {
     if (!toNum(doc.paidAt, 0)) patch.paidAt = toNum(doc.updatedAt, 0) || toNum(doc.createdAt, 0) || nowTs;
     if (!toStr(doc.statusText)) patch.statusText = '已到账';
   }
