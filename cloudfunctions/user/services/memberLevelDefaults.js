@@ -13,15 +13,15 @@ const DEFAULT_MEMBER_COUPON_TEMPLATES = [
 ];
 
 // 每个等级礼包仅发放一次（跨级时补发缺失等级礼包）
-// Lv1: 2张5元
-// Lv2: 3张5元 + 1张10元
-// Lv3: 5张5元 + 1张20元
-// Lv4: 5张10元 + 2张20元
+// Lv1: 1张5元
+// Lv2: 2张5元
+// Lv3: 1张5元 + 1张10元
+// Lv4: 2张5元 + 1张10元
 const DEFAULT_MEMBER_LEVELS = [
-  { level: 1, threshold: 100, coupons: [{ couponId: 'coupon_member_5', count: 2 }] },
-  { level: 2, threshold: 300, coupons: [{ couponId: 'coupon_member_5', count: 3 }, { couponId: 'coupon_member_10', count: 1 }] },
-  { level: 3, threshold: 500, coupons: [{ couponId: 'coupon_member_5', count: 5 }, { couponId: 'coupon_member_20', count: 1 }] },
-  { level: 4, threshold: 1000, coupons: [{ couponId: 'coupon_member_10', count: 5 }, { couponId: 'coupon_member_20', count: 2 }] },
+  { level: 1, threshold: 100, coupons: [{ couponId: 'coupon_member_5', count: 1 }] },
+  { level: 2, threshold: 300, coupons: [{ couponId: 'coupon_member_5', count: 2 }] },
+  { level: 3, threshold: 500, coupons: [{ couponId: 'coupon_member_5', count: 1 }, { couponId: 'coupon_member_10', count: 1 }] },
+  { level: 4, threshold: 1000, coupons: [{ couponId: 'coupon_member_5', count: 2 }, { couponId: 'coupon_member_10', count: 1 }] },
 ];
 
 function _isSeededV1MemberLevels(levels) {
@@ -44,6 +44,35 @@ function _isSeededV1MemberLevels(levels) {
     const c0 = cs[0] || {};
     if (String(c0.couponId || '') !== e.couponId) return false;
     if (Number(c0.count) !== e.count) return false;
+  }
+
+  return true;
+}
+
+function _isSeededV2MemberLevels(levels) {
+  const arr = Array.isArray(levels) ? levels : [];
+  if (arr.length !== 4) return false;
+
+  const expect = [
+    { level: 1, threshold: 100, coupons: [{ couponId: 'coupon_member_5', count: 2 }] },
+    { level: 2, threshold: 300, coupons: [{ couponId: 'coupon_member_5', count: 3 }, { couponId: 'coupon_member_10', count: 1 }] },
+    { level: 3, threshold: 500, coupons: [{ couponId: 'coupon_member_5', count: 5 }, { couponId: 'coupon_member_20', count: 1 }] },
+    { level: 4, threshold: 1000, coupons: [{ couponId: 'coupon_member_10', count: 5 }, { couponId: 'coupon_member_20', count: 2 }] },
+  ];
+
+  for (const e of expect) {
+    const it = arr.find(x => Number(x?.level) === e.level);
+    if (!it) return false;
+    if (Number(it.threshold) !== e.threshold) return false;
+
+    const cs = Array.isArray(it.coupons) ? it.coupons : [];
+    if (cs.length !== e.coupons.length) return false;
+
+    for (const ec of e.coupons) {
+      const got = cs.find((x) => String(x?.couponId || x?._id || x?.id || '') === ec.couponId);
+      if (!got) return false;
+      if (Number(got.count) !== ec.count) return false;
+    }
   }
 
   return true;
@@ -113,8 +142,10 @@ async function ensureMemberLevelDefaults(db, nowTs) {
   const main = mainGot && mainGot.data ? mainGot.data : null;
   const hasLevels = !!(main && Array.isArray(main.memberLevels) && main.memberLevels.length > 0);
 
-  // If main already has our old (v1) default, upgrade it to the new default.
-  const shouldPatchLevels = !hasLevels || _isSeededV1MemberLevels(main && main.memberLevels);
+  // If main already has our old seeded defaults (v1/v2), upgrade it to the new default.
+  const shouldPatchLevels = !hasLevels
+    || _isSeededV1MemberLevels(main && main.memberLevels)
+    || _isSeededV2MemberLevels(main && main.memberLevels);
   if (shouldPatchLevels) {
     const patch = { memberLevels: getDefaultMemberLevels(), updatedAt: tNow };
     if (main) {

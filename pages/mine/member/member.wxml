@@ -33,7 +33,7 @@
       <view class="rule-dot"></view>
       <view class="rule-content">
         <text class="rule-title">累计充值 100元 升级 Lv1</text>
-        <view class="gift-highlight">赠送 5元无门槛券 x2</view>
+        <view class="gift-highlight">赠送 5元无门槛券 x1</view>
       </view>
     </view>
 
@@ -41,7 +41,7 @@
       <view class="rule-dot"></view>
       <view class="rule-content">
         <text class="rule-title">累计充值 300元 升级 Lv2</text>
-        <view class="gift-highlight">赠送 5元无门槛券 x3 + 10元无门槛券 x1</view>
+        <view class="gift-highlight">赠送 5元无门槛券 x2</view>
       </view>
     </view>
 
@@ -49,7 +49,7 @@
       <view class="rule-dot"></view>
       <view class="rule-content">
         <text class="rule-title">累计充值 500元 升级 Lv3</text>
-        <view class="gift-highlight">赠送 5元无门槛券 x5 + 20元无门槛券 x1</view>
+        <view class="gift-highlight">赠送 5元无门槛券 x1 + 10元无门槛券 x1</view>
       </view>
     </view>
 
@@ -65,7 +65,7 @@
         
         <view class="gift-row">
           <text class="tag">升级礼包</text>
-          <text>10元无门槛券 x5 + 20元无门槛券 x2</text>
+          <text>5元无门槛券 x2 + 10元无门槛券 x1</text>
         </view>
       </view>
     </view>
