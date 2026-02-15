@@ -126,7 +126,7 @@ page {
 }
 
 .next-tip-gold {
-  color: rgba(227, 191, 135, 0.9);
+  color: #FFFFFF;
   font-weight: 500;
 }
 

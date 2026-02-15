@@ -272,15 +272,31 @@
   color: var(--text-main);
 }
 
-.metric-col-action {
-  margin-top: 12rpx;
-  font-size: 22rpx;
-  color: var(--primary);
+.metric-col-balance-row {
+  margin-top: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
 }
 
-.row-right {
-  display: none;
-  margin-top: 22rpx;
+.metric-col-balance-row .metric-col-value {
+  margin-top: 0;
+}
+
+.balance-log-btn {
+
+  padding: 20rpx 20rpx;
+  border-radius: 20rpx;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 20rpx;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.balance-log-btn:active {
+  opacity: 0.82;
 }
 
 .remark-block {

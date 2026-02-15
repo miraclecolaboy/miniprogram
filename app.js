@@ -47,6 +47,10 @@ App({
       return;
     }
 
+    if (currentRoute === 'pages/mine/mine') {
+      return;
+    }
+
     // 4. 确认是商家，并且当前在非商家页面，执行跳转
     const sess = wx.getStorageSync(MERCHANT_SESSION) || null;
     const hasToken = !!(sess && sess.token);

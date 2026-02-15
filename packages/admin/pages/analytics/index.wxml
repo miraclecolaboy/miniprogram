@@ -76,26 +76,17 @@
               </view>
               <view class="metric-col">
                 <view class="metric-col-label">余额</view>
-                <view class="metric-col-value">{{item.balanceText}}</view>
-                <view
-                  class="metric-col-action"
-                  data-openid="{{item.openid}}"
-                  data-name="{{item.userName}}"
-                  bindtap="onBalanceQueryTap"
-                >
-                  查询余额流水
+                <view class="metric-col-balance-row">
+                  <view class="metric-col-value">{{item.balanceText}}</view>
+                  <view
+                    class="balance-log-btn"
+                    data-openid="{{item.openid}}"
+                    data-name="{{item.userName}}"
+                    bindtap="onBalanceQueryTap"
+                  >
+                    查询余额流水
+                  </view>
                 </view>
-              </view>
-            </view>
-
-            <view class="row-right">
-              <view
-                class="btn btn-outline btn-mini"
-                data-openid="{{item.openid}}"
-                data-name="{{item.userName}}"
-                bindtap="onBalanceQueryTap"
-              >
-                查看余额流水
               </view>
             </view>
           </view>
