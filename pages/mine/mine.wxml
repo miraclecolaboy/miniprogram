@@ -24,7 +24,6 @@
       <view class="vip-header">
         <view class="vip-info">
           <view class="vip-name">{{userInfo.memberTitle || 'Lv.0会员'}}</view>
-          <view class="vip-tag" wx:if="{{(userInfo.memberLevel || 0) >= 4}}">下单95折</view>
         </view>
         <view class="vip-logo">VIP</view>
       </view>
@@ -37,7 +36,7 @@
         <view class="vip-progress-track">
           <view class="vip-progress-fill" style="{{userInfo.progressStyle || 'width: 0%;'}}"></view>
         </view>
-        <view class="vip-next-tip">{{userInfo.nextLevelText || '登录后查看会员成长值'}}</view>
+        <view class="vip-next-tip {{(userInfo.memberLevel || 0) >= 4 ? 'vip-next-tip-gold' : ''}}">{{userInfo.nextLevelText || '登录后查看会员成长值'}}</view>
         <view class="vip-actions">
           <view class="vip-action-btn" catchtap="onTapMemberDetail">查看权益</view>
         </view>

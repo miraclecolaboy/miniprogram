@@ -104,13 +104,12 @@
     background: linear-gradient(145deg, #323232 0%, #1A1A1A 100%);
     border-radius: 32rpx;
     height: 228rpx; /* 初始高度 */
-    padding: 38rpx 34rpx;
+    padding: 40rpx 36rpx;
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
     color: #E3BF87;
-    box-shadow: 0 32rpx 72rpx -24rpx rgba(0, 0, 0, 0.4);
-    border: 1rpx solid rgba(255,255,255,0.06);
+    box-shadow: 0 40rpx 80rpx -20rpx rgba(0,0,0,0.35);
     display: flex;
     flex-direction: column;
     transition: height 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -124,8 +123,8 @@
     position: absolute;
     top: -60%;
     right: -30%;
-    width: 520rpx;
-    height: 520rpx;
+    width: 600rpx;
+    height: 600rpx;
     background: radial-gradient(circle, rgba(227, 191, 135, 0.12) 0%, transparent 65%);
     border-radius: 50%;
     pointer-events: none;
@@ -158,6 +157,21 @@
     border-radius: 24rpx;
     font-weight: 700;
   }
+
+  .vip-lv4-benefit {
+    position: absolute;
+    left: 34rpx;
+    bottom: 42rpx;
+    z-index: 2;
+    font-size: 20rpx;
+    font-weight: 600;
+    color: rgba(227, 191, 135, 0.95);
+    letter-spacing: 0.4rpx;
+  }
+
+  .vip-card.expanded .vip-lv4-benefit {
+    display: none;
+  }
   
   .vip-logo {
     font-size: 44rpx;
@@ -187,10 +201,10 @@
   
   .vip-progress-meta {
     font-size: 22rpx;
-    color: rgba(255,255,255,0.8);
+    color: rgba(227, 191, 135, 0.9);
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12rpx;
+    margin-bottom: 16rpx;
     font-weight: 500;
   }
   
@@ -199,7 +213,7 @@
     background: rgba(255,255,255,0.18);
     border-radius: 6rpx;
     overflow: hidden;
-    margin-bottom: 12rpx;
+    margin-bottom: 16rpx;
   }
   
   .vip-progress-fill {
@@ -208,10 +222,15 @@
     box-shadow: 0 0 20rpx rgba(227, 191, 135, 0.5);
     transition: width 0.3s ease;
   }
-  
+
   .vip-next-tip {
     font-size: 20rpx;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.7);
+  }
+
+  .vip-next-tip-gold {
+    color: rgba(227, 191, 135, 0.9);
+    font-weight: 500;
   }
   
   .vip-actions {

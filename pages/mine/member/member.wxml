@@ -7,7 +7,6 @@
       <view class="card-header">
         <view class="user-info">
           <view class="name">{{memberTitle || 'Lv.0会员'}}</view>
-          <view class="level-tag active" wx:if="{{memberLevel >= 4}}">下单95折</view>
         </view>
         <view class="card-logo">VIP</view>
       </view>
@@ -22,7 +21,7 @@
           <view class="progress-fill" style="{{progressStyle}}"></view>
         </view>
         
-        <view class="next-tip">{{nextLevelText}}</view>
+        <view class="next-tip {{memberLevel >= 4 ? 'next-tip-gold' : ''}}">{{nextLevelText}}</view>
       </view>
     </view>
   </view>

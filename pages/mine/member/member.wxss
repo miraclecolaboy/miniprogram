@@ -125,6 +125,19 @@ page {
   color: rgba(255,255,255,0.7);
 }
 
+.next-tip-gold {
+  color: rgba(227, 191, 135, 0.9);
+  font-weight: 500;
+}
+
+.lv4-benefit-note {
+  margin-top: 10rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: rgba(227, 191, 135, 0.95);
+  letter-spacing: 0.4rpx;
+}
+
 /* === 升级规则说明 === */
 .section-title {
   padding: 0 32rpx 20rpx;

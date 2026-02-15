@@ -61,9 +61,16 @@ async function listOrders(tab, pageNum, pageSize) {
     if (tab === 'done') {
       // 已完成：
       // 1) 普通已完成/已取消订单（无售后字段）
+      //    - 其中“用户取消”不放在已完成里
       // 2) 已处理完成的售后（refund.status 属于已处理集合）
       return db.collection(COL_ORDERS).where(_.or([
-        _.and([{ status: _.in(['done', 'cancelled']) }, noRefundCond]),
+        _.and([
+          _.or([
+            { status: 'done' },
+            _.and([{ status: 'cancelled' }, { statusText: _.neq('用户取消') }]),
+          ]),
+          noRefundCond,
+        ]),
         _.and([{ refund: _.exists(true) }, { 'refund.status': _.in(refundFinalStatuses) }]),
       ]));
     }

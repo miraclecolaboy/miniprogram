@@ -47,7 +47,7 @@
           <text class="info-label">快递单号</text><text class="info-value" user-select>{{item.expressNoText}}</text>
         </view>
         <view class="info-row" wx:if="{{item.mode==='ziti' && item.pickupCodeText}}">
-          <text class="info-label">取餐号</text><text class="info-value" style="color: var(--primary); font-weight: 800; font-size: 28rpx;">{{item.pickupCodeText}}</text>
+          <text class="info-label">取餐号</text><text class="info-value" style="color: var(--primary); font-weight: 400; font-size: 28rpx;">{{item.pickupCodeText}}</text>
         </view>
         <view class="info-row" wx:if="{{item.mode==='ziti' && item.pickupTimeText}}">
           <text class="info-label">取餐时间</text><text class="info-value">{{item.pickupTimeText}}</text>
@@ -81,24 +81,16 @@
           <text class="pay-method">({{item.payMethodText}})</text>
         </view>
       </view>
-
       <view class="action-bar">
-        <view class="action-group-left">
-          <view class="btn btn-outline btn-mini" data-id="{{item._id}}" bindtap="onPrint">打印小票</view>
-          <view wx:if="{{item.mode!=='ziti'}}" class="btn btn-outline btn-mini" data-copytext="{{item.addrCopyText}}" bindtap="onCopyAddress">复制地址</view>
-          <view wx:if="{{item.receiverPhone}}" class="btn btn-outline btn-mini" data-phone="{{item.receiverPhone}}" bindtap="onCallPhone">联系买家</view>
+        <view class="btn btn-outline btn-mini action-btn" data-id="{{item._id}}" bindtap="onPrint">打印小票</view>
+        <view wx:if="{{item.mode!=='ziti'}}" class="btn btn-outline btn-mini action-btn" data-copytext="{{item.addrCopyText}}" bindtap="onCopyAddress">复制地址</view>
+        <view wx:if="{{item.receiverPhone}}" class="btn btn-outline btn-mini action-btn" data-phone="{{item.receiverPhone}}" bindtap="onCallPhone">联系买家</view>
+        <view wx:if="{{item.canApplyRefund}}" class="btn btn-danger btn-mini action-btn" data-id="{{item._id}}" bindtap="onApplyRefund">申请售后</view>
+        <view wx:if="{{item.mode==='kuaidi'}}" class="btn btn-outline btn-mini action-btn" data-id="{{item._id}}" data-no="{{item.expressNoText||''}}" bindtap="onOpenExpressModal">发货单号</view>
+        <view wx:if="{{!item.refundHandled && (item.status==='paid' || item.status==='making' || item.status==='processing')}}" class="btn btn-primary btn-mini action-btn" data-id="{{item._id}}" data-status="{{item.mode==='ziti'?'ready':'delivering'}}" bindtap="onUpdateStatus">
+          {{item.mode==='ziti' ? '出餐完成' : '立即发货'}}
         </view>
-        
-        <view class="action-group-right">
-          <view wx:if="{{item.canApplyRefund}}" class="btn btn-danger btn-mini" data-id="{{item._id}}" bindtap="onApplyRefund">申请售后</view>
-          <view wx:if="{{item.mode==='kuaidi'}}" class="btn btn-outline btn-mini" data-id="{{item._id}}" data-no="{{item.expressNoText||''}}" bindtap="onOpenExpressModal">发货单号</view>
-          
-          <view wx:if="{{!item.refundHandled && (item.status==='paid' || item.status==='making' || item.status==='processing')}}" class="btn btn-primary btn-mini" data-id="{{item._id}}" data-status="{{item.mode==='ziti'?'ready':'delivering'}}" bindtap="onUpdateStatus">
-            {{item.mode==='ziti' ? '出餐完成' : '立即发货'}}
-          </view>
-          
-          <view wx:if="{{!item.refundHandled && (item.status==='ready' || item.status==='delivering')}}" class="btn btn-primary btn-mini" data-id="{{item._id}}" data-status="done" bindtap="onUpdateStatus">完成订单</view>
-        </view>
+        <view wx:if="{{!item.refundHandled && (item.status==='ready' || item.status==='delivering')}}" class="btn btn-primary btn-mini action-btn" data-id="{{item._id}}" data-status="done" bindtap="onUpdateStatus">完成订单</view>
       </view>
 
     </view>

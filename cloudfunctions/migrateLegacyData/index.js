@@ -9,6 +9,7 @@ const COL_RECHARGES = 'recharges';
 
 const RUN_CONFIRM_TEXT = 'RUN_LEGACY_MIGRATION';
 const ORDER_STATUS_PAID_LIKE = new Set(['paid', 'making', 'preparing', 'processing', 'ready', 'delivering', 'done']);
+const CLIENT_VISIBLE_STATUS = new Set(['pending_payment', 'processing', 'ready', 'delivering', 'done', 'cancelled', 'closed']);
 
 function toStr(v) {
   return String(v == null ? '' : v).trim();
@@ -51,16 +52,73 @@ function round2(v) {
   return Number(toNum(v, 0).toFixed(2));
 }
 
+function calcLevelByTotalRecharge(totalRechargeYuan) {
+  const t = toNum(totalRechargeYuan, 0);
+  if (t >= 1000) return 4;
+  if (t >= 500) return 3;
+  if (t >= 300) return 2;
+  if (t >= 100) return 1;
+  return 0;
+}
+
+function pickFiniteNum(...candidates) {
+  for (const v of candidates) {
+    const n = Number(v);
+    if (Number.isFinite(n)) return n;
+  }
+  return NaN;
+}
+
+function isLikelyOpenid(v) {
+  const s = toStr(v);
+  if (!s) return false;
+  if (s.includes(' ')) return false;
+  return /^o[a-zA-Z0-9_-]{15,}$/.test(s);
+}
+
+function isMeaningfulId(v) {
+  const s = toStr(v).toLowerCase();
+  if (!s) return false;
+  if (s === 'undefined' || s === 'null' || s === 'none' || s === '0' || s === 'nan') return false;
+  return true;
+}
+
+function pickOpenid(...candidates) {
+  const vals = candidates.map((x) => toStr(x)).filter((x) => isMeaningfulId(x));
+  const good = vals.find((x) => isLikelyOpenid(x));
+  if (good) return good;
+  return vals[0] || '';
+}
+
 function statusToNew(rawStatus, paymentStatus, paidAt) {
   const s = toStr(rawStatus).toLowerCase();
   const paidLike = toStr(paymentStatus).toLowerCase() === 'paid' || toNum(paidAt, 0) > 0;
+  if (s === 'created' || s === 'unpaid' || s === 'wait_pay' || s === 'pending_pay') {
+    return paidLike ? 'processing' : 'pending_payment';
+  }
   if (s === 'pending') return paidLike ? 'processing' : 'pending_payment';
   if (s === 'paid' || s === 'making' || s === 'preparing') return 'processing';
   if (!s) {
     if (paidLike) return 'processing';
     return 'pending_payment';
   }
+  if (!CLIENT_VISIBLE_STATUS.has(s)) {
+    return paidLike ? 'processing' : 'pending_payment';
+  }
   return s;
+}
+
+function shouldArchiveCancelledOrder(doc) {
+  const status = toStr(doc && doc.status).toLowerCase();
+  if (status !== 'cancelled' && status !== 'canceled') return false;
+
+  const paidAt = toNum(doc && doc.paidAt, 0);
+  const paymentStatus = toStr(doc && doc.payment && doc.payment.status).toLowerCase()
+    || toStr(doc && doc.pay && doc.pay.status).toLowerCase();
+  const paidLike = paidAt > 0 || paymentStatus === 'paid';
+  if (paidLike) return false;
+
+  return true;
 }
 
 function normalizeRefund(refund) {
@@ -164,7 +222,14 @@ function buildOrderPickup(doc) {
 
 function buildOrderPatch(doc, nowTs) {
   const patch = {};
-  const openid = toStr(doc.openid || doc._openid);
+  const openid = pickOpenid(
+    doc.openid,
+    doc._openid,
+    doc.openId,
+    doc.userOpenid,
+    doc.buyerOpenid,
+    doc.customerOpenid
+  );
   if (openid && openid !== toStr(doc.openid)) patch.openid = openid;
 
   const nextAmount = buildOrderAmount(doc);
@@ -175,9 +240,14 @@ function buildOrderPatch(doc, nowTs) {
     (doc.payment && doc.payment.status) || (doc.pay && doc.pay.status),
     doc.paidAt
   );
-  if (nextStatus && nextStatus !== toStr(doc.status).toLowerCase()) patch.status = nextStatus;
+  let finalStatus = nextStatus;
+  if (shouldArchiveCancelledOrder(doc)) {
+    finalStatus = 'closed';
+    if (toStr(doc.statusText) !== '已关闭') patch.statusText = '已关闭';
+  }
+  if (finalStatus && finalStatus !== toStr(doc.status).toLowerCase()) patch.status = finalStatus;
 
-  const nextPayment = buildOrderPayment(doc, nextAmount, nextStatus);
+  const nextPayment = buildOrderPayment(doc, nextAmount, finalStatus);
   if (stable(nextPayment) !== stable(doc.payment)) patch.payment = nextPayment;
 
   const nextShipping = buildOrderShipping(doc);
@@ -236,7 +306,14 @@ function normalizeAddressList(addresses, defaultAddressId) {
 
 function buildUserPatch(doc, nowTs) {
   const patch = {};
-  const openid = toStr(doc.openid || doc._openid || doc._id);
+  const openid = pickOpenid(
+    doc.openid,
+    doc._openid,
+    doc.openId,
+    doc.userOpenid,
+    doc.buyerOpenid,
+    doc._id
+  );
   if (openid && openid !== toStr(doc.openid)) patch.openid = openid;
 
   const addr = normalizeAddressList(doc.addresses, doc.defaultAddressId);
@@ -249,15 +326,31 @@ function buildUserPatch(doc, nowTs) {
 
   const minRechargeByLevel = { 0: 0, 1: 100, 2: 300, 3: 500, 4: 1000 };
   let level = Number.isFinite(Number(doc.memberLevel)) ? toInt(doc.memberLevel, 0) : NaN;
+  let totalRecharge = pickFiniteNum(
+    doc.totalRecharge,
+    doc.totalRechargeAmount,
+    doc.rechargeTotal,
+    doc.total_recharge
+  );
+
   if (!Number.isFinite(level)) {
-    level = toNum(doc.memberExpireAt, 0) > nowTs ? 4 : 0;
+    if (Number.isFinite(totalRecharge)) level = calcLevelByTotalRecharge(totalRecharge);
+    else level = toNum(doc.memberExpireAt, 0) > nowTs ? 4 : 0;
     patch.memberLevel = level;
   }
+
   const levelClamped = Math.max(0, Math.min(4, toInt(level, 0)));
-  const totalRecharge = Number(doc.totalRechargeAmount);
   const minRecharge = minRechargeByLevel[levelClamped] || 0;
-  if (!Number.isFinite(totalRecharge)) patch.totalRechargeAmount = minRecharge;
-  else if (totalRecharge < minRecharge) patch.totalRechargeAmount = minRecharge;
+  if (!Number.isFinite(totalRecharge)) totalRecharge = minRecharge;
+  else if (totalRecharge < minRecharge) totalRecharge = minRecharge;
+  const normalizedTotalRecharge = round2(totalRecharge);
+
+  if (!Number.isFinite(Number(doc.totalRecharge)) || round2(doc.totalRecharge) !== normalizedTotalRecharge) {
+    patch.totalRecharge = normalizedTotalRecharge;
+  }
+  if (!Number.isFinite(Number(doc.totalRechargeAmount)) || round2(doc.totalRechargeAmount) !== normalizedTotalRecharge) {
+    patch.totalRechargeAmount = normalizedTotalRecharge;
+  }
 
   if (!Number.isFinite(Number(doc.balance))) patch.balance = 0;
   if (!Number.isFinite(Number(doc.points))) patch.points = 0;
@@ -269,7 +362,13 @@ function buildUserPatch(doc, nowTs) {
 
 function buildRechargePatch(doc, nowTs) {
   const patch = {};
-  const openid = toStr(doc.openid || doc._openid);
+  const openid = pickOpenid(
+    doc.openid,
+    doc._openid,
+    doc.openId,
+    doc.userOpenid,
+    doc.buyerOpenid
+  );
   if (openid && openid !== toStr(doc.openid)) patch.openid = openid;
 
   const status = toStr(doc.status).toLowerCase();
