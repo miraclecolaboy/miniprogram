@@ -130,7 +130,7 @@ async function listMyOrders(openid, { tab = 'doing', pageNum = 1, pageSize = 10 
   const skip = (pageNum - 1) * pageSize;
 
   const buildQuery = (refundCond) => {
-    const where = { _openid: openid };
+    const where = { openid: openid };
 
     if (tab === 'doing') {
       // Orders with after-sale should be shown only in the "refund" tab.
@@ -177,7 +177,7 @@ async function getOrderDetail(openid, orderId) {
   
   const res = await db.collection(COL_ORDERS).doc(orderId).get();
   
-  if (!res.data || res.data._openid !== openid) {
+  if (!res.data || res.data.openid !== openid) {
     return { error: 'order_not_found', message: 'Order not found or permission denied' };
   }
   

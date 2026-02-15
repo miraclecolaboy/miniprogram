@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "database": {
+      "read": "allow",
+      "write": "allow",
+      "remove": "allow",
+      "add": "allow"
+    }
+  }
+}

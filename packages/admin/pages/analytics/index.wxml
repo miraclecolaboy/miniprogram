@@ -1,10 +1,10 @@
 <view class="page">
   <scroll-view class="main-scroll" scroll-y="true" enhanced="true" enable-back-to-top="true" show-scrollbar="{{false}}">
-    
+
     <view class="page-header row-between">
       <view class="header-left">
-        <view class="page-title">运营分析</view>
-        <view class="page-sub">核心指标与数据总览</view>
+        <view class="page-title">店铺数据</view>
+        <view class="page-sub">按标签查看店铺数据、充值用户和订单数据</view>
       </view>
       <view class="btn btn-outline btn-mini {{loading ? 'btn-disabled' : ''}}" bindtap="onReloadTap">
         {{loading ? '加载中...' : '刷新数据'}}
@@ -12,121 +12,162 @@
     </view>
 
     <view class="page-content">
-      
       <view class="error-row" wx:if="{{errorText}}">{{errorText}}</view>
 
       <view class="filter-section">
         <view class="tabs-pill">
-          <view wx:for="{{rangeOptions}}" wx:key="value" 
-                class="tab-pill-item {{rangeDays === item.value ? 'active' : ''}}" 
-                data-value="{{item.value}}" 
-                bindtap="onRangeTap">
+          <view
+            wx:for="{{tabOptions}}"
+            wx:key="key"
+            class="tab-pill-item {{activeTab === item.key ? 'active' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="onTabTap"
+          >
             {{item.label}}
           </view>
         </view>
-        <view class="meta-row" wx:if="{{generatedAtText}}">更新时间：{{generatedAtText}}</view>
       </view>
 
       <view class="empty-hint" wx:if="{{loading && !hasData}}">数据加载中...</view>
 
       <block wx:if="{{hasData}}">
-        
-        <view class="section-title">订单分析</view>
-        <view class="metrics-grid">
-          <view class="metric-card" wx:for="{{orderCards}}" wx:key="label">
-            <view class="metric-label">{{item.label}}</view>
-            <view class="metric-value">{{item.value}}</view>
+        <block wx:if="{{activeTab === 'store'}}">
+          <view class="section-title">店铺数据</view>
+          <view class="metrics-grid">
+            <view class="metric-card" wx:for="{{customerCards}}" wx:key="label">
+              <view class="metric-label">{{item.label}}</view>
+              <view class="metric-value">{{item.value}}</view>
+            </view>
           </view>
-        </view>
+        </block>
 
-        <view class="card">
-          <view class="card-title">订单渠道分布</view>
-          <view class="list-row" wx:for="{{modeStats}}" wx:key="label">
-            <view>
-              <view class="row-label">{{item.label}}</view>
-              <view class="data-sub">支付 {{item.paidCount}} 单 · 占比 {{item.shareText}}</view>
-            </view>
-            <view class="input-inline" style="text-align: right; font-weight: 800; font-size: 30rpx;">
-              {{item.amountText}}
-            </view>
-          </view>
-        </view>
+        <block wx:elif="{{activeTab === 'recharge'}}">
+          <view class="section-title">充值用户</view>
+          <view class="meta-inline" wx:if="{{rechargeSummaryText}}">{{rechargeSummaryText}}</view>
 
-        <view class="card">
-          <view class="card-title">订单趋势</view>
-          <view class="trend-table">
-            <view class="trend-header">
-              <view class="th" style="flex: 2;">日期</view>
-              <view class="th" style="flex: 1; text-align: center;">订单</view>
-              <view class="th" style="flex: 1; text-align: center;">支付</view>
-              <view class="th" style="flex: 1.5; text-align: right;">成交额</view>
-            </view>
-            <view class="trend-row" wx:for="{{trend}}" wx:key="date">
-              <view class="td" style="flex: 2; color: var(--text-sub);">{{item.date}}</view>
-              <view class="td" style="flex: 1; text-align: center;">{{item.orderCount}}</view>
-              <view class="td" style="flex: 1; text-align: center;">{{item.paidCount}}</view>
-              <view class="td" style="flex: 1.5; text-align: right; font-weight: 800;">{{item.amountText}}</view>
-            </view>
+          <view class="search-row">
+            <input
+              class="search-input"
+              type="text"
+              value="{{rechargeSearchKeyword}}"
+              placeholder="通过用户名或电话搜索"
+              bindinput="onRechargeSearchInput"
+              confirm-type="search"
+            />
           </view>
-        </view>
 
-        <view class="section-title">顾客与会员分析</view>
-        <view class="metrics-grid">
-          <view class="metric-card" wx:for="{{customerCards}}" wx:key="label">
-            <view class="metric-label">{{item.label}}</view>
-            <view class="metric-value">{{item.value}}</view>
+          <view class="card" wx:if="{{!rechargeUsers.length}}">
+            <view class="empty-hint" style="padding: 20rpx 0;">暂无充值用户</view>
           </view>
-        </view>
 
-        <view class="card">
-          <view class="card-title">会员等级分布</view>
-          <view class="member-item" wx:for="{{memberStats}}" wx:key="label">
-            <view class="member-head">
-              <text class="row-label" style="font-size: 26rpx;">{{item.label}}</text>
-              <text class="data-sub" style="margin: 0;">{{item.count}}人 ({{item.ratioText}})</text>
+          <view class="card recharge-card" wx:for="{{rechargeUsers}}" wx:key="openid">
+            <view class="row-between">
+              <view>
+                <view class="recharge-name">{{item.userName}}</view>
+                <view class="recharge-phone">电话：{{item.phone}}</view>
+              </view>
+              <view class="level-tag">{{item.memberLevelText}}</view>
             </view>
-            <view class="member-bar">
-              <view class="member-bar-fill" style="width: {{item.widthPct}};"></view>
-            </view>
-          </view>
-        </view>
 
-        <view class="section-title">商品分析</view>
-        <view class="metrics-grid">
-          <view class="metric-card" wx:for="{{productCards}}" wx:key="label">
-            <view class="metric-label">{{item.label}}</view>
-            <view class="metric-value">{{item.value}}</view>
-          </view>
-        </view>
+            <view class="recharge-metrics">
+              <view class="metric-col">
+                <view class="metric-col-label">累计充值</view>
+                <view class="metric-col-value">{{item.totalRechargeText}}</view>
+              </view>
+              <view class="metric-col">
+                <view class="metric-col-label">余额</view>
+                <view class="metric-col-value">{{item.balanceText}}</view>
+              </view>
+            </view>
 
-        <view class="card">
-          <view class="card-title">商品销量 TOP10</view>
-          <view class="empty-hint" wx:if="{{!topProducts.length}}">暂无销量数据</view>
-          
-          <view class="data-item" wx:for="{{topProducts}}" wx:key="rank">
-            <view class="rank-badge {{index < 3 ? 'rank-top' : ''}}">{{item.rank}}</view>
-            <view class="data-main">
-              <view class="data-title" style="font-size: 28rpx;">{{item.name}}</view>
-              <view class="data-sub">销量 {{item.quantityText}} 件 · 销售额 {{item.amountText}}</view>
-            </view>
-            <view class="data-side">
-              <view style="font-size: 28rpx; font-weight: 800; color: var(--text-main);">{{item.orderCount}}单</view>
+            <view class="row-right">
+              <view
+                class="btn btn-outline btn-mini"
+                data-openid="{{item.openid}}"
+                data-name="{{item.userName}}"
+                bindtap="onBalanceQueryTap"
+              >
+                查看余额流水
+              </view>
             </view>
           </view>
-        </view>
+        </block>
+
+        <block wx:else>
+          <view class="section-title">订单数据</view>
+
+          <view class="order-filter">
+            <view class="tabs-pill order-time-tabs">
+              <view
+                wx:for="{{orderTimeOptions}}"
+                wx:key="key"
+                class="tab-pill-item {{orderTimeType === item.key ? 'active' : ''}}"
+                data-key="{{item.key}}"
+                bindtap="onOrderTimeTap"
+              >
+                {{item.label}}
+              </view>
+            </view>
+
+            <view class="date-row" wx:if="{{orderDateText}}">统计区间：{{orderDateText}}</view>
+
+            <view class="custom-range" wx:if="{{orderTimeType === 'custom'}}">
+              <picker mode="date" value="{{customStartDate}}" bindchange="onCustomStartChange">
+                <view class="date-picker">{{customStartDate || '开始日期'}}</view>
+              </picker>
+              <text class="date-sep">至</text>
+              <picker mode="date" value="{{customEndDate}}" bindchange="onCustomEndChange">
+                <view class="date-picker">{{customEndDate || '结束日期'}}</view>
+              </picker>
+              <view class="btn btn-primary btn-mini" bindtap="onApplyCustomRange">查询</view>
+            </view>
+          </view>
+
+          <view class="metrics-grid">
+            <view class="metric-card" wx:for="{{orderCards}}" wx:key="label">
+              <view class="metric-label">{{item.label}}</view>
+              <view class="metric-value">{{item.value}}</view>
+            </view>
+          </view>
+        </block>
 
         <view class="remark-block" wx:if="{{tips.length}}">
-          <text class="remark-label" style="color: var(--text-muted); font-weight: 600;">统计说明：</text>
+          <text class="remark-label">统计说明：</text>
           <view style="flex:1;">
-            <view class="remark-text" wx:for="{{tips}}" wx:key="*this" style="color: var(--text-sub);">{{item}}</view>
+            <view class="remark-text" wx:for="{{tips}}" wx:key="*this">{{item}}</view>
           </view>
         </view>
-
       </block>
 
       <view style="height: 180rpx;"></view>
     </view>
   </scroll-view>
+
+  <view class="popup-mask" wx:if="{{balancePopupVisible}}" catchtouchmove="onPopupTouchMove" bindtap="onBalancePopupClose">
+    <view class="popup-panel" catchtap="onPopupInnerTap">
+      <view class="popup-header row-between">
+        <view>
+          <view class="popup-title">{{balancePopupTitle}}</view>
+          <view class="popup-sub" wx:if="{{balancePopupMeta}}">{{balancePopupMeta}}</view>
+        </view>
+        <view class="popup-close" bindtap="onBalancePopupClose">关闭</view>
+      </view>
+
+      <view class="empty-hint" wx:if="{{balancePopupLoading}}" style="padding: 36rpx 0;">加载中...</view>
+      <view class="empty-hint" wx:if="{{!balancePopupLoading && !balanceLogs.length}}" style="padding: 36rpx 0;">暂无余额流水</view>
+
+      <scroll-view class="popup-list" scroll-y="true" wx:if="{{!balancePopupLoading && balanceLogs.length}}">
+        <view class="popup-item" wx:for="{{balanceLogs}}" wx:key="id">
+          <view class="row-between">
+            <view class="popup-scene">{{item.scene}}</view>
+            <view class="popup-delta {{item.deltaClass}}">{{item.deltaText}}</view>
+          </view>
+          <view class="popup-remark" wx:if="{{item.remark}}">{{item.remark}}</view>
+          <view class="popup-time">{{item.timeText || '-'}}</view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
 
   <admin-tabbar />
 </view>

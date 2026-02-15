@@ -1,0 +1,14 @@
+{
+  "name": "migrateLegacyData",
+  "version": "1.0.0",
+  "description": "Temporary legacy data migration helper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests\" && exit 0"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "wx-server-sdk": "~3.0.1"
+  }
+}

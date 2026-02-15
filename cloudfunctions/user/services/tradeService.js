@@ -254,7 +254,7 @@ async function createOrder(event, openid) {
       orderNo = genOrderNo();
       
       const orderDoc = {
-        _openid: openid, orderNo,
+        openid, orderNo,
         status: paidImmediately ? 'processing' : 'pending_payment',
         statusText: paidImmediately ? '准备中' : '待支付',
         mode,
@@ -331,7 +331,7 @@ async function sysHandlePaySuccess(payEvent) {
     if (order.payment.status === 'paid') return { errcode: 0, errmsg: 'OK' };
   
     const nowTs = now();
-    const openid = order._openid;
+    const openid = order.openid;
     
     await db.collection('orders').doc(order._id).update({
       data: {
@@ -417,7 +417,7 @@ async function sysHandleRefundSuccess(refundEvent) {
 async function cancelUnpaidOrder(orderId, openid) {
     const orderRes = await db.collection('orders').doc(orderId).get();
     const order = orderRes.data;
-    if (order && order._openid === openid && order.status === 'pending_payment') {
+    if (order && order.openid === openid && order.status === 'pending_payment') {
         await db.collection('orders').doc(orderId).update({
             data: { status: 'cancelled', statusText: '用户取消' }
         });
@@ -433,7 +433,7 @@ async function applyRefund(orderId, openid, reason, remark) {
   const orderRes = await db.collection(COL_ORDERS).doc(orderId).get();
   const order = orderRes.data;
 
-  if (!order || order._openid !== openid) {
+  if (!order || order.openid !== openid) {
     throw new Error('订单不存在或无权限');
   }
 
@@ -479,7 +479,7 @@ async function cancelRefund(orderId, openid) {
 
   const order = await db.collection(COL_ORDERS).doc(orderId).get().then(r => r.data);
 
-  if (!order || order._openid !== openid) {
+  if (!order || order.openid !== openid) {
     throw new Error('订单不存在或无权限');
   }
 

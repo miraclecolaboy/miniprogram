@@ -4,7 +4,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
+  overflow: hidden;
   background-color: var(--bg);
 }
 
@@ -17,14 +17,13 @@
   padding: 0 32rpx;
 }
 
-/* ===== 时间筛选区 (拨片风格) ===== */
 .filter-section {
-  margin-bottom: 32rpx;
+  margin-bottom: 28rpx;
 }
 
 .tabs-pill {
   display: flex;
-  background: #E5E7EB;
+  background: #e5e7eb;
   border-radius: 16rpx;
   padding: 6rpx;
   gap: 6rpx;
@@ -38,52 +37,104 @@
   padding: 12rpx 0;
   border-radius: 12rpx;
   font-weight: 600;
-  transition: all 0.2s;
 }
 
 .tab-pill-item.active {
-  background: #FFFFFF;
+  background: #ffffff;
   color: var(--text-main);
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
-.meta-row {
-  font-size: 22rpx;
-  color: var(--text-muted);
-  text-align: right;
+.meta-inline {
+  font-size: 24rpx;
+  color: var(--text-sub);
+  margin: -6rpx 0 18rpx;
+}
+
+.search-row {
+  margin: 0 0 20rpx;
+}
+
+.search-input {
+  height: 64rpx;
+  line-height: 64rpx;
+  background: #fff;
+  border: 2rpx solid var(--border);
+  border-radius: 14rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: var(--text-main);
+}
+
+.order-filter {
+  margin-bottom: 28rpx;
+}
+
+.order-time-tabs .tab-pill-item {
+  font-size: 24rpx;
+}
+
+.date-row {
+  margin-top: 14rpx;
+  color: var(--text-sub);
+  font-size: 24rpx;
+}
+
+.custom-range {
   margin-top: 16rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.date-picker {
+  min-width: 210rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 12rpx;
+  border: 2rpx solid var(--border);
+  background: #fff;
+  color: var(--text-main);
+  font-size: 24rpx;
+  padding: 0 14rpx;
+}
+
+.date-sep {
+  color: var(--text-sub);
+  font-size: 24rpx;
 }
 
 .error-row {
   margin-bottom: 24rpx;
   padding: 16rpx 24rpx;
   border-radius: 12rpx;
-  background: #FEF2F2;
-  color: #EF4444;
+  background: #fef2f2;
+  color: #ef4444;
   font-size: 24rpx;
   font-weight: 600;
 }
 
-/* ===== 分类大标题与网格数据卡片 ===== */
 .section-title {
   font-size: 32rpx;
   font-weight: 800;
   color: var(--text-main);
-  margin: 40rpx 0 24rpx 0;
+  margin: 36rpx 0 24rpx 0;
 }
 
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24rpx;
-  margin-bottom: 32rpx;
+  margin-bottom: 30rpx;
 }
 
 .metric-card {
   background: var(--card-bg);
   border-radius: 24rpx;
-  padding: 32rpx 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.02);
+  padding: 30rpx 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -92,7 +143,7 @@
 .metric-label {
   font-size: 24rpx;
   color: var(--text-sub);
-  margin-bottom: 12rpx;
+  margin-bottom: 10rpx;
   font-weight: 600;
 }
 
@@ -103,7 +154,6 @@
   line-height: 1.2;
 }
 
-/* ===== 模块卡片公共部分复用 ===== */
 .card-title {
   font-size: 30rpx;
   font-weight: 800;
@@ -112,6 +162,7 @@
   display: flex;
   align-items: center;
 }
+
 .card-title::before {
   content: "";
   display: block;
@@ -122,108 +173,218 @@
   margin-right: 12rpx;
 }
 
-.list-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid var(--border);
+.member-item {
+  margin-bottom: 24rpx;
 }
-.list-row:last-of-type { border-bottom: none; padding-bottom: 0; }
-.list-row:first-of-type { padding-top: 0; }
 
-.row-label { font-size: 28rpx; font-weight: 600; color: var(--text-main); }
-.data-sub { font-size: 24rpx; color: var(--text-sub); margin-top: 6rpx; }
-
-/* ===== 趋势表格 ===== */
-.trend-table { display: flex; flex-direction: column; }
-.trend-header {
-  display: flex;
-  padding-bottom: 16rpx;
-  border-bottom: 2rpx solid var(--border);
-  margin-bottom: 16rpx;
+.member-item:last-child {
+  margin-bottom: 0;
 }
-.th { font-size: 24rpx; font-weight: 800; color: var(--text-main); }
-.trend-row { display: flex; padding: 16rpx 0; border-bottom: 1rpx solid #F9FAFB; }
-.trend-row:last-child { border-bottom: none; }
-.td { font-size: 24rpx; color: var(--text-main); }
 
-/* ===== 会员等级分布条 ===== */
-.member-item { margin-bottom: 24rpx; }
-.member-item:last-child { margin-bottom: 0; }
 .member-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 12rpx;
 }
+
 .member-bar {
   height: 12rpx;
   background: var(--bg);
   border-radius: 6rpx;
   overflow: hidden;
 }
+
 .member-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #374151 0%, #111827 100%);
   border-radius: 6rpx;
 }
 
-/* ===== 排行榜列表 ===== */
-.data-item {
-  display: flex;
-  align-items: center;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid var(--border);
-  gap: 24rpx;
+.row-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-main);
 }
-.data-item:last-child { border-bottom: none; padding-bottom: 0; }
 
-.rank-badge {
-  width: 48rpx;
-  height: 48rpx;
-  line-height: 48rpx;
-  text-align: center;
-  border-radius: 12rpx;
-  background: var(--bg);
-  color: var(--text-sub);
+.data-sub {
   font-size: 24rpx;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-.rank-top {
-  background: var(--primary);
-  color: #fff;
+  color: var(--text-sub);
+  margin-top: 6rpx;
 }
 
-.data-main { flex: 1; min-width: 0; }
-.data-title {
+.recharge-card {
+  margin-bottom: 20rpx;
+}
+
+.recharge-name {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.recharge-phone {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-sub);
+}
+
+.level-tag {
+  font-size: 22rpx;
+  color: #1f2937;
+  background: #f3f4f6;
+  border-radius: 999rpx;
+  padding: 8rpx 16rpx;
+  font-weight: 600;
+}
+
+.recharge-metrics {
+  margin-top: 22rpx;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14rpx;
+}
+
+.metric-col {
+  background: #f9fafb;
+  border-radius: 14rpx;
+  padding: 14rpx 12rpx;
+}
+
+.metric-col-label {
+  font-size: 22rpx;
+  color: var(--text-sub);
+}
+
+.metric-col-value {
+  margin-top: 8rpx;
   font-size: 28rpx;
   font-weight: 800;
   color: var(--text-main);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 4rpx;
 }
-.data-side { display: flex; align-items: center; }
 
-/* ===== 底部统计提示说明 ===== */
+.row-right {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22rpx;
+}
+
 .remark-block {
-  background: #F9FAFB;
+  background: #f9fafb;
   border: 1rpx dashed var(--border);
   border-radius: 16rpx;
   padding: 24rpx;
   display: flex;
   align-items: flex-start;
-  margin-top: 32rpx;
+  margin-top: 28rpx;
 }
-.remark-label { font-size: 24rpx; color: var(--text-muted); font-weight: 800; flex-shrink: 0;}
-.remark-text { font-size: 24rpx; color: var(--text-sub); line-height: 1.6; }
+
+.remark-label {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.remark-text {
+  font-size: 24rpx;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
 
 .empty-hint {
   text-align: center;
   color: var(--text-muted);
   font-size: 26rpx;
   padding: 60rpx 0;
+}
+
+.popup-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 24rpx calc(24rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.popup-panel {
+  width: 100%;
+  max-height: 74vh;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.popup-header {
+  margin-bottom: 14rpx;
+}
+
+.popup-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.popup-sub {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--text-sub);
+}
+
+.popup-close {
+  padding: 8rpx 12rpx;
+  font-size: 24rpx;
+  color: var(--text-sub);
+}
+
+.popup-list {
+  max-height: 56vh;
+}
+
+.popup-item {
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.popup-item:last-child {
+  border-bottom: none;
+}
+
+.popup-scene {
+  font-size: 27rpx;
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.popup-delta {
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.popup-delta.plus {
+  color: #10b981;
+}
+
+.popup-delta.minus {
+  color: #ef4444;
+}
+
+.popup-remark {
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  color: var(--text-sub);
+}
+
+.popup-time {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--text-muted);
 }

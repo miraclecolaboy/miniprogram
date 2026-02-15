@@ -8,14 +8,12 @@ const analyticsService = require('./services/analyticsService');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-exports.main = async (event) => {
+exports.main = async (event = {}) => {
   const action = event.action || '';
   const { OPENID } = cloud.getWXContext();
-
   const triggerName = String(event?.TriggerName || '').trim();
 
   try {
-    // Bootstrap collections (first deploy / empty DB). Safe to call repeatedly.
     await initService.ensureCollections();
 
     if (!action && (event?.Type === 'Timer' || event?.type === 'timer') && triggerName === 'autoDoneTwiceDaily') {
@@ -35,7 +33,6 @@ exports.main = async (event) => {
     if (!sess) return { ok: false, code: 'AUTH_EXPIRED', message: '未登录或登录已过期' };
 
     switch (action) {
-      // 商品与分类
       case 'categories_list':
         return await productService.listCategories();
       case 'categories_add':
@@ -58,7 +55,6 @@ exports.main = async (event) => {
       case 'product_update_skus':
         return await productService.updateSkus(event.productId, event.skus);
 
-      // 订单管理
       case 'orders_list':
         return await orderService.listOrders(event.tab, event.pageNum, event.pageSize);
       case 'orders_get':
@@ -71,7 +67,7 @@ exports.main = async (event) => {
           patch: { expressNo: event.expressNo, expressNoAt: Date.now() },
           sess,
           action: 'order:setExpressNo',
-          note: event.expressNo
+          note: event.expressNo,
         }).then(() => ({ ok: true }));
       case 'orders_applyRefund':
         return await orderService.applyRefund(event.id || event.orderId, event.reason, event.remark, sess);
@@ -81,13 +77,14 @@ exports.main = async (event) => {
         const db = cloud.database();
         const o = await orderService.getOrder(event.id);
         if (!o) return { ok: true, data: null };
+
         const outRefundNo = o.refund && (o.refund.outRefundNo || o.refund.out_refund_no);
         if (!outRefundNo) return { ok: false, message: '无退款单号' };
 
         try {
           const res = await cloud.cloudPay.queryRefund({ outRefundNo });
           await db.collection('orders').doc(o._id).update({
-            data: { 'refund.refundStatus': res.resultCode === 'SUCCESS' ? 'SUCCESS' : res.errCode }
+            data: { 'refund.refundStatus': res.resultCode === 'SUCCESS' ? 'SUCCESS' : res.errCode },
           });
           return { ok: true, data: res };
         } catch (e) {
@@ -95,7 +92,6 @@ exports.main = async (event) => {
         }
       }
 
-      // 店铺与积分
       case 'shop_getConfig':
         return await shopService.getConfig();
       case 'shop_setNotice':
@@ -111,7 +107,6 @@ exports.main = async (event) => {
       case 'points_consumeCode':
         return await shopService.consumeCode(event.code);
 
-      // 优惠券管理
       case 'coupons_list':
         return await shopService.listCoupons();
       case 'coupons_upsert':
@@ -121,9 +116,10 @@ exports.main = async (event) => {
       case 'coupons_toggle_status':
         return await shopService.toggleCouponStatus(event.id, event.status);
 
-      // 运营分析
       case 'analytics_overview':
-        return await analyticsService.getOverview(event.rangeDays);
+        return await analyticsService.getOverview(event);
+      case 'analytics_balance_logs':
+        return await analyticsService.getBalanceLogs(event.openid, event.limit);
 
       default:
         return { ok: false, message: `未知 action: ${action}` };

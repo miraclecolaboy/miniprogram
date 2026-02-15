@@ -3,11 +3,6 @@ Component({
     active: '',
     tabs: [
       {
-        key: 'analytics',
-        text: '运营分析',
-        url: '/packages/admin/pages/analytics/index'
-      },
-      {
         key: 'goods',
         text: '商品管理',
         url: '/packages/admin/pages/goods/index'
@@ -16,6 +11,11 @@ Component({
         key: 'orders',
         text: '订单管理',
         url: '/packages/admin/pages/orders/index'
+      },
+      {
+        key: 'analytics',
+        text: '店铺数据',
+        url: '/packages/admin/pages/analytics/index'
       },
       {
         key: 'shop',

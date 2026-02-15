@@ -238,7 +238,7 @@ async function _applyRechargeSuccessByOutTradeNo(outTradeNo) {
   const rec = await db.collection(COL_RECHARGES).where({ outTradeNo }).limit(1).get();
   const recharge = (rec && rec.data && rec.data[0]) || null;
   if (!recharge) return { ok: false, error: 'not_found' };
-  if (recharge.status === 'success') return { ok: true, data: { rechargeId: recharge._id } };
+  if (recharge.status === 'paid') return { ok: true, data: { rechargeId: recharge._id } };
 
   const rechargeId = String(recharge._id || '');
   const amount = toNum(recharge.amount, 0);
@@ -251,7 +251,7 @@ async function _applyRechargeSuccessByOutTradeNo(outTradeNo) {
     const gotR = await rechargeRef.get().catch(() => null);
     const r = gotR && gotR.data;
     if (!r) return { ok: false, error: 'not_found' };
-    if (r.status === 'success') return { ok: true, data: { rechargeId } };
+    if (r.status === 'paid') return { ok: true, data: { rechargeId } };
 
     const openid = safeStr(r.openid);
     if (!openid) return { ok: false, error: 'bad_openid' };
@@ -288,7 +288,7 @@ async function _applyRechargeSuccessByOutTradeNo(outTradeNo) {
 
     await rechargeRef.update({
       data: {
-        status: 'success',
+        status: 'paid',
         statusText: '已到账',
         paidAt: nowTs,
         updatedAt: nowTs,
@@ -320,7 +320,7 @@ async function confirmRechargePaid(rechargeId, openid) {
   const r = got && got.data;
   if (!r) return { error: 'not_found' };
   if (safeStr(r.openid) && safeStr(r.openid) !== safeStr(openid)) return { error: 'no_permission' };
-  if (r.status === 'success') return { data: { ok: true } };
+  if (r.status === 'paid') return { data: { ok: true } };
 
   // Fallback: actively query and settle (covers missing/delayed payment callback).
   const outTradeNo = safeStr(r.outTradeNo);
@@ -351,7 +351,7 @@ async function listRecharges(openid, event = {}) {
   const scene = safeStr(event.scene);
   const limit = Math.min(200, Math.max(1, toInt(event.limit, 50)));
   // Only show settled logs by default.
-  const where = { openid: safeStr(openid), status: 'success' };
+  const where = { openid: safeStr(openid), status: 'paid' };
   if (scene) where.scene = scene;
   if (event && event.includeAll) delete where.status;
 
@@ -373,7 +373,7 @@ async function cancelRechargeOrder(rechargeId, openid) {
     const r = got && got.data;
     if (!r) return { error: 'not_found' };
     if (safeStr(r.openid) && safeStr(r.openid) !== safeStr(openid)) return { error: 'no_permission' };
-    if (r.status === 'success') return { data: { ok: true, skipped: true } };
+    if (r.status === 'paid') return { data: { ok: true, skipped: true } };
 
     await ref.update({
       data: {

@@ -92,7 +92,7 @@ async function _mapOrderForView(order) {
 
 async function listMyOrders(openid, { tab = 'doing', pageNum = 1, pageSize = 10 }) {
   const skip = (pageNum - 1) * pageSize;
-  let query = db.collection(COL_ORDERS).where({ _openid: openid });
+  let query = db.collection(COL_ORDERS).where({ openid: openid });
 
   if (tab === 'doing') {
     query = query.where({ status: _.in(['processing', 'ready', 'delivering']) });
@@ -115,7 +115,7 @@ async function getOrderDetail(openid, orderId) {
   
   const res = await db.collection(COL_ORDERS).doc(orderId).get();
   
-  if (!res.data || res.data._openid !== openid) {
+  if (!res.data || res.data.openid !== openid) {
     return { error: 'order_not_found', message: 'Order not found or permission denied' };
   }
   

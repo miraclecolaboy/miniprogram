@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "运营分析",
+  "navigationBarTitleText": "店铺数据",
   "enablePullDownRefresh": true,
   "usingComponents": {
     "admin-tabbar": "/packages/admin/components/admin-tabbar/index"

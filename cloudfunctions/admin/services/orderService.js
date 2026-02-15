@@ -193,7 +193,7 @@ async function handleRefund(orderId, decision, remark, sess) {
     }
     
     if (order.payment?.method === 'balance') {
-      const userRef = transaction.collection(COL_CUSTOMERS).doc(order._openid);
+      const userRef = transaction.collection(COL_CUSTOMERS).doc(order.openid);
       await userRef.update({
         data: { balance: _.inc(refundAmount) }
       });
