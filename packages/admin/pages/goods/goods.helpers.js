@@ -16,14 +16,6 @@ function modesToText(modes) {
   return Array.from(set).map((k) => map[k] || k).join('/');
 }
 
-function specsCountText(specs) {
-  if (!Array.isArray(specs) || !specs.length) return '';
-  const groups = specs.length;
-  let opts = 0;
-  specs.forEach((g) => { opts += (Array.isArray(g.options) ? g.options.length : 0); });
-  return `${groups}组 ${opts}项`;
-}
-
 function normalizeSpecsForSku(rawSpecs) {
   const specs = Array.isArray(rawSpecs) ? rawSpecs : [];
   return specs
@@ -60,7 +52,5 @@ module.exports = {
   buildSkuCombos,
   modesToText,
   normalizeModes,
-  specsCountText,
   toInt,
 };
-

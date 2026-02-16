@@ -3,7 +3,7 @@
     <view class="page-header row-between">
       <view class="header-left">
         <view class="page-title">店铺配置</view>
-        <view class="page-sub">核销优先 / 分组折叠 / 便捷操作</view>
+        <!-- <view class="page-sub">核销优先 / 分组折叠 / 便捷操作</view> -->
       </view>
       <view class="btn btn-outline btn-mini" bindtap="onReload">刷新数据</view>
     </view>
@@ -52,7 +52,7 @@
             <view class="divider"></view>
             <view class="form-group">
               <view class="label">店铺首页轮播图</view>
-              <view class="hint">展示在客户端首页顶部，比例 4:3，建议尺寸 750x300。</view>
+              <view class="hint">展示在客户端首页顶部，比例 4:3</view>
               <view class="banner-list">
                 <view class="banner-item" wx:for="{{banners}}" wx:key="key">
                   <image src="{{item.preview}}" mode="aspectFill" class="banner-img" />

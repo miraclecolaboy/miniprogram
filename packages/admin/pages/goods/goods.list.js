@@ -2,7 +2,7 @@
 
 const { requireLogin, getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
-const { modesToText, specsCountText } = require('./goods.helpers');
+const { modesToText } = require('./goods.helpers');
 
 let keywordTimer = null;
 
@@ -90,7 +90,6 @@ module.exports = {
       const incoming = (res.list || []).map((it) => ({
         ...it,
         modesText: modesToText(it.modes),
-        specsCountText: it.hasSpecs ? specsCountText(it.specs) : '',
       }));
 
       const hasMore = incoming.length === pageSize;

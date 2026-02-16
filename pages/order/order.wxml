@@ -273,7 +273,7 @@
     <view class="cart-bar-left" bindtap="showCartDetail" hover-class="hover-opacity">
       <view class="cart-bar-text">
         <view class="cart-total"><text class="currency">￥</text>{{totalPrice}}</view>
-        <view class="cart-tip" wx:if="{{mode!='ziti' && totalCount>0 && needMoreFreeDelivery>0}}">还差￥{{needMoreFreeDelivery}}免配送费</view>
+        <view class="cart-tip" wx:if="{{mode!='ziti' && totalCount>0 && needMoreFreeDelivery>0}}">还差￥{{needMoreFreeDelivery}}免配送费（以下单地址为准）</view>
         <view class="cart-tip" wx:elif="{{totalCount>0}}">已选 {{totalCount}} 件</view>
         <view class="cart-tip" wx:else>请选择商品</view>
       </view>

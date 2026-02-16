@@ -100,6 +100,11 @@ function isValidPhone(v) {
   return /^1\d{10}$/.test(String(v || ''));
 }
 
+function normalizePoints(v) {
+  const n = Math.floor(Number(v || 0));
+  return Number.isFinite(n) ? Math.max(0, n) : 0;
+}
+
 // --- 订单服务 ---
 
 async function createOrder(event, openid) {
@@ -231,6 +236,7 @@ async function createOrder(event, openid) {
       finalPayAmount = Math.max(0, Number(((afterVipFen - couponDiscountFen) / 100).toFixed(2)));
       const paidImmediately = payMethod === 'balance' || finalPayAmount <= 0;
       const paymentMethodFinal = finalPayAmount <= 0 ? 'free' : payMethod;
+      const pointsEarn = normalizePoints(finalPayAmount);
 
       if (payMethod === 'balance') {
         if (user.balance < finalPayAmount) throw { error: 'insufficient_balance', message: '余额不足' };
@@ -248,6 +254,12 @@ async function createOrder(event, openid) {
       if (mode === 'ziti' && reservePhoneFinal && reservePhoneFinal !== storedReservePhone) {
         await tx.collection(COL_USERS).doc(openid).update({
           data: { reservePhone: reservePhoneFinal }
+        });
+      }
+
+      if (paidImmediately && pointsEarn > 0) {
+        await tx.collection(COL_USERS).doc(openid).update({
+          data: { points: _.inc(pointsEarn) }
         });
       }
       
@@ -279,7 +291,7 @@ async function createOrder(event, openid) {
           time: mode === 'ziti' ? pickupTime : '',
           phone: mode === 'ziti' ? reservePhoneFinal : ''
         },
-        remark: remark || '', isVip, memberLevel, pointsEarn: Math.floor(finalPayAmount),
+        remark: remark || '', isVip, memberLevel, pointsEarn,
         createdAt: nowTs, updatedAt: nowTs, paidAt: paidImmediately ? nowTs : 0,
         storeName: shopConfig.storeName || '',
         buyerNickName: String(user.nickName || '').trim(),
@@ -341,9 +353,10 @@ async function sysHandlePaySuccess(payEvent) {
       }
     });
     
-    if (order.pointsEarn > 0 && openid) {
-      await db.collection('users').doc(openid).update({
-        data: { points: _.inc(order.pointsEarn) }
+    const pointsEarn = normalizePoints(order.pointsEarn);
+    if (pointsEarn > 0 && openid) {
+      await db.collection(COL_USERS).doc(openid).update({
+        data: { points: _.inc(pointsEarn) }
       }).catch(console.error);
     }
     
@@ -351,69 +364,104 @@ async function sysHandlePaySuccess(payEvent) {
 }
 
 async function sysHandleRefundSuccess(refundEvent) {
-    const outRefundNo = refundEvent.out_refund_no || refundEvent.outRefundNo;
-    const refundStatus = refundEvent.refund_status || refundEvent.refundStatus;
+  const outRefundNo = refundEvent.out_refund_no || refundEvent.outRefundNo;
+  const refundStatus = refundEvent.refund_status || refundEvent.refundStatus;
 
-    if (!outRefundNo) {
-        console.warn('[sysHandleRefundSuccess] Callback is missing out_refund_no', refundEvent);
-        return { errcode: 0, errmsg: 'OK' };
+  if (!outRefundNo) {
+    console.warn('[sysHandleRefundSuccess] Callback is missing out_refund_no', refundEvent);
+    return { errcode: 0, errmsg: 'OK' };
+  }
+
+  try {
+    const orderRes = await db.collection(COL_ORDERS).where({
+      'refund.outRefundNo': outRefundNo
+    }).limit(1).get();
+
+    const order = orderRes.data[0];
+    if (!order) {
+      console.error(`[sysHandleRefundSuccess] Order not found for outRefundNo: ${outRefundNo}`);
+      return { errcode: 0, errmsg: 'OK' };
     }
 
-    try {
-        const orderRes = await db.collection(COL_ORDERS).where({
-            'refund.outRefundNo': outRefundNo
-        }).limit(1).get();
+    if (refundStatus === 'SUCCESS') {
+      const nowTs = now();
+      const successTime = refundEvent.success_time || '';
 
-        const order = orderRes.data[0];
-        if (!order) {
-            console.error(`[sysHandleRefundSuccess] Order not found for outRefundNo: ${outRefundNo}`);
-            return { errcode: 0, errmsg: 'OK' };
+      await db.runTransaction(async tx => {
+        const orderRef = tx.collection(COL_ORDERS).doc(order._id);
+        const latestRes = await orderRef.get().catch(() => null);
+        const latestOrder = latestRes?.data;
+        if (!latestOrder) return;
+
+        const alreadySuccess = latestOrder.refund?.status === 'success';
+        const alreadyPointsReverted = !!latestOrder.refund?.pointsReverted;
+        if (alreadySuccess && alreadyPointsReverted) return;
+
+        const pointsToRevert = normalizePoints(latestOrder.pointsEarn);
+        let pointsReverted = alreadyPointsReverted || pointsToRevert <= 0;
+        let pointsDelta = alreadyPointsReverted ? Number(latestOrder.refund?.pointsDelta || 0) : 0;
+        let pointsRevertedAt = alreadyPointsReverted
+          ? Number(latestOrder.refund?.pointsRevertedAt || nowTs)
+          : (pointsToRevert <= 0 ? nowTs : 0);
+        let pointsNote = '';
+
+        if (!pointsReverted && pointsToRevert > 0) {
+          if (latestOrder.openid) {
+            const userRef = tx.collection(COL_USERS).doc(latestOrder.openid);
+            const userRes = await userRef.get().catch(() => null);
+            if (userRes?.data) {
+              await userRef.update({ data: { points: _.inc(-pointsToRevert) } });
+              pointsReverted = true;
+              pointsDelta = -pointsToRevert;
+              pointsRevertedAt = nowTs;
+              pointsNote = `，积分已扣除 ${pointsToRevert}`;
+            } else {
+              pointsNote = '，积分扣除失败：用户不存在';
+            }
+          } else {
+            pointsNote = '，积分扣除失败：订单缺少openid';
+          }
         }
 
-        if (order.refund && order.refund.status === 'success') {
-            console.log(`[sysHandleRefundSuccess] Refund for ${outRefundNo} already marked as success. Skipping.`);
-            return { errcode: 0, errmsg: 'OK' };
-        }
-
-        const nowTs = now();
-        let updateData = {};
-        const successTime = refundEvent.success_time || '';
-
-        if (refundStatus === 'SUCCESS') {
-            updateData = {
-                'refund.status': 'success',
-                'refund.statusText': '退款成功',
-                'refund.refundedAt': nowTs,
-                'refund.logs': _.push({
-                    ts: nowTs,
-                    text: `微信支付退款已到账。${successTime ? `到账时间: ${successTime}` : ''}`
-                })
-            };
-        } else {
-            updateData = {
-                'refund.status': 'failed',
-                'refund.statusText': '退款失败',
-                'refund.logs': _.push({
-                    ts: nowTs,
-                    text: `微信支付退款失败，微信返回状态: ${refundStatus}`
-                })
-            };
-        }
-
-        await db.collection(COL_ORDERS).doc(order._id).update({
-            data: { ...updateData, updatedAt: nowTs }
+        const successNote = successTime ? `到账时间: ${successTime}` : '';
+        await orderRef.update({
+          data: {
+            'refund.status': 'success',
+            'refund.statusText': '退款成功',
+            'refund.refundedAt': nowTs,
+            'refund.pointsReverted': pointsReverted,
+            'refund.pointsDelta': pointsDelta,
+            'refund.pointsRevertedAt': pointsRevertedAt,
+            'refund.logs': _.push({
+              ts: nowTs,
+              text: `微信支付退款已到账。${successNote}${pointsNote}`
+            }),
+            updatedAt: nowTs
+          }
         });
-
-        console.log(`[sysHandleRefundSuccess] Processed callback for outRefundNo: ${outRefundNo}, status: ${refundStatus}`);
-        return { errcode: 0, errmsg: 'OK' };
-
-    } catch (e) {
-        console.error(`[sysHandleRefundSuccess] CRITICAL ERROR processing outRefundNo: ${outRefundNo}`, e);
-        return { errcode: 0, errmsg: 'OK' };
+      });
+    } else if (order.refund?.status !== 'success') {
+      const nowTs = now();
+      await db.collection(COL_ORDERS).doc(order._id).update({
+        data: {
+          'refund.status': 'failed',
+          'refund.statusText': '退款失败',
+          'refund.logs': _.push({
+            ts: nowTs,
+            text: `微信支付退款失败，微信返回状态: ${refundStatus}`
+          }),
+          updatedAt: nowTs
+        }
+      });
     }
+
+    console.log(`[sysHandleRefundSuccess] Processed callback for outRefundNo: ${outRefundNo}, status: ${refundStatus}`);
+    return { errcode: 0, errmsg: 'OK' };
+  } catch (e) {
+    console.error(`[sysHandleRefundSuccess] CRITICAL ERROR processing outRefundNo: ${outRefundNo}`, e);
+    return { errcode: 0, errmsg: 'OK' };
+  }
 }
-
-
 async function cancelUnpaidOrder(orderId, openid) {
     const orderRes = await db.collection('orders').doc(orderId).get();
     const order = orderRes.data;

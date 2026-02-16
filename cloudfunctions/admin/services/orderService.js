@@ -12,6 +12,11 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
 
+function normalizePoints(v) {
+  const n = Math.floor(Number(v || 0));
+  return Number.isFinite(n) ? Math.max(0, n) : 0;
+}
+
 // ... [listOrders, getOrder, updateOrderStatus, applyRefund 函数保持不变] ...
 async function listOrders(tab, pageNum, pageSize) {
   const skip = (pageNum - 1) * pageSize;
@@ -158,7 +163,7 @@ async function handleRefund(orderId, decision, remark, sess) {
     const orderRef = transaction.collection(COL_ORDERS).doc(orderId);
     const orderDoc = await orderRef.get();
     const order = orderDoc.data;
-    
+
     if (!order) throw new Error('订单不存在');
     if (!order.refund || !['applied', 'pending'].includes(order.refund.status)) {
       throw new Error('当前状态无法处理售后');
@@ -179,13 +184,29 @@ async function handleRefund(orderId, decision, remark, sess) {
           'refund.logs': _.push(logEntry)
         }
       });
-      return; // 事务内结束
+      return;
     }
-    
-    // --- 同意售后 ---
+
     const refundAmount = Number(order.amount?.total || 0);
+    const pointsToRevert = normalizePoints(order.pointsEarn);
+    let pointsReverted = !!order.refund?.pointsReverted || pointsToRevert <= 0;
+    let pointsDelta = !!order.refund?.pointsReverted ? Number(order.refund?.pointsDelta || 0) : 0;
+    let pointsRevertedAt = !!order.refund?.pointsReverted
+      ? Number(order.refund?.pointsRevertedAt || nowTs)
+      : (pointsToRevert <= 0 ? nowTs : 0);
 
     if (refundAmount <= 0) {
+      if (!pointsReverted && pointsToRevert > 0) {
+        if (!order.openid) throw new Error('缺少用户标识，无法扣除积分');
+        const userRef = transaction.collection(COL_CUSTOMERS).doc(order.openid);
+        await userRef.update({
+          data: { points: _.inc(-pointsToRevert) }
+        });
+        pointsReverted = true;
+        pointsDelta = -pointsToRevert;
+        pointsRevertedAt = nowTs;
+      }
+
       await orderRef.update({
         data: {
           'refund.status': 'success',
@@ -193,18 +214,27 @@ async function handleRefund(orderId, decision, remark, sess) {
           'refund.handleRemark': remark || '0元订单，无需退款',
           'refund.handleAt': nowTs,
           'refund.refundedAt': nowTs,
+          'refund.pointsReverted': pointsReverted,
+          'refund.pointsDelta': pointsDelta,
+          'refund.pointsRevertedAt': pointsRevertedAt,
           'refund.logs': _.push(logEntry)
         }
       });
-      return; // 事务内结束
+      return;
     }
-    
+
     if (order.payment?.method === 'balance') {
+      if (!order.openid) throw new Error('缺少用户标识，无法退回余额');
       const userRef = transaction.collection(COL_CUSTOMERS).doc(order.openid);
-      await userRef.update({
-        data: { balance: _.inc(refundAmount) }
-      });
-      
+      const userPatch = { balance: _.inc(refundAmount) };
+      if (!pointsReverted && pointsToRevert > 0) {
+        userPatch.points = _.inc(-pointsToRevert);
+        pointsReverted = true;
+        pointsDelta = -pointsToRevert;
+        pointsRevertedAt = nowTs;
+      }
+      await userRef.update({ data: userPatch });
+
       await orderRef.update({
         data: {
           'refund.status': 'success',
@@ -212,21 +242,23 @@ async function handleRefund(orderId, decision, remark, sess) {
           'refund.handleRemark': remark,
           'refund.handleAt': nowTs,
           'refund.refundedAt': nowTs,
+          'refund.pointsReverted': pointsReverted,
+          'refund.pointsDelta': pointsDelta,
+          'refund.pointsRevertedAt': pointsRevertedAt,
           'refund.logs': _.push(logEntry)
         }
       });
-      return; // 事务内结束
+      return;
     }
 
-    // 准备微信支付退款（在事务外执行）
     isWxPayRefund = true;
     const outRefundNo = `refund_${genOutRefundNo32()}`;
     wxPayPayload = {
-        outTradeNo: order.orderNo,
-        outRefundNo,
-        totalFee: moneyToFen(refundAmount)
+      outTradeNo: order.orderNo,
+      outRefundNo,
+      totalFee: moneyToFen(refundAmount)
     };
-    
+
     await orderRef.update({
       data: {
         'refund.status': 'processing',
@@ -239,7 +271,6 @@ async function handleRefund(orderId, decision, remark, sess) {
     });
   });
 
-  // 如果是微信支付退款，在事务成功后执行
   if (isWxPayRefund) {
     const shopConfig = await db.collection(COL_SHOP_CONFIG).doc('main').get().then(r => r.data).catch(()=>({}));
     const subMchId = shopConfig.subMchId;
@@ -272,8 +303,6 @@ async function handleRefund(orderId, decision, remark, sess) {
 
   return { ok: true };
 }
-
-
 async function orderUpdateWithLog({ id, patch, sess, action, note }) {
   await db.collection(COL_ORDERS).doc(id).update({
     data: {

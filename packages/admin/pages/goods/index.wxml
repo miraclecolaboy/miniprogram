@@ -7,7 +7,7 @@
       <view class="row-between">
         <view class="header-left">
           <view class="page-title">商品管理</view>
-          <view class="page-sub">统一管理商品、分类、规格等信息</view>
+          <!-- <view class="page-sub">统一管理商品、分类、规格等信息</view> -->
         </view>
         <view class="btn btn-primary btn-mini" bindtap="openAdd">新增商品</view>
       </view>
@@ -38,9 +38,9 @@
                 <text class="badge {{item.status===1 ? 'badge-success' : 'badge-disabled'}}">{{item.status===1 ? '上架中' : '已下架'}}</text>
               </view>
               <view class="data-sub" style="color: var(--warning); font-weight: 700; font-size: 26rpx;">¥{{item.price}}</view>
-              <view class="data-sub">分类：{{item.categoryName || '-'}} <text wx:if="{{item.hasSpecs}}" style="margin-left: 16rpx;">规格：{{item.specsCountText}}</text></view>
+              <view class="data-sub">分类：{{item.categoryName || '-'}} <text wx:if="{{item.hasSpecs}}" style="margin-left: 16rpx;">规格商品</text></view>
             </view>
-            <view class="data-side" style="flex-direction: row; gap: 16rpx; align-items: center;">
+            <view class="data-side" style="flex-direction: row; gap: 16rpx;align-items: center;">
               <view class="btn btn-mini btn-outline" data-id="{{item._id}}" data-onshelf="{{item.status===1}}" bindtap="toggleShelf">{{item.status===1 ? '下架' : '上架'}}</view>
               <view class="btn btn-mini btn-outline" data-id="{{item._id}}" bindtap="openEdit">编辑</view>
               <view class="btn btn-mini btn-danger" data-id="{{item._id}}" bindtap="removeItem">删除</view>

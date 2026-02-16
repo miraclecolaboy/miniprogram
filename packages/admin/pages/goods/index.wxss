@@ -107,6 +107,14 @@
   margin-top: 4rpx;
 }
 
+.data-side {
+  padding: 10rpx 0;
+}
+
+.data-side .btn {
+  margin: 8rpx 0;
+}
+
 .badge {
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
