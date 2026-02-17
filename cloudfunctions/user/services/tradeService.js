@@ -108,6 +108,8 @@ function round2(v) {
   return Number(n.toFixed(2));
 }
 
+const MAX_ITEM_QTY = 99;
+
 async function createOrder(event, openid) {
   const { mode, items, addressId, remark, pickupTime, paymentMethod, userCouponId, storeSubMode, reservePhone } = event;
   const reservePhoneInput = normalizePhone(reservePhone);
@@ -175,7 +177,10 @@ async function createOrder(event, openid) {
           price = product.price;
         }
 
-        const count = Number(item.count || 0);
+        const count = Number(item.count);
+        if (!Number.isInteger(count) || count <= 0 || count > MAX_ITEM_QTY) {
+          throw { error: 'invalid_item_count', message: `商品「${product.name}」数量不合法` };
+        }
         goodsTotalFen += Math.round(Number(price || 0) * 100) * count;
         orderItems.push({
           productId: product._id, skuId: item.skuId || '', productName: product.name,

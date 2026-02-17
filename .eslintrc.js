@@ -4,11 +4,8 @@ module.exports = {
     browser: true,
     node: true,
   },
-  ecmaFeatures: {
-    modules: true,
-  },
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2022,
     sourceType: 'module',
   },
   globals: {

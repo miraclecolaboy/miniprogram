@@ -21,7 +21,6 @@ exports.main = async (event) => {
 
   try {
     const cfg = await getShopConfig();
-    const enabled = !!cfg.cloudPrintOn;
     const storeName = safeStr(cfg.storeName || '');
 
     const feieConfig = {
@@ -42,8 +41,12 @@ exports.main = async (event) => {
       if (!sn) return { ok: false, message: '未配置打印机SN' };
       
       const orderId = safeStr(event.orderId || event.id);
-      
-      const order = {};
+      if (!orderId) return { ok: false, message: '缺少订单ID' };
+
+      const got = await db.collection('orders').doc(orderId).get().catch(() => null);
+      const order = got && got.data ? { ...got.data, _id: orderId } : null;
+      if (!order) return { ok: false, message: '订单不存在' };
+
       const text = buildReceiptText(order, storeName);
       
       const out = await feie.printMsg({ sn, content: textToFeieContent(text), times }, feieConfig);
