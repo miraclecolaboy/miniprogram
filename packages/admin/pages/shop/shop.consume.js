@@ -1,11 +1,9 @@
-// packages/admin/pages/shop/shop.consume.js
 
 const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
 const { safeStr } = require('../../../../utils/common');
 
 module.exports = {
-  // ===== 核销（6位码，核销后即消失）=====
   onConsumeCodeInput(e) {
     this.setData({ consumeCode: safeStr(e.detail.value), consumeTip: '' });
   },

@@ -1,7 +1,7 @@
 .page {
   background: #f7f7f7;
   height: 100vh;
-  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  overflow: hidden;
   padding-bottom: 0;
   box-sizing: border-box;
   display: flex;
@@ -18,7 +18,6 @@
   height: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-/* 顶部 */
 .header {
   padding: 30rpx 24rpx 10rpx;
 }
@@ -28,7 +27,6 @@
   font-weight: 700;
 }
 
-/* 卡片 */
 .card {
   background: #ffffff;
   border-radius: 20rpx;
@@ -37,7 +35,6 @@
   box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.03);
 }
 
-/* 表单项 */
 .form-item {
   display: flex;
   align-items: center;
@@ -70,7 +67,6 @@
   color: #aaa;
 }
 
-/* 默认地址 */
 .switch-card {
   padding: 24rpx;
 }
@@ -85,7 +81,6 @@
   font-size: 28rpx;
 }
 
-/* 底部 */
 .bottom-bar {
   position: fixed;
   left: 0;

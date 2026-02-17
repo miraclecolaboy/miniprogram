@@ -1,4 +1,3 @@
-// cloudfunctions/user/services/tradeService.js
 const cloud = require('wx-server-sdk');
 const {
   COL_ORDERS, COL_USERS, COL_PRODUCTS,
@@ -9,8 +8,6 @@ const { now, toNum } = require('../utils/common');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
-
-// --- 内部辅助函数 ---
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, Math.max(0, Number(ms) || 0))); }
 
@@ -105,7 +102,11 @@ function normalizePoints(v) {
   return Number.isFinite(n) ? Math.max(0, n) : 0;
 }
 
-// --- 订单服务 ---
+function round2(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return 0;
+  return Number(n.toFixed(2));
+}
 
 async function createOrder(event, openid) {
   const { mode, items, addressId, remark, pickupTime, paymentMethod, userCouponId, storeSubMode, reservePhone } = event;
@@ -116,7 +117,6 @@ async function createOrder(event, openid) {
     ? (['tangshi', 'ziti'].includes(rawStoreSubMode) ? rawStoreSubMode : 'ziti')
     : '';
 
-  // Be tolerant to older/buggy clients: default to wechat when missing/invalid.
   let payMethod = String(paymentMethod || '').trim();
   if (!['wechat', 'balance'].includes(payMethod)) payMethod = 'wechat';
 
@@ -130,7 +130,6 @@ async function createOrder(event, openid) {
   let orderNo = '';
 
   try {
-    // [修复] 事务偶发冲突/抖动：自动重试一次，避免用户必须点两次下单
     let txResult;
     const maxAttempts = 2;
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -217,7 +216,7 @@ async function createOrder(event, openid) {
       const deliveryFeeFen = Math.round(Number(deliveryFee || 0) * 100);
       const payableFen = goodsTotalFen + deliveryFeeFen;
       const memberLevel = Number(user.memberLevel || 0);
-      const isVip = memberLevel >= 4; // Lv4: permanent 95% price (5% off)
+      const isVip = memberLevel >= 4;
       const vipDiscountFen = isVip ? Math.round(payableFen * 0.05) : 0;
       const vipDiscount = Number((vipDiscountFen / 100).toFixed(2));
 
@@ -237,9 +236,14 @@ async function createOrder(event, openid) {
       const paidImmediately = payMethod === 'balance' || finalPayAmount <= 0;
       const paymentMethodFinal = finalPayAmount <= 0 ? 'free' : payMethod;
       const pointsEarn = normalizePoints(finalPayAmount);
+      const userBalance = round2(toNum(user.balance, 0));
+      let balanceBeforePay = null;
+      let balanceAfterPay = null;
 
-      if (payMethod === 'balance') {
-        if (user.balance < finalPayAmount) throw { error: 'insufficient_balance', message: '余额不足' };
+      if (paymentMethodFinal === 'balance') {
+        balanceBeforePay = userBalance;
+        balanceAfterPay = round2(userBalance - finalPayAmount);
+        if (balanceAfterPay < 0) throw { error: 'insufficient_balance', message: '余额不足' };
         await tx.collection(COL_USERS).doc(openid).update({ data: { balance: _.inc(-finalPayAmount) } });
       }
       
@@ -264,6 +268,12 @@ async function createOrder(event, openid) {
       }
       
       orderNo = genOrderNo();
+      const paymentDoc = {
+        method: paymentMethodFinal,
+        status: paidImmediately ? 'paid' : 'pending',
+        paidAt: paidImmediately ? nowTs : 0,
+        ...(paymentMethodFinal === 'balance' ? { balanceBeforePay, balanceAfterPay } : {}),
+      };
       
       const orderDoc = {
         openid, orderNo,
@@ -275,13 +285,13 @@ async function createOrder(event, openid) {
         amount: {
           goods: Number((goodsTotalFen / 100).toFixed(2)),
           delivery: Number((deliveryFeeFen / 100).toFixed(2)),
-          // legacy alias used by some order detail UIs ("会员折扣")
           discount: vipDiscount,
           vipDiscount,
           couponDiscount,
           total: Number(finalPayAmount.toFixed(2))
         },
-        payment: { method: paymentMethodFinal, status: paidImmediately ? 'paid' : 'pending', paidAt: paidImmediately ? nowTs : 0 },
+        payment: paymentDoc,
+        ...(paymentMethodFinal === 'balance' ? { balanceBeforePay, balanceAfterPay } : {}),
         userCouponId: userCouponId || '',
         shippingInfo: address,
         receiverPhone: mode === 'ziti' ? reservePhoneFinal : '',
@@ -301,7 +311,6 @@ async function createOrder(event, openid) {
         });
         break;
       } catch (e) {
-        // 业务异常不重试
         if (e && typeof e === 'object' && e.error) throw e;
         if (attempt >= maxAttempts) throw e;
         await sleep(120);
@@ -538,7 +547,6 @@ async function cancelRefund(orderId, openid) {
   const nowTs = now();
   await db.collection(COL_ORDERS).doc(orderId).update({
     data: {
-      // Remove after-sale info so the order returns to normal "doing/done" tabs.
       refund: _.remove(),
       updatedAt: nowTs
     }
@@ -546,7 +554,6 @@ async function cancelRefund(orderId, openid) {
 
   return { ok: true };
 }
-
 
 module.exports = {
   createOrder,

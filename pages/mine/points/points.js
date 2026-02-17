@@ -1,4 +1,3 @@
-// pages/mine/points/points.js
 const { ensureLogin, refreshUserToStorage } = require('../../../utils/auth');
 const { callUser } = require('../../../utils/cloud');
 const { toNum, fmtTime } = require('../../../utils/common');
@@ -69,14 +68,12 @@ Page({
   },
 
   async refreshPage({ forceGifts } = {}) {
-    // 礼品列表独立拉取，不受其它接口影响
     this.fetchGiftsInBackground({ force: !!forceGifts });
 
     try {
       const u = await ensureLogin();
       if (!u) return;
 
-      // 积分和兑换码分开容错，避免互相阻塞
       const [meRes, listRes] = await Promise.allSettled([
         callUser('getMe', {}),
         callUser('listPoints', {}),

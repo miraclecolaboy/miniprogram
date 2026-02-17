@@ -2,7 +2,7 @@
   <view class="card">
     <view class="row-between">
       <text style="font-size: 36rpx; font-weight: 600;">商家端登录</text>
-      <!-- <text class="text-muted" style="font-size: 24rpx;">默认：admin / admin123</text> -->
+      
     </view>
 
     <view class="mt-32">
@@ -18,7 +18,7 @@
     <button class="mt-32 btn-primary" loading="{{logging}}" disabled="{{logging}}" bindtap="onLogin">登录</button>
 
     <view class="mt-24 text-muted" style="font-size: 24rpx; line-height: 36rpx;">
-      <!-- <text>提示：首次使用会自动初始化默认管理员账号到云数据库。</text> -->
+      
     </view>
   </view>
 </view>

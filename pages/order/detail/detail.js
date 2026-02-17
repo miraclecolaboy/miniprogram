@@ -1,4 +1,3 @@
-// pages/order/detail/detail.js
 
 const { toNum } = require('../../../utils/common');
 const { resolveCloudFileList } = require('../../../utils/cloudFile');

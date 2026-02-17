@@ -1,5 +1,3 @@
-// pages/order/order.shop.js
-// 点单页：门店配置/模式切换/分享
 
 const { callUser } = require('../../utils/cloud');
 const { toNum } = require('../../utils/common');
@@ -11,7 +9,6 @@ module.exports = {
       const res = await callUser('getShopConfig');
       const cfg = res?.result?.data || {};
 
-      // Cache for other pages / next entry.
       setShopConfigCache(cfg);
 
       const waimaiOn = cfg.waimaiOn !== false;

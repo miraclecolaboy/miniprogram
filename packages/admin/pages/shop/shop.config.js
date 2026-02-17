@@ -1,4 +1,3 @@
-// packages/admin/pages/shop/shop.config.js
 
 const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');

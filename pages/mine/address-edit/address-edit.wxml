@@ -1,12 +1,10 @@
 <view class="page">
   <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
 
-<!-- 顶部标题 -->
 <view class="header">
   <view class="header-title">{{pageTitle}}</view>
 </view>
 
-<!-- 表单卡片 -->
 <view class="card">
 
   <view class="form-item">
@@ -32,7 +30,6 @@
   </view>
 
 
-<!-- 地图定位 -->
 <view class="form-item" bindtap="chooseLocation">
   <view class="form-label">地图定位</view>
   <view class="form-value {{form.baseAddress ? '' : 'placeholder'}}">
@@ -53,7 +50,6 @@
 
 </view>
 
-<!-- 默认地址 -->
 <view class="card switch-card">
   <view class="switch-row">
     <view class="switch-text">设为默认地址</view>
@@ -64,7 +60,6 @@
   </view>
 </view>
 
-<!-- 底部按钮 -->
   <view class="page-scroll-spacer"></view>
   </scroll-view>
 

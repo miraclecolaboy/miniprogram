@@ -1,4 +1,3 @@
-// packages/admin/pages/orders/refund-handle/refund-handle.decorate.js
 
 const { fmtTime } = require('../../../../../utils/common');
 const { mergeApplyReasonText, modeText } = require('./refund-handle.helpers');
@@ -27,7 +26,6 @@ module.exports = {
       ...o,
       modeText: modeText(o.mode, o.storeSubMode),
       createdAtText: fmtTime(o.createdAt),
-      // 从 order.amount.total 读取金额
       payAmountText: Number(o.amount?.total || 0).toFixed(2),
       refundStatusText: String(refund.statusText || '售后处理中'),
       refundLatestText: String(refund.latestText || ''),

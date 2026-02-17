@@ -1,6 +1,4 @@
-// packages/admin/pages/login/login.js
 const { getSession, setSession } = require('../../utils/auth');
-// [修复] 引入 missing 的 call 方法
 const { call } = require('../../utils/cloud'); 
 const { IS_MERCHANT } = require('../../../../utils/storageKeys');
 
@@ -12,10 +10,8 @@ Page({
   },
 
   onLoad() {
-    // 标记用户为商家，用于 app.js 中的全局跳转逻辑
     wx.setStorageSync(IS_MERCHANT, true);
     
-    // 启动时，如本地已有 token 直接进入后台，避免额外的云端校验造成“进入慢/闪一下登录页”
     const session = getSession();
     if (session && session.token) {
       wx.reLaunch({ url: '/packages/admin/pages/goods/index' });
@@ -40,7 +36,6 @@ Page({
     this.setData({ logging: true });
 
     try {
-      // 这里的 call 之前未定义，现在已在顶部引入
       const result = await call(
         'admin',
         { action: 'login', username, password },

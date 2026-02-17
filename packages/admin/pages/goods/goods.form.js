@@ -1,4 +1,3 @@
-// packages/admin/pages/goods/goods.form.js
 
 const { requireLogin, getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
@@ -124,8 +123,6 @@ module.exports = {
     this.setData({ formModesMap: map, 'form.modes': Object.keys(map).filter((k) => map[k]) });
   },
 
-  // 直接调用 uploader.js 的 generateThumbnail
-  // 必须确保 WXML 里有 canvas-id="image-cropper"
   async triggerThumbnailGen(filePath) {
     if (!filePath) return;
     try {

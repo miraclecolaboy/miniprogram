@@ -5,7 +5,7 @@ const { groupUserCoupons } = require('../../../utils/coupon');
 
 Page({
   data: {
-    activeTab: 'available', // available, mine
+    activeTab: 'available',
     availableCoupons: [],
     myCoupons: {
       unused: [],
@@ -20,7 +20,6 @@ Page({
   },
 
   onShow() {
-    // onShow 时也刷新，以便从结算页回来能看到券被使用
     this.refreshData();
   },
 

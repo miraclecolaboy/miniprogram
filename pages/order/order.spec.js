@@ -1,5 +1,3 @@
-// pages/order/order.spec.js
-// 点单页：规格弹窗/详情页回传的加购逻辑
 
 const { toNum } = require('../../utils/common');
 const { buildSkuKey, buildSpecText, getDefaultSelectedSpecs } = require('../../utils/sku');
@@ -117,7 +115,6 @@ module.exports = {
     const addQty = toNum(quantity, 0);
     if (addQty <= 0) return;
 
-    // 无规格商品也允许从详情页加购
     if (!product.hasSpecs) {
       const cartItem = this._cart.get(product.id) || { ...product, count: 0, createdAt: Date.now() };
       const nextCount = toNum(cartItem.count, 0) + addQty;

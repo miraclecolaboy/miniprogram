@@ -1,5 +1,3 @@
-// pages/checkout/checkout.cart.js
-// 结算页：购物车/优惠券计算相关方法
 
 const { toNum, pickImg } = require('../../utils/common');
 const { groupCouponInstancesForCheckout, buildCouponGroupKey } = require('../../utils/coupon');
@@ -14,7 +12,6 @@ module.exports = {
     const list = Array.isArray(cart) ? cart : [];
     const computed = list.map((it) => ({
       ...it,
-      // Normalize for createOrder payload.
       productId: String(it.productId || it.id || it._id || '').trim(),
       skuKey: String(it.skuKey || it.skuId || '').trim(),
       price: toNum(it.priceWithSpec ?? it.price, 0),
@@ -23,7 +20,6 @@ module.exports = {
       img: pickImg(it.img),
     }));
 
-    // Use "fen" to avoid floating errors and to make discount clamping strict.
     const goodsTotalFen = computed.reduce((sum, item) => sum + (Math.round(toNum(item.price, 0) * 100) * toNum(item.count, 0)), 0);
     const goodsTotal = goodsTotalFen / 100;
     const rawAvailableCoupons = (this.data.userCoupons || []).filter(c => toNum(c?.minSpend, 0) <= goodsTotal);

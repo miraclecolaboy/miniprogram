@@ -1,4 +1,3 @@
-// packages/admin/pages/orders/refund-handle/refund-handle.helpers.js
 
 function modeText(mode, storeSubMode) {
   const m = String(mode || '').trim();

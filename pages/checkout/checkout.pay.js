@@ -1,5 +1,3 @@
-// pages/checkout/checkout.pay.js
-// 结算页：支付相关方法
 
 const { ensureLogin, refreshUserToStorage } = require('../../utils/auth');
 const { callUser } = require('../../utils/cloud');
@@ -65,7 +63,6 @@ module.exports = {
         userCouponId: selectedCoupon ? selectedCoupon.userCouponId : ''
       };
 
-      // [修复] 下单偶发失败：对 createOrder 做一次轻量重试（常见于事务/网络抖动）
       const callCreateOrder = async () => (await callUser('createOrder', payload)).result;
       let out;
       try {

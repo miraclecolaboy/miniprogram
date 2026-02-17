@@ -1,5 +1,3 @@
-// pages/order/order.cart.js
-// 点单页：购物车渲染与操作
 
 const { toNum } = require('../../utils/common');
 const { getCartKey } = require('./order.helpers');

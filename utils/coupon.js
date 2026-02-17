@@ -1,5 +1,3 @@
-// utils/coupon.js
-// 优惠券分组/展示：统一客户端处理，避免多处重复实现。
 
 const { safeStr, toNum } = require('./common');
 
@@ -46,14 +44,12 @@ function _groupCouponInstances(list) {
   return { groups, itemsMap };
 }
 
-// 结算页用：优先展示力度更大的券
 function groupCouponInstancesForCheckout(list) {
   const { groups, itemsMap } = _groupCouponInstances(list);
   groups.sort((a, b) => (toNum(b.discount, 0) - toNum(a.discount, 0)) || (toNum(b.lastClaimedAt, 0) - toNum(a.lastClaimedAt, 0)));
   return { groups, itemsMap };
 }
 
-// 我的优惠券页用：优先展示最近领取
 function groupUserCoupons(list) {
   const { groups } = _groupCouponInstances(list);
   return groups.sort((a, b) => (toNum(b.lastClaimedAt, 0) - toNum(a.lastClaimedAt, 0)) || (toNum(b.discount, 0) - toNum(a.discount, 0)));

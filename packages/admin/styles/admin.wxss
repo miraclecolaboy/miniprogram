@@ -1,5 +1,4 @@
 page {
-  /* 现代 UI 色彩系统 */
   --bg: #F3F4F6;
   --card-bg: #FFFFFF;
   --primary: #000000;
@@ -29,7 +28,6 @@ page {
 .page-title { font-size: 44rpx; font-weight: 800; color: var(--text-main); }
 .page-sub { font-size: 24rpx; color: var(--text-sub); margin-top: 10rpx; }
 
-/* 现代感卡片 */
 .card {
   background: var(--card-bg);
   border-radius: 32rpx;
@@ -38,12 +36,10 @@ page {
   box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.02);
 }
 
-/* 布局辅助 */
 .row { display: flex; align-items: center; }
 .row-between { display: flex; align-items: center; justify-content: space-between; }
 .row-right { display: flex; align-items: center; justify-content: flex-end; gap: 16rpx; }
 
-/* 现代化按钮体系 */
 .btn {
   padding: 0 32rpx;
   height: 64rpx;

@@ -1,8 +1,3 @@
-/*
- * Eslint config file
- * Documentation: https://eslint.org/docs/user-guide/configuring/
- * Install the Eslint extension before using this feature.
- */
 module.exports = {
   env: {
     es6: true,
@@ -26,6 +21,5 @@ module.exports = {
     requirePlugin: true,
     requireMiniProgram: true,
   },
-  // extends: 'eslint:recommended',
   rules: {},
 }

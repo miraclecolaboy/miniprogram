@@ -1,10 +1,5 @@
 const cloud = require('wx-server-sdk');
 
-// 初始化 cloud 用于 getTempFileURL
-// 注意：在被 require 时可能还没 init，所以函数内使用 cloud 实例前最好确保外部已 init，
-// 或者在这里 lazy init。为简单起见，这里假设外部 index.js 会负责 init，或者函数内部直接调用 wx-server-sdk。
-// 但为了独立性，这里不执行 cloud.init，直接使用 cloud 对象的方法（需确保上下文）
-
 function now() { return Date.now(); }
 
 function toNum(v, d = 0) {
@@ -41,7 +36,6 @@ function safeErrMsg(e) {
 }
 
 function gen6Code() {
-  // 100000-999999
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
@@ -54,7 +48,6 @@ function formatTimeText(ts) {
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
-// 批量换取临时链接
 async function getTempUrlMap(fileIds) {
   const ids = (fileIds || []).map(x => String(x || '')).filter(Boolean);
   if (!ids.length) return {};

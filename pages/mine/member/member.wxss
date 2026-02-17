@@ -1,8 +1,7 @@
-/* pages/mine/member/member.wxss */
 page {
   background-color: #F8F9FB;
   height: 100vh;
-  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  overflow: hidden;
 }
 
 .page-container {
@@ -21,20 +20,18 @@ page {
   height: calc(240rpx + env(safe-area-inset-bottom));
 }
 
-/* === 核心会员卡区域 === */
 .card-wrap {
   padding: 32rpx 32rpx 36rpx;
 }
 
 .member-card {
-  /* 黑金渐变背景 */
   background: linear-gradient(145deg, #323232 0%, #1A1A1A 100%);
   border-radius: 32rpx;
   aspect-ratio: 1.95 / 1;
   width: 100%;
   box-sizing: border-box;
   padding: 40rpx 36rpx;
-  color: #E3BF87; /* 金色 */
+  color: #E3BF87;
   box-shadow: 0 40rpx 80rpx -20rpx rgba(0,0,0,0.35);
   position: relative;
   overflow: hidden;
@@ -43,7 +40,6 @@ page {
   justify-content: space-between;
 }
 
-/* 卡片纹理 */
 .card-texture {
   position: absolute;
   top: -60%;
@@ -71,7 +67,6 @@ page {
   letter-spacing: 1rpx;
 }
 
-/* 权益标签 - 金色激活态 */
 .level-tag.active {
   display: inline-block;
   background: linear-gradient(90deg, #E3BF87, #C69C6D);
@@ -104,7 +99,6 @@ page {
   font-weight: 500;
 }
 
-/* 进度条 */
 .progress-track {
   height: 10rpx;
   background: rgba(255,255,255,0.15);
@@ -138,7 +132,6 @@ page {
   letter-spacing: 0.4rpx;
 }
 
-/* === 升级规则说明 === */
 .section-title {
   padding: 0 32rpx 20rpx;
   font-size: 28rpx;
@@ -156,11 +149,11 @@ page {
 
 .rule-item {
   display: flex;
-  margin-bottom: 32rpx; /* 间距拉大 */
+  margin-bottom: 32rpx;
   font-size: 24rpx;
   color: #444;
   line-height: 1.5;
-  align-items: flex-start; /* 顶部对齐 */
+  align-items: flex-start;
 }
 
 .rule-item:last-child {
@@ -178,7 +171,6 @@ page {
 }
 
 .dot-lv4 {
-  /* Lv4 的点稍微大一点，颜色深一点 */
   background: #C69C6D; 
   transform: scale(1.2);
 }
@@ -201,17 +193,15 @@ page {
   margin-top: 8rpx;
 }
 
-/* 新增：多行礼包布局 */
 .gift-row {
   display: flex;
   align-items: center;
   margin-top: 12rpx;
   font-size: 22rpx;
   color: #666;
-  flex-wrap: wrap; /* 防止小屏换行 */
+  flex-wrap: wrap;
 }
 
-/* 标签样式 (权益/礼包) */
 .gift-row .tag {
   background: rgba(198, 156, 109, 0.1);
   color: #C69C6D;
@@ -222,14 +212,13 @@ page {
   flex-shrink: 0;
 }
 
-/* Lv4 永久权益特殊样式 - 黑金风 */
 .gift-row.special {
   margin-top: 16rpx;
 }
 
 .gift-row.special .tag {
-  background: #1A1A1A; /* 黑底 */
-  color: #E3BF87;    /* 金字 */
+  background: #1A1A1A;
+  color: #E3BF87;
 }
 
 .gift-row.special .val {
@@ -245,13 +234,12 @@ page {
   padding-left: 32rpx;
 }
 
-/* === 底部按钮 === */
 .fixed-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 30rpx 48rpx 60rpx; /* 适配全面屏底部 */
+  padding: 30rpx 48rpx 60rpx;
   background: #fff;
   border-top: 1rpx solid #f0f0f0;
   z-index: 100;

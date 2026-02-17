@@ -1,15 +1,11 @@
-/* pages/mine/mine.wxss */
 
-/* ===================================
-   变量定义
-   =================================== */
    page {
     --bg-page: #F7F8FA;
     --card-bg: #FFFFFF;
     --text-main: #1D1D1F;
     --text-sub: #86909C;
     --text-light: #C5C6CB;
-    --gold: #BFA15F; /* 仅保留用于积分/标签的金色 */
+    --gold: #BFA15F;
     --black: #1A1A1A;
     
     --shadow-float: 0 20rpx 60rpx rgba(0, 0, 0, 0.06);
@@ -20,7 +16,7 @@
     box-sizing: border-box;
     color: var(--text-main);
     height: 100vh;
-    overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+    overflow: hidden;
     padding-bottom: 0;
   }
 
@@ -40,9 +36,6 @@
     height: calc(40rpx + env(safe-area-inset-bottom));
   }
   
-  /* ===================================
-     1. 头部用户信息
-     =================================== */
   .user-header {
     padding: 40rpx 40rpx 20rpx;
     display: flex;
@@ -90,9 +83,6 @@
     box-shadow: var(--shadow-card);
   }
   
-  /* ===================================
-     2. 会员权益卡 (Expandable Card)
-     =================================== */
   .vip-card-wrap {
     padding: 0 32rpx;
     margin-top: 24rpx;
@@ -103,7 +93,7 @@
   .vip-card {
     background: linear-gradient(145deg, #323232 0%, #1A1A1A 100%);
     border-radius: 32rpx;
-    height: 228rpx; /* 初始高度 */
+    height: 228rpx;
     padding: 40rpx 36rpx;
     box-sizing: border-box;
     position: relative;
@@ -258,21 +248,15 @@
   .expand-indicator text { font-size: 28rpx; }
   .expand-indicator.rotate { transform: rotate(180deg); }
   
-  /* ===================================
-     3. 悬浮数据舱
-     =================================== */
   .dashboard-section {
     padding: 0 32rpx;
-    /* 核心修改：大幅向上遮挡会员卡，营造插槽感 */
     margin-top: -70rpx; 
     position: relative;
     z-index: 10;
-    /* 增加弹簧阻尼感 */
     transition: margin-top 0.5s cubic-bezier(0.19, 1, 0.22, 1);
   }
   
   .dashboard-section.card-expanded {
-    /* 展开时向下移动，露出完整卡片 */
     margin-top: 24rpx;
   }
   
@@ -305,9 +289,6 @@
     font-weight: 500;
   }
   
-  /* ===================================
-     4. 功能宫格
-     =================================== */
   .menu-section { padding: 40rpx 32rpx; }
   
   .menu-list {
@@ -356,13 +337,10 @@
   .menu-icon { width: 36rpx; height: 36rpx; }
   .menu-text { font-size: 28rpx; color: #333; font-weight: 600; }
   
-  /* ===================================
-     5. 弹窗样式 (新版 - 黑白极简风格)
-     =================================== */
   .spec-mask {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.6); /* 略微加深遮罩 */
+    background-color: rgba(0, 0, 0, 0.6);
     z-index: 500;
     backdrop-filter: blur(4px);
     transition: opacity 0.3s;
@@ -396,7 +374,6 @@
     margin-bottom: 48rpx;
   }
   
-  /* 头像居中部分 */
   .pop-avatar-center {
     display: flex;
     justify-content: center;
@@ -418,14 +395,13 @@
     background: #F0F0F0;
   }
   
-  /* 相机角标 - 纯黑底白标 */
   .pop-avatar-badge {
     position: absolute;
     right: 0;
     bottom: 0;
     width: 48rpx;
     height: 48rpx;
-    background: #1A1A1A; /* 纯黑 */
+    background: #1A1A1A;
     border-radius: 50%;
     border: 4rpx solid #fff;
     display: flex;
@@ -434,7 +410,6 @@
     box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.1);
   }
   
-  /* 纯白相机形状 */
   .camera-shape {
     width: 24rpx;
     height: 18rpx;
@@ -442,18 +417,17 @@
     border-radius: 2rpx;
     position: relative;
   }
-  .camera-shape::before { /* 镜头 */
+  .camera-shape::before {
     content: ''; position: absolute; left: 50%; top: 50%;
     width: 8rpx; height: 8rpx; border-radius: 50%;
-    border: 2rpx solid #1A1A1A; /* 黑色镜头圈，形成对比 */
+    border: 2rpx solid #1A1A1A;
     transform: translate(-50%, -50%);
   }
-  .camera-shape::after { /* 快门 */
+  .camera-shape::after {
     content: ''; position: absolute; right: 4rpx; top: -2rpx;
     width: 4rpx; height: 2rpx; background: #FFFFFF;
   }
   
-  /* 输入框 */
   .pop-input-group {
     margin-bottom: 48rpx;
   }
@@ -479,7 +453,6 @@
     border: 2rpx solid transparent;
   }
   
-  /* 聚焦时变黑 */
   .pop-input:focus {
     background: #fff;
     border-color: #1A1A1A; 
@@ -488,7 +461,6 @@
   
   .pop-input-ph { color: #C5C6CB; }
   
-  /* 按钮组 */
   .pop-btn-group {
     display: flex;
     gap: 24rpx;
@@ -498,7 +470,7 @@
     flex: 1;
     height: 88rpx;
     line-height: 88rpx;
-    border-radius: 44rpx; /* 胶囊形 */
+    border-radius: 44rpx;
     font-size: 28rpx;
     font-weight: 600;
     margin: 0;
@@ -512,8 +484,8 @@
   }
   
   .pop-btn-save {
-    background: #1A1A1A; /* 纯黑背景 */
-    color: #FFFFFF;      /* 纯白文字 */
+    background: #1A1A1A;
+    color: #FFFFFF;
     box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.2);
   }
   .pop-btn-save:active {

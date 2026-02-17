@@ -1,21 +1,13 @@
-/* app.wxss */
 
-/* ===================================
-   1. 设计系统 (Design System) - 纯排版主义
-   =================================== */
    page {
-    /* --- 色板 --- */
-    --black: #000000;       /* 极致纯黑 */
+    --black: #000000;
     --white: #FFFFFF;
-    --bg-page: #F2F2F2;     /* 稍微深一点的灰，衬托白色卡片 */
+    --bg-page: #F2F2F2;
     --text-main: #111111;
-    --text-sub: #888888;    /* 灰色用于英文装饰 */
+    --text-sub: #888888;
     
-    /* --- 字体 --- */
-    /* 使用系统默认的无衬线字体，Apple设备上显示为 San Francisco，非常漂亮 */
     font-family: -apple-system, "Helvetica Neue", Helvetica, sans-serif;
   
-    /* --- 阴影 --- */
     --shadow-float: 0 20rpx 50rpx rgba(0, 0, 0, 0.05);
     --shadow-card: 0 4rpx 20rpx rgba(0, 0, 0, 0.02);
   
@@ -26,10 +18,8 @@
   
   .container { box-sizing: border-box; }
   
-  /* 交互：透明度变化 */
   .hover-scale { opacity: 0.6; transition: opacity 0.2s; }
   
-  /* 通用箭头 (用纯 CSS 画，比图标更锐利) */
   .css-arrow {
     display: inline-block;
     width: 16rpx;
@@ -39,7 +29,6 @@
     transform: rotate(45deg);
   }
 
-  /* Hide scrollbars globally (page scroll + scroll-view). */
   page::-webkit-scrollbar,
   scroll-view::-webkit-scrollbar {
     display: none;
@@ -48,9 +37,6 @@
     color: transparent;
   }
 
-  /* ===================================
-     2. Motion (Entrance / Skeleton)
-     =================================== */
   @keyframes lljFadeInUp {
     from { opacity: 0; transform: translateY(26rpx); }
     to { opacity: 1; transform: translateY(0); }
@@ -72,7 +58,6 @@
     100% { transform: translateX(220%); }
   }
 
-  /* Apply to a block with `position: relative; overflow: hidden;` */
   .llj-shimmer {
     position: relative;
     overflow: hidden;

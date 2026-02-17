@@ -1,4 +1,3 @@
-// packages/admin/pages/goods/goods.list.js
 
 const { requireLogin, getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');

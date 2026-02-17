@@ -1,4 +1,3 @@
-// packages/admin/pages/shop/shop.gifts.js
 
 const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');

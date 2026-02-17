@@ -1,4 +1,3 @@
-// packages/admin/pages/goods/goods.sku.js
 
 const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');

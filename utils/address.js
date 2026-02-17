@@ -1,5 +1,3 @@
-// utils/address.js
-// 地址相关：兼容旧数据结构（id/_id、lat/lng/latitude/longitude/location 等），统一归一化逻辑。
 
 const { safeStr, toNum } = require('./common');
 

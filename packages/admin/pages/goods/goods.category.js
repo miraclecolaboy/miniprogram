@@ -1,4 +1,3 @@
-// packages/admin/pages/goods/goods.category.js
 
 const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');

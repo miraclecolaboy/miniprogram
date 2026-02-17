@@ -1,7 +1,5 @@
-/* pages/points/points.wxss */
 
 page {
-  /* === 全局变量 (保持与 recharge.wxss 一致) === */
   --bg-page: #F9FAFC;   
   --text-main: #1D1D1F; 
   --text-sub: #8C8883;  
@@ -13,7 +11,7 @@ page {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
   box-sizing: border-box;
   height: 100vh;
-  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  overflow: hidden;
   padding-bottom: 0;
   color: var(--text-main);
 }
@@ -32,9 +30,6 @@ page {
   box-sizing: border-box;
 }
 
-/* ============================
-   1. 头部资产区域 (复用 Recharge 样式)
-   ============================ */
 .header-section {
   padding: 32rpx 32rpx 8rpx;
   margin-bottom: 24rpx;
@@ -50,12 +45,10 @@ page {
   border: 2rpx solid rgba(255, 255, 255, 0.8);
 }
 
-/* POINTS 水印：居中更均匀（清晰但极淡） */
 .card-decoration {
   position: absolute;
   top: 50%;
   left: 50%;
-  /* 居中 + 轻微旋转 */
   transform: translate(-50%, -50%) rotate(-10deg);
   font-family: 'Didot', 'Times New Roman', serif; 
   font-size: 130rpx; 
@@ -74,7 +67,6 @@ page {
   margin-bottom: 28rpx;
 }
 
-/* 双语标签组 */
 .label-group {
   display: flex;
   flex-direction: column;
@@ -92,7 +84,7 @@ page {
 
 .card-label-en {
   font-size: 18rpx;
-  color: #B08D55; /* 深金色 */
+  color: #B08D55;
   font-weight: 600;
   letter-spacing: 3rpx; 
   text-transform: uppercase;
@@ -116,7 +108,7 @@ page {
 .symbol-unit {
   font-size: 32rpx; font-weight: 700; color: #B08D55;
   margin-left: 16rpx; font-family: 'DIN Alternate', sans-serif;
-  transform: translateY(-8rpx); /* 微调对齐 */
+  transform: translateY(-8rpx);
 }
 
 .btn-history {
@@ -132,9 +124,6 @@ page {
   transform: translateY(-10rpx);
 }
 
-/* ============================
-   2. 内容区域 (列表)
-   ============================ */
 .section-wrap { padding: 0 32rpx; }
 
 .section-header {
@@ -152,15 +141,14 @@ page {
   padding: 4rpx 12rpx; border-radius: 8rpx; font-weight: 700; letter-spacing: 1rpx;
 }
 
-/* === 礼品卡片 (升级圆角和阴影) === */
 .gift-card {
   background: #FFFFFF;
-  border-radius: 32rpx; /* 与充值页一致 */
+  border-radius: 32rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
   display: flex;
   align-items: center;
-  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.02); /* 空气阴影 */
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.02);
   border: 2rpx solid transparent;
   transition: transform 0.1s;
 }
@@ -223,7 +211,6 @@ page {
   margin-left: 8rpx; font-weight: 600;
 }
 
-/* 兑换按钮：保持黑色药丸形状 */
 .btn-redeem {
   padding: 0 32rpx;
   height: 60rpx; line-height: 60rpx;
@@ -237,7 +224,6 @@ page {
   background: #F0F2F5; color: #CCC; box-shadow: none;
 }
 
-/* === 兑换券卡片 (升级风格) === */
 .voucher-ticket {
   background: #FFFFFF;
   border-radius: 32rpx;
@@ -270,7 +256,6 @@ page {
   letter-spacing: 1rpx; font-size: 28rpx;
 }
 
-/* 分割线优化 */
 .voucher-split {
   width: 2rpx; height: 100%; position: relative;
   display: flex; align-items: center; justify-content: center;
@@ -288,7 +273,6 @@ page {
 .circle-top { top: -15rpx; }
 .circle-bottom { bottom: -15rpx; }
 
-/* 复制按钮 */
 .voucher-right {
   width: 140rpx;
   display: flex; align-items: center; justify-content: center;

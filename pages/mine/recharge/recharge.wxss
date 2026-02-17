@@ -1,7 +1,5 @@
-/* pages/recharge/recharge.wxss */
 
 page {
-  /* === 全局变量 === */
   --bg-page: #F9FAFC;   
   --text-main: #1D1D1F; 
   --text-sub: #8C8883;  
@@ -13,7 +11,7 @@ page {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
   box-sizing: border-box;
   height: 100vh;
-  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  overflow: hidden;
   padding-bottom: 0;
   color: var(--text-main);
 }
@@ -34,16 +32,12 @@ page {
   height: calc(220rpx + env(safe-area-inset-bottom));
 }
 
-/* ============================
-   1. 主视觉区域
-   ============================ */
 .header-section {
   padding: 32rpx 32rpx 8rpx;
   margin-bottom: 24rpx;
 }
 
 .asset-card {
-  /* 香槟微渐变 */
   background: linear-gradient(135deg, #FFFFFF 0%, #FBF7F2 100%);
   border-radius: 32rpx;
   padding: 44rpx 40rpx;
@@ -53,22 +47,18 @@ page {
   border: 2rpx solid rgba(255, 255, 255, 0.8);
 }
 
-/* 核心修改：恢复清晰、精致的衬线体水印 */
 .card-decoration {
   position: absolute;
   top: -5%; 
   right: -8%;
-  /* 使用衬线体，更有杂志感 */
   font-family: 'Didot', 'Times New Roman', serif; 
   font-size: 120rpx;
-  /* 清晰但极淡，像钢印一样 */
   color: rgba(199, 171, 133, 0.06); 
   font-weight: 700;
   pointer-events: none;
   z-index: 0;
   letter-spacing: 4rpx;
   transform: rotate(-5deg);
-  /* 没有任何模糊滤镜 */
 }
 
 .card-content { position: relative; z-index: 1; }
@@ -78,7 +68,6 @@ page {
   margin-bottom: 28rpx;
 }
 
-/* 双语标签组 */
 .label-group {
   display: flex;
   flex-direction: column;
@@ -94,7 +83,7 @@ page {
 
 .card-label-en {
   font-size: 18rpx;
-  color: #B08D55; /* 深金色 */
+  color: #B08D55;
   font-weight: 600;
   letter-spacing: 3rpx; 
   text-transform: uppercase;
@@ -129,9 +118,6 @@ page {
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
 }
 
-/* ============================
-   2. 充值功能区
-   ============================ */
 .section-wrap { padding: 0 32rpx; }
 
 .section-header {
@@ -149,7 +135,6 @@ page {
   padding: 4rpx 12rpx; border-radius: 8rpx; font-weight: 700; letter-spacing: 1rpx;
 }
 
-/* Grid 三列布局 */
 .grid-box {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -175,7 +160,6 @@ page {
 
 .option-desc { font-size: 22rpx; color: #999; font-weight: 500; }
 
-/* 选中态：金线框 */
 .option-btn.active {
   border-color: var(--gold-main);
   background: #FFFCF7;
@@ -194,7 +178,6 @@ page {
   box-shadow: -2rpx 2rpx 8rpx rgba(168, 139, 96, 0.2);
 }
 
-/* 自定义金额（作为卡片放在 grid 最后一个） */
 .custom-option { padding: 0 12rpx; }
 
 .custom-input {
@@ -211,9 +194,6 @@ page {
 }
 .ph-style { font-size: 22rpx; color: #D1D1D6; font-weight: 400; text-align: center; }
 
-/* ============================
-   3. 底部悬浮栏
-   ============================ */
 .fixed-footer {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: rgba(255,255,255,0.92);
@@ -245,9 +225,6 @@ page {
 }
 .pay-btn:active { transform: scale(0.98); }
 
-/* ============================
-   4. 弹窗样式 (保持原版逻辑)
-   ============================ */
 .spec-mask {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; backdrop-filter: blur(4px);
 }
@@ -279,7 +256,6 @@ page {
   transition: all 0.2s;
 }
 
-/* 选中态适配黑色 */
 .log-tab.active { background: var(--text-main); color: #FFFFFF; }
 
 .spec-scroll { flex: 1; height: 0; overflow-y: auto; }
@@ -295,7 +271,6 @@ page {
   font-family: 'DIN Alternate', sans-serif;
   font-size: 32rpx; font-weight: 700; color: var(--black);
 }
-/* 适配金色 */
 .record-amount.plus { color: #000000; }
 
 .empty-state {

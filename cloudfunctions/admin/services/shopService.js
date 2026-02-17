@@ -81,7 +81,6 @@ async function findRedeemCodeOwner(code) {
       if (hit) return { openid: safeStr(user && user._id), ...hit };
     }
   } catch (_) {
-    // fallback scan
   }
 
   let skip = 0;

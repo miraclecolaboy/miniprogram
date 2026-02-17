@@ -1,4 +1,3 @@
-// packages/admin/pages/goods/goods.helpers.js
 
 function toInt(v, d = 0) {
   const n = parseInt(v, 10);

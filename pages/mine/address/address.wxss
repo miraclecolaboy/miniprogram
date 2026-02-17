@@ -1,6 +1,6 @@
 .page{
   height:100vh;
-  overflow:hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  overflow:hidden;
   background:#F6F7F9;
   padding:0;
   box-sizing:border-box;
@@ -21,14 +21,12 @@
   border-radius:20rpx;
 }
 
-/* 地址卡片 */
 .address-card{
   display:flex;
   padding:24rpx;
   margin-bottom:20rpx;
 }
 
-/* 左侧内容 */
 .addr-content{
   flex:1;
   padding-right:20rpx;
@@ -67,8 +65,6 @@
   line-height:1.5;
 }
 
-/* 右侧操作区 */
-/* 右侧操作区：整体弱化 */
 .addr-ops{
   width:88rpx;
   display:flex;
@@ -77,7 +73,6 @@
   gap:12rpx;
 }
 
-/* 单个操作 */
 .op-btn{
   height:60rpx;            
   border-radius:16rpx;     
@@ -99,8 +94,6 @@
   background:#E5E7EB;
 }
 
-
-/* 底部 */
 .footer{
   margin-top:32rpx;
 }
@@ -117,7 +110,6 @@
   font-weight:700;
 }
 
-/* 空状态 */
 .empty{
   text-align:center;
   padding:80rpx 0;

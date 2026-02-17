@@ -1,5 +1,3 @@
-// pages/checkout/checkout.sync.js
-// 结算页：本地缓存/用户信息/地址选择等杂项方法
 
 const { ensureLogin, refreshUserToStorage, isLoginOK } = require('../../utils/auth');
 const { fmtMoney, toNum } = require('../../utils/common');

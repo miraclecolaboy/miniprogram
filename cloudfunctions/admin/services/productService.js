@@ -1,4 +1,3 @@
-// cloudfunctions/admin/services/productService.js
 const cloud = require('wx-server-sdk');
 const { COL_PRODUCTS, COL_CATEGORIES } = require('../config/constants');
 const { now, isCollectionNotExists, safeStr, toNum, toInt, normalizeModes, sanitizeSpecs } = require('../utils/common');
@@ -8,12 +7,10 @@ const db = cloud.database();
 const _ = db.command;
 const $ = db.command.aggregate;
 
-// 内部辅助：安全删除云文件
 async function deleteFileSafe(fileIDs) {
   const ids = (Array.isArray(fileIDs) ? fileIDs : [fileIDs]).filter(id => typeof id === 'string' && id.startsWith('cloud://'));
   if (!ids.length) return;
   try {
-    // 增加日志，便于追踪
     console.log('[deleteFileSafe] Deleting files:', ids);
     await cloud.deleteFile({ fileList: ids });
   } catch (e) {
@@ -21,7 +18,6 @@ async function deleteFileSafe(fileIDs) {
   }
 }
 
-// [修改] 内部辅助：将传入的商品数据清洗并标准化
 function normalizeProductInput(data) {
   const input = data || {};
   const name = safeStr(input.name);
@@ -63,7 +59,7 @@ function normalizeProductInput(data) {
     sort: toInt(input.sort, 0),
     modes: normalizeModes(input.modes),
     imgs: (Array.isArray(input.imgs) ? input.imgs : []).filter(Boolean).slice(0, 3),
-    thumbFileID: safeStr(input.thumbFileID), // [新增]
+    thumbFileID: safeStr(input.thumbFileID),
     desc: safeStr(input.desc),
     detail: safeStr(input.detail),
     hasSpecs,
@@ -73,7 +69,6 @@ function normalizeProductInput(data) {
   };
 }
 
-// --- 分类管理 (无变化) ---
 async function listCategories() {
   try {
     const r = await db.collection(COL_CATEGORIES).orderBy('sort', 'asc').limit(200).get();
@@ -103,9 +98,6 @@ async function removeCategory(id) {
   return { ok: true };
 }
 
-// --- 商品管理 ---
-
-// [修改] listProducts, 增加缩略图返回
 async function listProducts(event) {
   const { keyword = '', categoryId = '', pageNum = 1, pageSize = 20 } = event;
   const skip = (pageNum - 1) * pageSize;
@@ -128,14 +120,13 @@ async function listProducts(event) {
       })
       .project({
         _id: 1, name: 1, price: 1, status: 1, modes: 1, hasSpecs: 1,
-        thumbFileID: 1, // [新增]
+        thumbFileID: 1,
         categoryName: $.arrayElemAt([$.ifNull(['$category.name', '']), 0])
       })
       .end();
 
     let list = res.list || [];
     const allFileIDs = new Set();
-    // [修改] 同时收集缩略图ID
     list.forEach(item => {
       if (item.thumbFileID && item.thumbFileID.startsWith('cloud://')) {
         allFileIDs.add(item.thumbFileID);
@@ -151,7 +142,6 @@ async function listProducts(event) {
     }
 
     list = list.map(item => {
-      // [修改] 生成 thumbUrl
       const thumbUrl = tempUrlMap[item.thumbFileID] || '';
       return { ...item, thumbUrl };
     });
@@ -164,15 +154,13 @@ async function listProducts(event) {
   }
 }
 
-// [修改] getProductForEdit, 返回 FileID
 async function getProductForEdit(id) {
   if (!id) return { ok: false, message: '缺少商品ID' };
   const doc = await db.collection(COL_PRODUCTS).doc(id).get().then(res => res.data).catch(() => null);
   if (!doc) return { ok: false, message: '商品不存在' };
 
-  // [修改] 同时返回原始 fileID 和预览 URL
   const imgFileIDs = (doc.imgs || []).filter(img => typeof img === 'string' && img.startsWith('cloud://'));
-  doc.imgFileIDs = imgFileIDs; // [新增]
+  doc.imgFileIDs = imgFileIDs;
 
   if (imgFileIDs.length > 0) {
     try {
@@ -188,7 +176,6 @@ async function getProductForEdit(id) {
   return { ok: true, data: doc };
 }
 
-// [修改] addProduct, 增加 thumbFileID
 async function addProduct(data, tempId) {
   const input = normalizeProductInput(data);
   const doc = {
@@ -220,7 +207,6 @@ async function addProduct(data, tempId) {
   return { ok: true, id: realId };
 }
 
-// [修改] updateProduct, 增加 thumbFileID
 async function updateProduct(id, data, deletedFileIDs) {
   if (!id || typeof id !== 'string') return { ok: false, message: '缺少商品ID' };
   
@@ -232,7 +218,6 @@ async function updateProduct(id, data, deletedFileIDs) {
   await db.collection(COL_PRODUCTS).doc(id).update({
     data: {
       ...input,
-      // Inventory is no longer used; remove legacy fields to avoid confusion.
       stock: _.remove(),
       updatedAt: now()
     }
@@ -245,23 +230,21 @@ async function updateProduct(id, data, deletedFileIDs) {
   return { ok: true };
 }
 
-// [修改] removeProduct, 增加删除缩略图
 async function removeProduct(id) {
   if (!id) return { ok: false, message: '缺少商品ID' };
   const old = await db.collection(COL_PRODUCTS).doc(id).get().then(res => res.data).catch(() => null);
   const oldImgs = old?.imgs || [];
-  const oldThumb = old?.thumbFileID || ''; // [新增]
+  const oldThumb = old?.thumbFileID || '';
   await db.collection(COL_PRODUCTS).doc(id).remove();
   
   const filesToDelete = [...oldImgs];
-  if (oldThumb) filesToDelete.push(oldThumb); // [新增]
+  if (oldThumb) filesToDelete.push(oldThumb);
   if (filesToDelete.length > 0) {
     deleteFileSafe(filesToDelete);
   }
   return { ok: true };
 }
 
-// toggleProductStatus, updateSkus 无变化
 async function toggleProductStatus(id, onShelf) {
   if (!id) return { ok: false, message: '缺少商品ID' };
   await db.collection(COL_PRODUCTS).doc(id).update({

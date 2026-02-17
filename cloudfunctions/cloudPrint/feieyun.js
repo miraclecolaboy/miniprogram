@@ -1,4 +1,3 @@
-// cloudfunctions/cloudPrint/feieyun.js
 const https = require('https');
 const http = require('http');
 const querystring = require('querystring');
@@ -9,7 +8,6 @@ function sha1Hex(str) {
   return crypto.createHash('sha1').update(String(str || ''), 'utf8').digest('hex');
 }
 
-// [核心改造] 不再读取环境变量，只依赖传入的配置
 function getFeieCredentials(cfg = {}) {
   const config = cfg || {};
   const user = safeStr(config.user);
@@ -60,7 +58,6 @@ function postForm({ host, path, data, timeoutMs = 8000, useHttps = true }) {
   });
 }
 
-// [核心改造] 接受 feieConfig 对象
 async function openApi(apiname, params, feieConfig) {
   const { user, ukey } = getFeieCredentials(feieConfig);
   const host = 'api.feieyun.cn';
@@ -94,7 +91,6 @@ function ensureContentLimit(content) {
   return s;
 }
 
-// [核心改造] 接受 feieConfig 对象
 async function printMsg({ sn, content, times = 1 }, feieConfig) {
   const s = safeStr(sn);
   if (!s) {
@@ -109,7 +105,6 @@ async function printMsg({ sn, content, times = 1 }, feieConfig) {
   return await openApi('Open_printMsg', { sn: s, content: c, times: safeTimes }, feieConfig);
 }
 
-// [核心改造] 接受 feieConfig 对象
 async function queryPrinterStatus({ sn }, feieConfig) {
   const s = safeStr(sn);
   if (!s) {

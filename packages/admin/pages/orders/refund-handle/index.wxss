@@ -15,7 +15,6 @@
   padding: 0 24rpx;
 }
 
-/* ================= 卡片共用 ================= */
 .card {
   background: #FFFFFF;
   border-radius: 24rpx;
@@ -42,7 +41,6 @@
   margin-right: 12rpx;
 }
 
-/* ================= 信息网格 ================= */
 .info-grid {
   display: flex;
   flex-direction: column;
@@ -66,7 +64,6 @@
   word-break: break-all;
 }
 
-/* ================= 订单明细内嵌区块 ================= */
 .goods-block {
   background: #F9FAFB;
   border-radius: 16rpx;
@@ -103,7 +100,6 @@
 .remark-label { font-size: 24rpx; color: #D97706; font-weight: 800; flex-shrink: 0;}
 .remark-text { font-size: 24rpx; color: #B45309; font-weight: 600; line-height: 1.5; }
 
-/* ================= 表单与操作区 ================= */
 .form-group {
   margin-bottom: 32rpx;
 }

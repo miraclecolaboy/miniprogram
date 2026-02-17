@@ -1,4 +1,3 @@
-// cloudfunctions/user/services/rechargeService.js
 const cloud = require('wx-server-sdk');
 const {
   COL_USERS,
@@ -80,7 +79,6 @@ function pad2(n) {
 }
 
 function genRechargeNo() {
-  // R + yyyyMMddHHmmss + 4 random digits
   const d = new Date();
   const rnd = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
   return `R${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}${rnd}`;
@@ -139,7 +137,6 @@ async function _getPayConfig() {
 }
 
 async function createRechargeOrder(event, openid) {
-  // Seed default member coupons/levels (idempotent; keep manual edits).
   await ensureMemberLevelDefaults(db, now()).catch(() => {});
 
   const amount = toNum(event && event.amount, 0);
@@ -150,7 +147,6 @@ async function createRechargeOrder(event, openid) {
   const outTradeNo = genRechargeNo();
   const nowTs = now();
 
-  // 1) Create recharge record first (idempotent anchor for later callbacks).
   const doc = {
     openid,
     outTradeNo,
@@ -167,7 +163,6 @@ async function createRechargeOrder(event, openid) {
   const rechargeId = addRes && addRes._id ? String(addRes._id) : '';
   if (!rechargeId) return { error: 'create_failed' };
 
-  // 2) Create WeChat Pay order.
   try {
     const { subMchId } = await _getPayConfig();
     const payRes = await cloud.cloudPay.unifiedOrder({
@@ -191,7 +186,6 @@ async function createRechargeOrder(event, openid) {
 
     return { ok: true, data: { rechargeId, payment: payRes.payment } };
   } catch (e) {
-    // Create pay failed -> delete pending record to avoid clutter.
     await db.collection(COL_RECHARGES).doc(rechargeId).remove().catch(() => {});
     return { error: 'wxpay_failed', message: e.message || '' };
   }
@@ -205,7 +199,6 @@ async function _grantLevelCouponsTx(tx, userDoc, userRef, levelsCfg, fromLevel, 
   const warnings = [];
   const newCoupons = [];
 
-  // Merge duplicates (same couponId may appear across levels or within a level).
   const needMap = new Map();
   plan.forEach((p) => {
     const key = p.couponId;
@@ -278,7 +271,6 @@ async function _grantLevelCouponsTx(tx, userDoc, userRef, levelsCfg, fromLevel, 
 }
 
 async function _applyRechargeSuccessByOutTradeNo(outTradeNo) {
-  // Ensure default coupons exist before granting.
   await ensureMemberLevelDefaults(db, now()).catch(() => {});
 
   const rec = await db.collection(COL_RECHARGES).where({ outTradeNo }).limit(1).get();
@@ -320,7 +312,6 @@ async function _applyRechargeSuccessByOutTradeNo(outTradeNo) {
 
     const nextLevel = calcMemberLevel(nextTotalRecharge, levelsCfg);
 
-    // Update user main fields first; coupons are granted with an additional update when needed.
     await userRef.update({
       data: {
         balance: nextBalance,
@@ -368,11 +359,9 @@ async function confirmRechargePaid(rechargeId, openid) {
   if (safeStr(r.openid) && safeStr(r.openid) !== safeStr(openid)) return { error: 'no_permission' };
   if (r.status === 'paid') return { data: { ok: true } };
 
-  // Fallback: actively query and settle (covers missing/delayed payment callback).
   const outTradeNo = safeStr(r.outTradeNo);
   if (!outTradeNo) return { error: 'not_paid' };
 
-  // Some environments may not expose queryOrder; we keep this optional.
   if (cloud.cloudPay && typeof cloud.cloudPay.queryOrder === 'function') {
     try {
       const { subMchId } = await _getPayConfig();
@@ -386,7 +375,6 @@ async function confirmRechargePaid(rechargeId, openid) {
         if (settle && settle.ok) return { data: { ok: true } };
       }
     } catch (_) {
-      // ignore, fall back to polling
     }
   }
 

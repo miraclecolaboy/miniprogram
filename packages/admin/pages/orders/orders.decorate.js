@@ -1,4 +1,3 @@
-// packages/admin/pages/orders/orders.decorate.js
 
 const { fmtTime } = require('../../../../utils/common');
 const {
@@ -9,20 +8,28 @@ const {
   needRefundHandle,
 } = require('./orders.helpers');
 
+function getBalanceAfterPayText(order) {
+  const candidates = [
+    order?.payment?.balanceAfterPay,
+    order?.balanceAfterPay,
+    order?.payment?.balanceAfter,
+    order?.balanceAfter,
+  ];
+  for (const raw of candidates) {
+    const n = Number(raw);
+    if (Number.isFinite(n)) return n.toFixed(2);
+  }
+  return '';
+}
+
 module.exports = {
-  /**
-   * 移除旧字段兼容，直接读取新结构
-   */
   decorateOrder(o) {
     const hasRefund = !!(o && o.refund);
     const refundStatus = getRefundStatus(o);
-    // 售后已结束但订单可继续履约（如拒绝/取消售后）
     const refundEndedButOrderContinues = ['rejected', 'reject', 'cancelled', 'canceled'];
-    // 售后进行中/或已退款成功：不允许继续推进订单状态（避免误操作）
     const refundBlocksOrder = hasRefund && !refundEndedButOrderContinues.includes(refundStatus);
     const needHandle = hasRefund && needRefundHandle(o);
 
-    // 商品
     const items = o.items || [];
     const itemsView = items.map((it, idx) => {
       const name = String(it.productName || it.name || '');
@@ -31,9 +38,8 @@ module.exports = {
       return { key: `${o._id}_${idx}`, line: `${name} × ${c}${spec ? `（${spec}）` : ''}` };
     });
 
-    // 地址
-    const addr = o.shippingInfo || {}; // 直接读取 shippingInfo
-    const pickupInfo = o.pickupInfo || {}; // 直接读取 pickupInfo
+    const addr = o.shippingInfo || {};
+    const pickupInfo = o.pickupInfo || {};
     const pickupPhone = String(pickupInfo.phone || o.reservePhone || o.receiverPhone || '').trim();
     const receiverName = o.mode === 'ziti' ? '' : (addr.name || '');
     const receiverPhone = o.mode === 'ziti' ? pickupPhone : (addr.phone || '');
@@ -43,7 +49,6 @@ module.exports = {
       ? `${[receiverName, receiverPhone].filter(Boolean).join(' ')}\n${addrText}`.trim()
       : '';
 
-    // 自提
     const pickupCodeText = String(pickupInfo.code || '');
     let pickupTimeText = '';
     if (o.mode === 'ziti' && pickupInfo.time) {
@@ -52,8 +57,7 @@ module.exports = {
         : String(pickupInfo.time).trim();
     }
 
-    // 金额
-    const amount = o.amount || {}; // 直接读取 amount
+    const amount = o.amount || {};
     const payAmountText = Number(amount.total || 0).toFixed(2);
     const goodsAmountText = Number(amount.goods || 0).toFixed(2);
     const deliveryAmountText = Number(amount.delivery || 0).toFixed(2);
@@ -62,12 +66,12 @@ module.exports = {
     const vipDiscountText = Number.isFinite(vipDiscountNum) ? vipDiscountNum.toFixed(2) : '0.00';
     const couponDiscountText = Number.isFinite(couponDiscountNum) ? couponDiscountNum.toFixed(2) : '0.00';
     const payMethod = String(o?.payment?.method || '').trim();
+    const balanceAfterPayText = getBalanceAfterPayText(o);
     const payMethodText = payMethod === 'balance'
       ? '余额支付'
       : (payMethod === 'free' ? '无需支付' : '微信支付');
     const buyerNickName = String(o.buyerNickName || o.userNickName || o.nickName || '').trim();
 
-    // 状态
     const st = String(o.status || '').toLowerCase();
     const isPaidLike = !!o.paidAt || ['paid', 'making', 'processing', 'ready', 'delivering', 'done'].includes(st);
     const canApplyRefund = !!(isPaidLike && st !== 'cancelled' && (!hasRefund || refundEndedButOrderContinues.includes(refundStatus)));
@@ -82,6 +86,7 @@ module.exports = {
       paidAtText: fmtTime(o.paidAt),
       pickupCodeText,
       pickupTimeText,
+      balanceAfterPayText,
       receiverName,
       receiverPhone,
       receiverPhoneMasked: maskPhone(receiverPhone),

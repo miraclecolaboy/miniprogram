@@ -1,5 +1,3 @@
-// pages/checkout/checkout.helpers.js
-// 结算页专用的纯函数/Promise 包装，避免 checkout.js 变成“巨石文件”。
 
 const { parseServiceHoursRanges, roundUpMinutes, fmtMinOfDay } = require('../../utils/serviceHours');
 
@@ -141,7 +139,6 @@ function genPickupTimeSlotsByServiceHours(serviceHours) {
   const nowMin = nowD.getHours() * 60 + nowD.getMinutes();
   const step = 10;
 
-  // 找到今天“下一段”营业区间：end >= nowMin（与原逻辑保持一致，结束时间点仍视为可选）
   let rangeIndex = ranges.findIndex(r => r.end >= nowMin);
   let useTomorrow = false;
   if (rangeIndex < 0) {

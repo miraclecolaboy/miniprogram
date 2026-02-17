@@ -15,7 +15,6 @@
   color: #fff;
   box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.18);
 
-  /* 关键：强制裁剪溢出文本 */
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -28,7 +27,6 @@
   padding: 0 18rpx;
   box-sizing: border-box;
 
-  /* 关键：允许子元素收缩 */
   min-width: 0;
   overflow: hidden;
 }
@@ -46,7 +44,6 @@
 }
 
 .pf-text{
-  /* 关键：让文字在 flex 内可收缩并省略 */
   flex: 1;
   min-width: 0;
 

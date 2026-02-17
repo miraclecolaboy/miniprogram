@@ -8,10 +8,8 @@ Page({
     order: null,
     shopCfg: {},
     
-    // UI状态
-    isInfoExpanded: false, // 控制底部信息折叠
+    isInfoExpanded: false,
     
-    // 售后弹窗
     refundSheetVisible: false,
     refundReasonList: ['不想要了', '商品有问题', '信息填写错误', '其他原因'],
     refundReasonIndex: 0,
@@ -24,12 +22,11 @@ Page({
 
     this.loadShopConfig();
 
-    // 尝试从 EventChannel 获取预加载数据
     const eventChannel = this.getOpenerEventChannel();
     if (eventChannel && eventChannel.on) {
        eventChannel.on('initOrder', ({ order }) => {
          if (order) this.setData({ order });
-         this.refreshOrderDetail(); // 静默刷新
+         this.refreshOrderDetail();
        });
     }
     
@@ -39,7 +36,6 @@ Page({
   },
 
   onShow() {
-    // 每次显示都刷新最新状态
     if(this.data.orderId || (this.data.order && this.data.order._id)) {
         this.refreshOrderDetail();
     }
@@ -50,7 +46,6 @@ Page({
       const res = await callUser('getShopConfig');
       const cfg = res?.result?.data || {};
 
-      // Cache for other pages / next entry.
       setShopConfigCache(cfg);
 
       this.setData({
@@ -67,7 +62,6 @@ Page({
     }
   },
 
-  // 获取订单详情
   async refreshOrderDetail() {
     const orderId = this.data.orderId || this.data.order?._id;
     if (!orderId) return;
@@ -86,14 +80,12 @@ Page({
     }
   },
 
-  // [新增] 切换底部信息展开/收起
   toggleInfoExpand() {
     this.setData({
       isInfoExpanded: !this.data.isInfoExpanded
     });
   },
 
-  // 导航
   openNavigate() {
     const { order } = this.data;
     if (!order) return;
@@ -116,7 +108,6 @@ Page({
     }
   },
 
-  // 复制订单号
   copyOrderId() {
     const orderNo = String(this.data.order?.orderNo || '').trim();
     if (!orderNo) return;
@@ -132,14 +123,12 @@ Page({
     wx.setClipboardData({ data: expressNo });
   },
 
-  // 联系商家/客服
   contactShop() {
     const phone = String(this.data.shopCfg?.phone || '').trim();
     if (!phone) return wx.showToast({ title: '暂未配置联系电话', icon: 'none' });
     wx.makePhoneCall({ phoneNumber: phone });
   },
 
-  // --- 售后逻辑 ---
   openRefundSheet() {
     if (!this.data.order?.canApplyRefund) return;
     this.setData({

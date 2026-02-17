@@ -35,7 +35,6 @@ function calcDefaultPos() {
 
 function mapStatusToDot(statusText) {
   const s = String(statusText || '');
-  // 只把“在线且正常”点亮；离线/异常/未开启/未配置都熄灭
   return s.includes('在线') && s.includes('正常');
 }
 
@@ -45,8 +44,8 @@ Component({
   data: {
     x: 0,
     y: 0,
-    bound: false,                 // 复用原字段：表示“云打印在线正常”
-    boundText: '云打印：检测中…',  // 复用原字段：状态文案
+    bound: false,
+    boundText: '云打印：检测中…',
   },
 
   lifetimes: {
@@ -73,7 +72,7 @@ Component({
     async _refreshStatus({ silent } = {}) {
       const now = Date.now();
       if (this._reqing) return;
-      if (this._lastReqAt && (now - this._lastReqAt) < 1500) return; // 简单节流
+      if (this._lastReqAt && (now - this._lastReqAt) < 1500) return;
       this._lastReqAt = now;
 
       const session = getSession();
@@ -138,7 +137,6 @@ Component({
         if (idx === 0) return await this._refreshStatus({ silent: false });
         if (idx === 1) return await this._doTestPrint();
       } catch (_) {
-        // 用户取消，不提示
       }
     },
 

@@ -1,4 +1,3 @@
-// packages/admin/pages/shop/index.js
 const { emptyServiceHoursRange } = require('./shop.helpers');
 
 const coreMethods = require('./shop.core');
@@ -24,7 +23,6 @@ Page(Object.assign({
     notice: '',
     noticeChanged: false,
 
-    // { key, fileId, preview, localPath? }
     banners: [],
     removedBannerFileIds: [],
 
@@ -40,7 +38,6 @@ Page(Object.assign({
     minOrderKuaidiOut: '140',
     configChanged: false,
 
-    // hidden in UI, retained for compatibility with existing methods
     subMchId: '',
     payChanged: false,
 

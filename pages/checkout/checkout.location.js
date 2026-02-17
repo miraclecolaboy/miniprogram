@@ -1,5 +1,3 @@
-// pages/checkout/checkout.location.js
-// 结算页：定位/距离/配送范围校验相关方法
 
 const { toNum } = require('../../utils/common');
 const { LOC_CACHE: KEY_LOC_CACHE } = require('../../utils/storageKeys');
@@ -75,7 +73,6 @@ module.exports = {
       this.safeSetData({ distance, distanceUnit });
     };
 
-    // 1) 读缓存（首次进页优先秒开；点击时也可用缓存避免频繁定位）
     try {
       const cached = wx.getStorageSync(KEY_LOC_CACHE);
       const ts = Number(cached?.ts || 0);
@@ -84,12 +81,10 @@ module.exports = {
       const fresh = ts > 0 && (nowTs - ts) <= LOC_CACHE_TTL;
       if (fresh && Number.isFinite(lat) && Number.isFinite(lng)) {
         setDistanceByLatLng(lat, lng);
-        // 非用户主动点击：用到缓存就直接返回；用户点击则继续尝试刷新一次
         if (!userInitiated) return;
       }
     } catch (_) {}
 
-    // 2) 非用户主动触发：没有授权就不弹窗不请求（避免“进页就弹授权”）
     let authed = false;
     try {
       const setting = await promisifyGetSetting();
@@ -99,7 +94,6 @@ module.exports = {
     }
     if (!authed && !userInitiated) return;
 
-    // 3) 用户主动触发：处理系统定位开关/权限提示
     if (userInitiated) {
       const flags = getSystemLocationFlags();
       if (flags.locationEnabled === false) {

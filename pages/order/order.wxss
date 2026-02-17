@@ -1,7 +1,5 @@
-/* pages/order/order.wxss */
 
 .page {
-  /* 黑白极简（对齐项目整体 UI） */
   --bg-page: #F7F8FA;
   --card-bg: #FFFFFF;
 
@@ -26,9 +24,6 @@
   box-sizing: border-box;
 }
 
-/* =========================
-   Header
-   ========================= */
 .page-header {
   flex-shrink: 0;
   padding: 24rpx 32rpx 18rpx;
@@ -147,9 +142,6 @@
   line-height: 1.4;
 }
 
-/* =========================
-   Body (Two Columns)
-   ========================= */
 .page-body {
   flex: 1;
   overflow: hidden;
@@ -191,7 +183,7 @@
   transition: all 0.2s ease;
   border-radius: 18rpx;
   line-height: 34rpx;
-  max-height: 68rpx; /* at most 2 lines */
+  max-height: 68rpx;
   white-space: normal;
   overflow: hidden;
 }
@@ -237,9 +229,6 @@
   margin: 10rpx 0 18rpx;
 }
 
-/* =========================
-   Skeleton (Products Loading)
-   ========================= */
 .sk-list {
   padding-top: 0;
 }
@@ -377,9 +366,6 @@
   font-family: 'DIN Alternate', sans-serif;
 }
 
-/* =========================
-   Qty Controls
-   ========================= */
 .qty-control {
   display: flex;
   align-items: center;
@@ -453,7 +439,6 @@
   letter-spacing: 1rpx;
 }
 
-/* 强制购物车和规格弹窗的加减号样式与列表一致 */
 .cart-item-qty .qty-btn,
 .spec-qty-control .qty-btn {
   width: 52rpx;
@@ -478,9 +463,6 @@
   box-shadow: none;
 }
 
-/* =========================
-   Spec Popup (Center Modal)
-   ========================= */
 .spec-mask {
   position: fixed;
   left: 0;
@@ -659,9 +641,6 @@
 }
 .spec-bottom-btn::after { border: 0; }
 
-/* =========================
-   Cart Detail Sheet
-   ========================= */
 .cart-mask {
   position: fixed;
   left: 0;
@@ -809,9 +788,6 @@
 
 .cart-item-qty { display: flex; align-items: center; }
 
-/* =========================
-   Floating Cart Bar (Bottom)
-   ========================= */
 .cart-float {
   position: fixed;
   left: 32rpx;
@@ -897,9 +873,6 @@
   transition: transform 0.18s ease-out;
 }
 
-/* =========================
-   Motion
-   ========================= */
 @keyframes maskIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -916,9 +889,6 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* =========================
-   Press / Hover States
-   ========================= */
 .hover-opacity { opacity: 0.6; }
 .hover-scale-sm { transform: scale(0.97); }
 .category-hover { background: rgba(0, 0, 0, 0.03); }

@@ -58,6 +58,9 @@
         <view class="info-row">
           <text class="info-label">下单时间</text><text class="info-value" style="color: var(--text-muted);">{{item.createdAtText}}</text>
         </view>
+        <view class="info-row" wx:if="{{item.balanceAfterPayText}}">
+          <text class="info-label">剩余余额</text><text class="info-value">￥{{item.balanceAfterPayText}}</text>
+        </view>
       </view>
 
       <view class="remark-block" wx:if="{{item.remarkText}}">

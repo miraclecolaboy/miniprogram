@@ -1,4 +1,3 @@
-// packages/admin/pages/shop/shop.helpers.js
 
 const { safeStr, pad2 } = require('../../../../utils/common');
 const { parseServiceHoursRanges, fmtMinOfDay } = require('../../../../utils/serviceHours');
@@ -47,7 +46,6 @@ function buildServiceHoursFromInputRanges(ranges) {
     const hasAny = shStr || smStr || ehStr || emStr;
     if (!hasAny) continue;
 
-    // 分钟可不填，默认 00；小时必须填
     if (!shStr || !ehStr) return { ok: false, message: `请填写完整的时段${i + 1}` };
 
     const sh = parseInt(shStr, 10);

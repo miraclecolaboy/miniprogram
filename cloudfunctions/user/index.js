@@ -1,4 +1,3 @@
-// cloudfunctions/user/index.js
 const cloud = require('wx-server-sdk');
 const userService = require('./services/userService');
 const shopService = require('./services/shopService');
@@ -46,7 +45,6 @@ exports.main = async (event, context) => {
       case 'getOrderDetail': return await orderQueryService.getOrderDetail(OPENID, event.orderId);
       
       case 'sys_pay_success':
-        // One callback endpoint handles both order payments and recharges.
         await Promise.allSettled([
           tradeService.sysHandlePaySuccess(event.payEvent),
           rechargeService.sysHandlePaySuccess(event.payEvent),

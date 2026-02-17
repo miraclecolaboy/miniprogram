@@ -1,9 +1,8 @@
 <view class="page">
 
-<!-- 顶部区域 -->
 <view class="page-header">
 
-  <!-- 顶部信息区（黑白极简） -->
+  
   <view class="top-card llj-enter llj-delay-1">
 
     <view class="top-card-main">
@@ -34,7 +33,7 @@
       </view>
     </view>
 
-    <!-- 公告条 -->
+    
     <view class="notice-bar" wx:if="{{notice}}">
       <view class="notice-icon">告</view>
       <view class="notice-marquee">{{notice}}</view>
@@ -44,11 +43,10 @@
 
 </view>
 
-<!-- 主体点单区域 -->
 <view class="page-body llj-enter llj-delay-2">
   <view class="order-container">
 
-    <!-- 左侧分类栏 -->
+    
     <scroll-view class="categories" scroll-y enhanced="true" show-scrollbar="{{false}}">
       <block wx:for="{{categories}}" wx:key="id">
         <view
@@ -62,7 +60,7 @@
       </block>
     </scroll-view>
 
-    <!-- 右侧商品列表 -->
+    
     <scroll-view class="products" scroll-y bindscrolltolower="onProductsReachBottom" lower-threshold="200" enhanced="true" show-scrollbar="{{false}}">
       <view wx:if="{{catalogLoading}}" class="sk-list">
         <view class="sk-title llj-shimmer"></view>
@@ -98,10 +96,10 @@
                 <view class="product-bottom">
                   <view class="product-price"><text class="currency">￥</text>{{item.priceWithSpec || item.price}}</view>
 
-                <!-- 右侧数量 / 选规格 -->
+                
                 <view class="product-qty">
 
-                  <!-- 有规格：显示“选规格”按钮 -->
+                  
                   <view wx:if="{{item.hasSpecs}}" class="qty-control">
                     <view
                       class="spec-choose-btn"
@@ -114,7 +112,7 @@
                     </view>
                   </view>
 
-                  <!-- 无规格：显示 + - 数量 -->
+                  
                   <view wx:else class="qty-control">
                     <view wx:if="{{item.count > 0}}" class="qty-control">
                       <view class="qty-btn minus" catchtap="decreaseCount" data-id="{{item.id}}" hover-class="qty-hover" hover-stay-time="80" hover-stop-propagation="true">
@@ -145,21 +143,19 @@
   </view>
 </view>
 
-<!-- 规格选择弹窗遮罩 -->
 <view
   wx:if="{{showSpecPopup}}"
   class="spec-mask"
   bindtap="closeSpecPopup"
 ></view>
 
-<!-- 规格选择弹窗：新版布局 -->
 <view wx:if="{{showSpecPopup}}" class="spec-popup" catchtap="noop">
 
   <view class="spec-header">
     <view class="spec-header-title">选择规格</view>
   </view>
 
-  <!-- 顶部 商品图片 + 文案 -->
+  
   <view class="spec-top">
     <image class="spec-top-img" src="{{specProduct.img}}" mode="aspectFill" lazy-load="true"></image>
     <view class="spec-top-info">
@@ -168,10 +164,10 @@
     </view>
   </view>
 
-  <!-- 内容滚动 -->
+  
   <scroll-view class="spec-scroll" scroll-y enhanced="true" show-scrollbar="{{false}}">
 
-    <!-- 规格组 -->
+    
     <block wx:for="{{specProduct.specs}}" wx:key="name">
       <view class="spec-group">
         <view class="spec-group-title">{{item.name}}</view>
@@ -192,7 +188,7 @@
       </view>
     </block>
 
-    <!-- 数量选择 -->
+    
     <view class="spec-qty">
       <view class="spec-qty-label">数量</view>
       <view class="spec-qty-control">
@@ -209,7 +205,7 @@
 
   </scroll-view>
 
-  <!-- 底部金额栏 -->
+  
   <view class="spec-bottom">
     <view class="spec-bottom-left">
       <view class="spec-bottom-label">合计</view>
@@ -222,10 +218,8 @@
   </view>
 </view>
 
-<!-- 购物车遮罩 -->
 <view wx:if="{{showCartDetailFlag}}" class="cart-mask" bindtap="closeCartDetail"></view>
 
-<!-- 购物车详情弹层 -->
 <view wx:if="{{showCartDetailFlag}}" class="cart-sheet">
   <view class="cart-sheet-header">
     <view class="cart-sheet-title">已选商品</view>
@@ -239,13 +233,13 @@
         <view class="cart-item-content">
           <view class="cart-item-title">{{item.name}}</view>
 
-          <!-- 规格 + 单价同一行（有规格时） -->
+          
           <view wx:if="{{item.specText}}" class="cart-item-sub cart-item-sub-row">
             <text class="cart-item-spec">{{item.specText}}</text>
             <text class="cart-item-unit">单价 ￥{{item.price}}</text>
           </view>
 
-          <!-- 无规格：单价独占一行 -->
+          
           <view wx:else class="cart-item-sub">单价 ￥{{item.price}}</view>
 
           <view class="cart-item-bottom">
@@ -267,7 +261,6 @@
   </scroll-view>
 </view>
 
-<!-- 底部悬浮结算条 -->
 <view class="cart-float llj-enter llj-delay-3">
   <view class="cart-bar">
     <view class="cart-bar-left" bindtap="showCartDetail" hover-class="hover-opacity">

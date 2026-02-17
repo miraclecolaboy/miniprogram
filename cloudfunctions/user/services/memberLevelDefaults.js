@@ -1,22 +1,12 @@
-// cloudfunctions/user/services/memberLevelDefaults.js
-// Default level membership rules + coupons. This keeps the mini program usable
-// without any merchant-side configuration. When needed, data can be edited
-// manually in the DB.
 
 const { COL_SHOP_CONFIG } = require('../config/constants');
 
-// Deterministic IDs so other code can reference them safely.
 const DEFAULT_MEMBER_COUPON_TEMPLATES = [
   { id: 'coupon_member_5', title: '会员无门槛5元券', minSpend: 0, discount: 5 },
   { id: 'coupon_member_10', title: '会员无门槛10元券', minSpend: 0, discount: 10 },
   { id: 'coupon_member_20', title: '会员无门槛20元券', minSpend: 0, discount: 20 },
 ];
 
-// 每个等级礼包仅发放一次（跨级时补发缺失等级礼包）
-// Lv1: 1张5元
-// Lv2: 2张5元
-// Lv3: 1张5元 + 1张10元
-// Lv4: 2张5元 + 1张10元
 const DEFAULT_MEMBER_LEVELS = [
   { level: 1, threshold: 100, coupons: [{ couponId: 'coupon_member_5', count: 1 }] },
   { level: 2, threshold: 300, coupons: [{ couponId: 'coupon_member_5', count: 2 }] },
@@ -94,7 +84,6 @@ async function ensureMemberLevelDefaults(db, nowTs) {
   const tNow = Number(nowTs || Date.now());
   if (!db) throw new Error('missing_db');
 
-  // 1) Ensure member gift coupon templates exist (hidden / not claimable in coupon center).
   for (const tpl of DEFAULT_MEMBER_COUPON_TEMPLATES) {
     const id = String(tpl.id || '').trim();
     if (!id) continue;
@@ -102,7 +91,6 @@ async function ensureMemberLevelDefaults(db, nowTs) {
     const ref = db.collection(COL_SHOP_CONFIG).doc(id);
     const got = await ref.get().catch(() => null);
     if (got && got.data) {
-      // Backward compatible rename (only patch when it still matches the legacy seeded title).
       const cur = got.data || {};
       const curTitle = String(cur.title || '').trim();
       const legacyTitle = `等级会员无门槛${Number(tpl.discount || 0)}元券`;
@@ -117,14 +105,14 @@ async function ensureMemberLevelDefaults(db, nowTs) {
       ) {
         await ref.update({ data: { title: nextTitle, updatedAt: tNow } }).catch(() => {});
       }
-      continue; // Keep manual edits.
+      continue;
     }
 
     await ref.set({
       data: {
         type: 'coupon_template',
         status: 'active',
-        claimable: false, // Not shown/claimable in coupon center; only granted by upgrade.
+        claimable: false,
         title: String(tpl.title || '').trim(),
         minSpend: Number(tpl.minSpend || 0),
         discount: Number(tpl.discount || 0),
@@ -136,13 +124,11 @@ async function ensureMemberLevelDefaults(db, nowTs) {
     }).catch(() => {});
   }
 
-  // 2) Ensure shop_config/main has memberLevels.
   const mainRef = db.collection(COL_SHOP_CONFIG).doc('main');
   const mainGot = await mainRef.get().catch(() => null);
   const main = mainGot && mainGot.data ? mainGot.data : null;
   const hasLevels = !!(main && Array.isArray(main.memberLevels) && main.memberLevels.length > 0);
 
-  // If main already has our old seeded defaults (v1/v2), upgrade it to the new default.
   const shouldPatchLevels = !hasLevels
     || _isSeededV1MemberLevels(main && main.memberLevels)
     || _isSeededV2MemberLevels(main && main.memberLevels);

@@ -1,5 +1,3 @@
-// pages/order/order.catalog.js
-// 点单页：分类/商品加载与列表筛选
 
 const { callUser } = require('../../utils/cloud');
 const { toNum } = require('../../utils/common');
@@ -20,7 +18,6 @@ module.exports = {
         name: c.name,
       }));
 
-      // 重建 SKU 价格表，避免旧数据残留
       if (this._skuPriceMap && typeof this._skuPriceMap.clear === 'function') this._skuPriceMap.clear();
       else this._skuPriceMap = new Map();
 

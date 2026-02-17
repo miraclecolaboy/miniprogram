@@ -1,5 +1,3 @@
-// utils/wxPay.js
-// 微信支付相关的小工具：统一 timeStamp/string 兼容与取消判断。
 
 function requestPaymentAsync(payment) {
   const p = payment || {};

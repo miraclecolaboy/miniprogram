@@ -1,4 +1,3 @@
-// packages/admin/pages/shop/shop.cloudprint.js
 
 const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
@@ -11,7 +10,6 @@ function mapStatusToDot(statusText) {
 }
 
 module.exports = {
-  // --- 云打印 ---
   onCloudPrintInput(e) {
     const field = e.currentTarget.dataset.field;
     this.setData({

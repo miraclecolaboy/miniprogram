@@ -1,4 +1,3 @@
-// cloudfunctions/cloudPrint/receipt.js
 
 function fmtTime(ts) {
   if (!ts) return '';
@@ -102,11 +101,28 @@ function getAmountText(order) {
   return Number.isFinite(n) ? n.toFixed(2) : '0.00';
 }
 
-function getPayMethodText(order) {
-  if (order?.payMethodText) return String(order.payMethodText).trim();
+function getBalanceAfterPayText(order) {
+  const candidates = [
+    order?.payment?.balanceAfterPay,
+    order?.balanceAfterPay,
+    order?.payment?.balanceAfter,
+    order?.balanceAfter,
+  ];
+  for (const raw of candidates) {
+    const n = Number(raw);
+    if (Number.isFinite(n)) return n.toFixed(2);
+  }
+  return '';
+}
 
+function getPayMethodText(order) {
   const method = String(order?.payment?.method || '').trim();
-  if (method === 'balance') return '\u4f59\u989d\u652f\u4ed8';
+  if (method === 'balance') {
+    const balanceAfterPayText = getBalanceAfterPayText(order);
+    if (balanceAfterPayText) return `\u4f59\u989d\u652f\u4ed8\uff08\u5269\u4f59\u4f59\u989d\uffe5${balanceAfterPayText}\uff09`;
+    return '\u4f59\u989d\u652f\u4ed8';
+  }
+  if (order?.payMethodText) return String(order.payMethodText).trim();
   if (method === 'free') return '\u65e0\u9700\u652f\u4ed8';
   return '\u5fae\u4fe1\u652f\u4ed8';
 }
@@ -200,7 +216,7 @@ function buildReceiptText(order, storeName) {
   }
 
   lines.push('----------------');
-  lines.push(`\u5b9e\u4ed8\uff1a\u00a5${getAmountText(o)} \u652f\u4ed8\u65b9\u5f0f\uff1a${getPayMethodText(o)}`);
+  lines.push(`\u5b9e\u4ed8\uff1a\uffe5${getAmountText(o)} \u652f\u4ed8\u65b9\u5f0f\uff1a${getPayMethodText(o)}`);
   lines.push(getAmountDetailText(o));
 
   return lines.join('\n') + '\n\n';

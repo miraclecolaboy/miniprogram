@@ -1,5 +1,3 @@
-// packages/admin/pages/orders/index.js
-// 订单管理页：按客户端页面的方式拆分 methods，降低单文件复杂度
 const listMethods = require('./orders.list');
 const decorateMethods = require('./orders.decorate');
 const actionMethods = require('./orders.actions');

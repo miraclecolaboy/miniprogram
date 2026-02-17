@@ -1,5 +1,3 @@
-// utils/serviceHours.js
-// 营业时间解析/格式化：前端(用户端/商家端)共用，避免两套逻辑漂移。
 
 const { safeStr, pad2 } = require('./common');
 
@@ -13,7 +11,6 @@ function parseServiceHoursRanges(text) {
     return h >= 0 && h <= 23 && m >= 0 && m <= 59;
   };
 
-  // 支持：10:00-22:00 / 10:00~22:00 / 10-22 / 10：00 至 22：00 / 10:00-14:00 17:00-22:00
   const ranges = [];
   const re = /(\d{1,2})(?:[:：](\d{1,2}))?\s*(?:-|~|～|—|–|至)\s*(\d{1,2})(?:[:：](\d{1,2}))?/g;
   let m;
@@ -27,7 +24,6 @@ function parseServiceHoursRanges(text) {
 
     const start = sh * 60 + sm;
     const end = eh * 60 + em;
-    // 暂不支持跨天（例如 20:00-02:00）
     if (end <= start) continue;
 
     ranges.push({ start, end });
@@ -35,7 +31,6 @@ function parseServiceHoursRanges(text) {
 
   if (!ranges.length) return null;
 
-  // 排序 + 合并重叠
   ranges.sort((a, b) => a.start - b.start);
   const merged = [];
   for (const r of ranges) {

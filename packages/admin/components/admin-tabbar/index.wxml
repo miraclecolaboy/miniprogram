@@ -1,4 +1,4 @@
-<!-- 占位：防止页面底部内容被固定导航遮住 -->
+
 <view class="admin-tabbar__spacer"></view>
 
 <view class="admin-tabbar">

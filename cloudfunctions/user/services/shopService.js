@@ -1,4 +1,3 @@
-// cloudfunctions/user/services/shopService.js
 const cloud = require('wx-server-sdk');
 const {
   COL_SHOP_CONFIG,
@@ -124,7 +123,6 @@ async function isRedeemCodeExistsInUsers(code) {
       .get();
     if (Array.isArray(quick && quick.data) && quick.data.length) return true;
   } catch (_) {
-    // Fallback to scan for environments where elemMatch is unavailable.
   }
 
   let skip = 0;

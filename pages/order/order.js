@@ -1,5 +1,3 @@
-// pages/order/order.js
-// 点单页：通过“分模块 methods”降低单文件复杂度
 
 const {
   CART_CLEAR: KEY_CART_CLEAR,

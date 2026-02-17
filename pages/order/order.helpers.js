@@ -1,5 +1,3 @@
-// pages/order/order.helpers.js
-// 点单页专用 helper：纯函数，方便复用与测试。
 
 const { buildSkuKey, buildSpecText } = require('../../utils/sku');
 

@@ -4,10 +4,8 @@
   box-sizing: border-box;
   min-height: 100vh;
   background: var(--bg);
-  /* 恢复页面级原生滚动，利用原生触底刷新 onReachBottom */
 }
 
-/* ================= 固定的头部与分类栏 ================= */
 .header-section {
   position: sticky;
   top: 0;
@@ -57,7 +55,6 @@
   border-radius: 4rpx;
 }
 
-/* ================= 列表区域 ================= */
 .list-container {
   padding: 24rpx;
 }
@@ -67,7 +64,6 @@
   padding: 32rpx;
 }
 
-/* 1. 卡片头部 */
 .card-header {
   border-bottom: 1rpx solid var(--border);
   padding-bottom: 24rpx;
@@ -85,9 +81,9 @@
   border-radius: 8rpx;
   color: #fff;
 }
-.mode-ziti { background: #3B82F6; } /* 到店蓝色 */
-.mode-waimai { background: #F59E0B; } /* 外卖橙色 */
-.mode-kuaidi { background: #10B981; } /* 快递绿色 */
+.mode-ziti { background: #3B82F6; }
+.mode-waimai { background: #F59E0B; }
+.mode-kuaidi { background: #10B981; }
 
 .order-no {
   font-size: 26rpx;
@@ -95,7 +91,6 @@
   color: var(--text-main);
 }
 
-/* 徽章体系优化 */
 .badge {
   padding: 6rpx 16rpx;
   border-radius: 12rpx;
@@ -107,7 +102,6 @@
 .badge-done { background: var(--bg); color: var(--text-sub); }
 .badge-refund { background: #FEE2E2; color: #EF4444; }
 
-/* 2. 商品明细区块 (浅灰背景块收纳) */
 .goods-block {
   background: #F9FAFB;
   border-radius: 16rpx;
@@ -133,7 +127,6 @@
   line-height: 1.4;
 }
 
-/* 3. 信息网格 (Label对齐排版) */
 .info-grid {
   display: flex;
   flex-direction: column;
@@ -157,7 +150,6 @@
   word-break: break-all;
 }
 
-/* 4. 备注突出 */
 .remark-block {
   background: #FFFBEB;
   border: 1rpx dashed #FDE68A;
@@ -170,7 +162,6 @@
 .remark-label { font-size: 24rpx; color: #D97706; font-weight: 800; flex-shrink: 0;}
 .remark-text { font-size: 24rpx; color: #B45309; font-weight: 600; line-height: 1.5; }
 
-/* 5. 售后警报 */
 .refund-alert {
   background: #FEF2F2;
   border: 1rpx solid #FECACA;
@@ -187,7 +178,6 @@
   font-weight: 800;
 }
 
-/* 6. 价格与结算栏 */
 .price-section {
   border-top: 1rpx dashed var(--border);
   padding-top: 24rpx;
@@ -223,7 +213,6 @@
   margin-left: 8rpx;
 }
 
-/* 7. 操作按钮栏 */
 .action-bar {
   border-top: 1rpx solid var(--border);
   margin-top: 24rpx;
@@ -241,7 +230,6 @@
   text-overflow: ellipsis;
 }
 
-/* 列表缺省与状态提示 */
 .empty-hint {
   text-align: center;
   color: var(--text-muted);
@@ -252,7 +240,6 @@
   align-items: center;
 }
 
-/* ================= 共用弹窗样式补充 ================= */
 .mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 200; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(4px); }
 .modal-center { background: #FFFFFF; border-radius: 24rpx; width: 85%; margin: auto; overflow: hidden; box-shadow: 0 10rpx 40rpx rgba(0,0,0,0.1); }
 .modal-header { padding: 32rpx 32rpx 24rpx; border-bottom: 1rpx solid var(--border); }

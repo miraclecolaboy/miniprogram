@@ -1,4 +1,3 @@
-/* 复用核心变量 */
 page {
   --bg-page: #F7F8FA;
   --card-bg: #FFFFFF;
@@ -8,7 +7,6 @@ page {
   --gold: #BFA15F;
   --green: #34C759;
   
-  /* 阴影：更细腻的层级 */
   --shadow-base: 0 4rpx 12rpx rgba(0, 0, 0, 0.02);
   --shadow-float: 0 16rpx 40rpx rgba(0, 0, 0, 0.06);
   
@@ -16,7 +14,7 @@ page {
   font-family: -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
   box-sizing: border-box;
   height: 100vh;
-  overflow: hidden; /* Use inner scroll-view to avoid page scrollbar. */
+  overflow: hidden;
   padding: 0;
 }
 
@@ -38,7 +36,6 @@ page {
   height: env(safe-area-inset-bottom);
 }
 
-/* --- 1. Header --- */
 .header-area {
   padding: 40rpx 0 32rpx;
   position: relative;
@@ -59,7 +56,6 @@ page {
   color: var(--text-main);
   letter-spacing: -1rpx;
 }
-/* 顶部光晕装饰 */
 .header-glow {
   position: absolute;
   top: -60rpx; right: -40rpx;
@@ -69,16 +65,14 @@ page {
   z-index: -1;
 }
 
-/* --- 2. 核心矩阵布局 (左1右2) --- */
 .dashboard-grid {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  height: 460rpx; /* 固定总高度 */
+  height: 460rpx;
   margin-bottom: 48rpx;
 }
 
-/* 左侧大卡 (微信) */
 .grid-col-left {
   width: 48%;
   height: 100%;
@@ -95,8 +89,8 @@ page {
 }
 
 .wx-bg-gradient {
-  background: linear-gradient(160deg, #FFFFFF 0%, #F0FDF4 100%); /* 极淡绿渐变 */
-  background: linear-gradient(160deg, #FFFFFF 0%, #FEF9F0 100%); /* 极淡金渐变 */
+  background: linear-gradient(160deg, #FFFFFF 0%, #F0FDF4 100%);
+  background: linear-gradient(160deg, #FFFFFF 0%, #FEF9F0 100%);
 }
 
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
@@ -107,7 +101,6 @@ page {
 }
 .live-dot { width: 10rpx; height: 10rpx; background: var(--green); border-radius: 50%; margin-right: 6rpx; box-shadow: 0 0 8rpx rgba(52, 199, 89, 0.4); }
 
-/* 大二维码区域 */
 .qr-area-large {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -122,22 +115,19 @@ page {
 .real-qr-large { width: 100%; height: 100%; }
 .qr-tip { font-size: 20rpx; color: var(--text-light); margin-top: 16rpx; }
 
-/* 底部文字 */
 .card-bottom-area { text-align: center; }
 .wx-label { font-size: 30rpx; font-weight: 700; color: var(--text-main); margin-bottom: 4rpx; }
 .wx-sub { font-size: 20rpx; color: var(--text-sub); }
 
-/* --- 右侧列 (电话+时间) --- */
 .grid-col-right {
   width: 48%;
   height: 100%;
   display: flex; flex-direction: column; justify-content: space-between;
 }
 
-/* 小卡片通用 */
 .small-card {
   width: 100%;
-  height: 218rpx; /* (460 - 24gap) / 2 */
+  height: 218rpx;
   background: var(--card-bg);
   border-radius: 32rpx;
   box-shadow: var(--shadow-base);
@@ -151,7 +141,6 @@ page {
 .card-label { font-size: 28rpx; font-weight: 700; color: var(--text-main); margin-bottom: 4rpx; }
 .card-sub { font-size: 20rpx; color: var(--text-light); font-weight: 500; }
 
-/* 电话卡特有样式 */
 .phone-card-small { justify-content: space-between; }
 .phone-bottom {
   display: flex; justify-content: space-between; align-items: center;
@@ -159,7 +148,6 @@ page {
 }
 .phone-num-sm {
   font-size: 30rpx; font-weight: 800; color: var(--text-main);
-  /* 防止号码太长换行 */
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180rpx;
 }
 .btn-call {
@@ -180,7 +168,6 @@ page {
   filter: brightness(0.98);
 }
 
-/* 时间卡特有样式 */
 .time-card { justify-content: space-between; }
 .time-txt {
   font-size: 30rpx; font-weight: 700; color: var(--text-main);
@@ -189,7 +176,6 @@ page {
 }
 .time-line + .time-line { margin-top: 8rpx; }
 
-/* --- 3. FAQ Section (问答版) --- */
 .section-header {
   font-size: 28rpx; font-weight: 800; color: var(--text-main);
   margin-bottom: 24rpx;
@@ -224,7 +210,7 @@ page {
 }
 
 .a-row {
-  padding-left: 50rpx; /* 对齐问题文字 */
+  padding-left: 50rpx;
 }
 .a-text {
   font-size: 26rpx; color: var(--text-sub);
@@ -238,7 +224,6 @@ page {
   width: 100%;
 }
 
-/* 公共工具类 */
 .din-font { font-family: 'DIN Alternate', sans-serif; }
 .icon-halo {
   width: 80rpx; height: 80rpx; border-radius: 50%;

@@ -1,4 +1,3 @@
-// pages/trade/trade-refund-detail/trade-refund-detail.js
 const { callUser } = require('../../../utils/cloud');
 const { fmtTime } = require('../../../utils/common');
 const { TRADE_TAB: KEY_TRADE_TAB } = require('../../../utils/storageKeys');
@@ -12,9 +11,8 @@ Page({
     orderId: '',
     order: null,
     
-    // UI状态：控制折叠
-    isInfoExpanded: false, // 底部申请信息
-    isCostExpanded: false, // [新增] 金额明细
+    isInfoExpanded: false,
+    isCostExpanded: false,
 
     refundSheetVisible: false,
     refundReasonList: ['不想要了', '商品有问题', '信息填写错误', '其他原因'],
@@ -37,12 +35,10 @@ Page({
     }
   },
   
-  // 切换底部信息
   toggleInfoExpand() {
     this.setData({ isInfoExpanded: !this.data.isInfoExpanded });
   },
 
-  // [新增] 切换费用明细
   toggleCostExpand() {
     this.setData({ isCostExpanded: !this.data.isCostExpanded });
   },
@@ -177,7 +173,6 @@ Page({
 
         wx.showToast({ title: '已取消', icon: 'none' });
 
-        // Cancelled after-sale should return the order back to "doing" list.
         const status = String(order.status || '').trim();
         const targetTab = ['done', 'cancelled'].includes(status) ? 'done' : 'doing';
         wx.setStorageSync(KEY_TRADE_TAB, targetTab);

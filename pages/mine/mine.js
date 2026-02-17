@@ -1,4 +1,3 @@
-// pages/mine/mine.js
 const { ensureLogin, isLoginOK, refreshUserToStorage } = require('../../utils/auth');
 const { callUser } = require('../../utils/cloud');
 const { USER: KEY_USER } = require('../../utils/storageKeys');
@@ -60,8 +59,7 @@ Page({
     refresherTriggered: false,
     showUI: true,
     
-    // UI状态
-    memberCardExpanded: false, // 会员卡是否展开
+    memberCardExpanded: false,
     showProfilePopup: false,
     profileNickName: '',
     profileAvatarTmp: '',
@@ -145,9 +143,6 @@ Page({
     };
   },
 
-  // --- 交互逻辑 ---
-
-  // 切换会员卡展开/收起
   toggleMemberCard() {
     if (!this.data.isLogin) {
       return this.loginAndNavigate();
@@ -178,7 +173,6 @@ Page({
     }
   },
 
-  // --- 个人资料弹窗逻辑 ---
   openProfilePopup() {
     const { userInfo } = this.data;
     if (!userInfo) return;
@@ -219,7 +213,6 @@ Page({
         });
       }
     } catch (error) {
-       // ignore cancel
     } finally {
       if (loadingShown) wx.hideLoading();
     }
@@ -228,7 +221,6 @@ Page({
   async _cropAndCompressAvatar(filePath) {
     if (!filePath) return '';
 
-    // Make it consistent with product thumbnails: square 300x300 + gentle compression.
     let outPath = filePath;
     try {
       outPath = await generateThumbnail(filePath);
@@ -281,10 +273,8 @@ Page({
     }
   },
 
-  // --- 路由跳转 ---
   onRecharge() { if(this.data.isLogin) wx.navigateTo({ url: '/pages/mine/recharge/recharge' }); else this.loginAndNavigate('/pages/mine/recharge/recharge'); },
   onPoints() { if(this.data.isLogin) wx.navigateTo({ url: '/pages/mine/points/points' }); else this.loginAndNavigate('/pages/mine/points/points'); },
-  // 点击会员权益文字跳转详情，点击卡片本身是展开
   onTapMemberDetail() { if(this.data.isLogin) wx.navigateTo({ url: '/pages/mine/member/member' }); else this.loginAndNavigate('/pages/mine/member/member'); },
   onTapService() { if(this.data.isLogin) wx.navigateTo({ url: '/pages/mine/service/service' }); else this.loginAndNavigate('/pages/mine/service/service'); },
   onTapAddress() { if(this.data.isLogin) wx.navigateTo({ url: '/pages/mine/address/address' }); else this.loginAndNavigate('/pages/mine/address/address'); },

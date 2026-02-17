@@ -1,5 +1,3 @@
-// pages/checkout/checkout.shop.js
-// 结算页：门店配置/取餐时间/到店方式相关方法
 
 const { callUser } = require('../../utils/cloud');
 const { toNum } = require('../../utils/common');
@@ -14,7 +12,6 @@ module.exports = {
       const res = await callUser('getShopConfig', {});
       const cfg = res?.result?.data || {};
 
-      // Cache for other pages / next entry.
       setShopConfigCache(cfg);
 
       this.setData({

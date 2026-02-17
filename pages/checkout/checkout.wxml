@@ -179,7 +179,6 @@
   <view class="pay-btn" bindtap="onPayTap">立即支付</view>
 </view>
 
-
 <view class="coupon-mask" wx:if="{{showCouponPopup}}" bindtap="closeCouponPopup" catchtouchmove="noop"></view>
 <view class="coupon-sheet" wx:if="{{showCouponPopup}}" catchtap="noop" catchtouchmove="noop">
   

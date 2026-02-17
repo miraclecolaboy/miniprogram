@@ -43,7 +43,6 @@ Page({
       });
       await this.fetchOrders(tab, true);
     } catch (e) {
-      // User cancelled login
     }
   },
 
@@ -91,7 +90,6 @@ Page({
     const allOrders = [...this.data.orders.doing, ...this.data.orders.done, ...this.data.orders.refund];
     const order = allOrders.find(o => o._id === orderId);
 
-    // Orders with after-sale should open after-sale detail directly.
     if (order && order.refund) {
       wx.navigateTo({ url: `/pages/trade/trade-refund-detail/trade-refund-detail?orderId=${orderId}` });
       return;

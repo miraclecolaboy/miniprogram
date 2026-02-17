@@ -1,4 +1,3 @@
-// [新文件] cloudfunctions/user/services/couponService.js
 const cloud = require('wx-server-sdk');
 const { COL_USERS, COL_SHOP_CONFIG } = require('../config/constants');
 const { now, toNum } = require('../utils/common');
@@ -7,9 +6,6 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
 
-/**
- * 用户领取优惠券
- */
 async function claimCoupon(couponId, openid) {
   if (!couponId) throw new Error('缺少优惠券ID');
 
@@ -17,7 +13,6 @@ async function claimCoupon(couponId, openid) {
 
   try {
     return await db.runTransaction(async tx => {
-      // 1. 检查优惠券模板
       const couponRef = tx.collection(COL_SHOP_CONFIG).doc(couponId);
       const couponDoc = await couponRef.get();
       const coupon = couponDoc.data;
@@ -32,7 +27,6 @@ async function claimCoupon(couponId, openid) {
         throw new Error('优惠券已被领完');
       }
 
-      // 2. 检查用户是否已领取
       const userRef = tx.collection(COL_USERS).doc(openid);
       const userDoc = await userRef.get();
       const user = userDoc.data;
@@ -44,7 +38,6 @@ async function claimCoupon(couponId, openid) {
         throw new Error('您已领取过该优惠券');
       }
 
-      // 3. 更新优惠券模板的领取数量
       await couponRef.update({
         data: {
           claimedQuantity: _.inc(1),
@@ -52,7 +45,6 @@ async function claimCoupon(couponId, openid) {
         }
       });
 
-      // 4. 在用户文档中添加优惠券
       const userCouponId = `${couponId}_${tNow}`;
       const newUserCoupon = {
         userCouponId,
@@ -77,7 +69,6 @@ async function claimCoupon(couponId, openid) {
       return { ok: true, data: newUserCoupon };
     });
   } catch (e) {
-    // 将事务中的错误 message 传递出去
     return { error: e.message || '领取失败' };
   }
 }

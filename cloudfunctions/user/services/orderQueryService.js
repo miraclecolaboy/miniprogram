@@ -1,4 +1,3 @@
-// [New File] cloudfunctions/user/services/orderQueryService.js
 
 const cloud = require('wx-server-sdk');
 const { COL_ORDERS } = require('../config/constants');
@@ -37,14 +36,13 @@ async function _mapOrderForView(order) {
   const amount = order.amount || {};
   const vipDiscountNum = Number.isFinite(Number(amount.vipDiscount))
     ? Number(amount.vipDiscount)
-    : Number(amount.discount || 0); // legacy
+    : Number(amount.discount || 0);
   const couponDiscountNum = Number.isFinite(Number(amount.couponDiscount))
     ? Number(amount.couponDiscount)
     : 0;
   const fee = {
     goods: Number(amount.goods || 0).toFixed(2),
     delivery: Number(amount.delivery || 0).toFixed(2),
-    // legacy field used by old UI ("会员折扣")
     discount: vipDiscountNum.toFixed(2),
     vipDiscount: vipDiscountNum.toFixed(2),
     couponDiscount: couponDiscountNum.toFixed(2),
@@ -60,7 +58,6 @@ async function _mapOrderForView(order) {
     price: Number(it.price || 0).toFixed(2)
   }));
   
-  // [核心修正] 简化 canApplyRefund 的计算逻辑
   const isPaid = order.payment?.status === 'paid';
   const isCancelled = status === 'cancelled';
   const isDone = status === 'done';
@@ -69,11 +66,8 @@ async function _mapOrderForView(order) {
   
   const refundStatus = order.refund?.status?.toLowerCase();
   
-  // 检查售后是否处于一个“进行中”或“已成功”的非终结状态
-  // 如果是，则不能再次申请
   const refundIsActive = ['applied', 'processing', 'success'].includes(refundStatus);
   
-  // 最终判断：必须已支付、未取消、未超3天，且没有正在处理的售后
   const canApplyRefund = isPaid && !isCancelled && !over3Days && !refundIsActive;
   
   const canCancelPayment = status === 'pending_payment';
@@ -134,11 +128,9 @@ async function listMyOrders(openid, { tab = 'doing', pageNum = 1, pageSize = 10 
     const where = { openid: openid };
 
     if (tab === 'doing') {
-      // Orders with after-sale should be shown only in the "refund" tab.
       where.status = _.in(['pending_payment', 'processing', 'ready', 'delivering']);
       where.refund = refundCond;
     } else if (tab === 'done') {
-      // Orders with after-sale should be shown only in the "refund" tab.
       where.status = _.in(['done', 'cancelled']);
       where.refund = refundCond;
     } else if (tab === 'refund') {
@@ -161,7 +153,6 @@ async function listMyOrders(openid, { tab = 'doing', pageNum = 1, pageSize = 10 
   try {
     res = await query.get();
   } catch (e) {
-    // Some envs might not support exists(false). Fallback to "refund == null" (null or missing).
     if (tab === 'doing' || tab === 'done') {
       res = await buildQuery(_.eq(null)).get();
     } else {

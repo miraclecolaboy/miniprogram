@@ -1,8 +1,6 @@
-// packages/admin/pages/orders/orders.helpers.js
 
-// --- 辅助函数 (用于UI展示) ---
 function maskPhone(p) {
-  return String(p || ''); // 商家端不打码
+  return String(p || '');
 }
 
 function modeText(mode, storeSubMode) {
@@ -18,10 +16,6 @@ function modeText(mode, storeSubMode) {
   return m;
 }
 
-/**
- * 简化状态文本生成逻辑：
- * 明确将 'processing' 视为 '准备中'
- */
 function buildStatusText(o) {
   const st = String(o?.status || '').toLowerCase();
   if (['paid', 'making', 'processing'].includes(st)) return '准备中';

@@ -1,4 +1,3 @@
-// packages/admin/pages/shop/shop.core.js
 
 const { requireLogin, getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
@@ -53,11 +52,9 @@ module.exports = {
 
     const cfg = r.data || {};
 
-    // 处理图片资源
     const kefuQrFileId = safeStr(cfg.kefuQrUrl);
     const bannerIds = Array.isArray(cfg.banners) ? cfg.banners : [];
 
-    // 批量换取临时链接
     const allIds = [...(kefuQrFileId ? [kefuQrFileId] : []), ...bannerIds];
     const urlMap = await getTempUrlMap(allIds);
 
@@ -119,7 +116,6 @@ module.exports = {
       cloudPrinterTimes: safeStr(cfg.cloudPrinterTimes),
       cloudPrintChanged: false,
 
-      // 默认展开与操作高频相关的区域
       sectionOpen: {
         consume: false,
         shopInfo: false,

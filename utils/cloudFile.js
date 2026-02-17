@@ -1,5 +1,3 @@
-// utils/cloudFile.js
-// cloud:// fileID 与临时 URL 处理（前端）。
 
 const { safeStr, isCloudFileId } = require('./common');
 

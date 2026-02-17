@@ -1,4 +1,3 @@
-// pages/mine/recharge/recharge.js
 const { ensureLogin, refreshUserToStorage } = require('../../../utils/auth');
 const { callUser } = require('../../../utils/cloud');
 const { fmtMoney, fmtTime, sleep } = require('../../../utils/common');
@@ -17,11 +16,10 @@ function sceneText(scene) {
 Page({
   data: {
     amount: 0,
-    presetAmount: 0, // 预设金额（用于高亮）
-    customAmount: '', // 自定义输入（字符串，保证 input 可控）
-    balanceText: '0.00', // 当前余额展示用
+    presetAmount: 0,
+    customAmount: '',
+    balanceText: '0.00',
 
-    // 流水弹窗
     showLogPopup: false,
     logScene: '',
     logList: [],
@@ -30,14 +28,12 @@ Page({
   _paying: false,
 
   onShow: async function () {
-    // 先用本地缓存渲染余额（不等云端）
     this.syncBalanceFromStorage();
 
     try {
       const u = await ensureLogin();
-      if (!u) return; // 用户拒绝授权：直接返回
+      if (!u) return;
 
-      // 同步云端 -> 写入 storage（余额/积分/会员等）
       await refreshUserToStorage();
       this.syncBalanceFromStorage();
     } catch (e) {
@@ -48,13 +44,11 @@ Page({
   syncBalanceFromStorage() {
     const b = wx.getStorageSync(KEY_BALANCE);
     const txt = fmtMoney(b);
-    // 避免不必要 setData
     if (txt !== this.data.balanceText) {
       this.setData({ balanceText: txt });
     }
   },
 
-  // ===== 弹窗相关（查询流水）=====
   noop() {},
 
   openLogPopup() {
@@ -80,7 +74,7 @@ Page({
       const u = await ensureLogin();
       if (!u) return;
 
-      const scene = this.data.logScene; // '' 表示全部
+      const scene = this.data.logScene;
       const res = await callUser('listRecharges', { scene, limit: 100 });
       const out = res?.result;
       if (out?.error) return;
@@ -105,7 +99,6 @@ Page({
     }
   },
 
-  // ===== 充值金额选择 =====
   selectAmount(e) {
     const amt = Number(e.currentTarget.dataset.amount || 0);
     this.setData({ presetAmount: amt, amount: amt, customAmount: '' });
@@ -124,7 +117,6 @@ Page({
     }
   },
 
-  // ===== 发起充值 =====
   async onPay() {
     const amount = Number(this.data.amount || 0);
     if (!amount || amount <= 0) return wx.showToast({ title: '请选择金额', icon: 'none' });
@@ -138,7 +130,6 @@ Page({
 
       wx.showLoading({ title: '发起支付...', mask: true });
 
-      // ① 创建充值单 + 获取微信支付参数（云端不落 pending）
       const createRes = await callUser('createRechargeOrder', { amount, body: '会员充值' });
       const out = createRes?.result;
       if (out?.error) throw new Error(out.message || out.error);
@@ -146,14 +137,12 @@ Page({
       const { rechargeId, payment } = out?.data || {};
       if (!rechargeId || !payment) throw new Error(out?.message || 'bad_pay_params');
 
-      // ② 拉起微信支付
       wx.hideLoading();
 
       try {
         await requestPaymentAsync(payment);
       } catch (ePay) {
         if (isUserCancelPay(ePay)) {
-          // 标记取消，避免一直卡在 pending
           callUser('cancelRechargeOrder', { rechargeId }).catch(() => {});
           wx.showToast({ title: '已取消支付', icon: 'none' });
           return;
@@ -161,7 +150,6 @@ Page({
         throw ePay;
       }
 
-      // ③ 支付成功后，确认到账（云端 queryOrder -> SUCCESS 后入账）
       wx.showLoading({ title: '确认到账...', mask: true });
 
       let lastErr = null;
@@ -178,7 +166,6 @@ Page({
           break;
         }
 
-        // 仅对 not_paid 做重试（支付成功后可能存在微信侧状态同步延迟）
         if (out2.error === 'not_paid') {
           lastErr = out2;
           continue;
@@ -190,7 +177,6 @@ Page({
 
       wx.hideLoading();
 
-      // not_paid：大概率是支付回调延迟，不当成失败提示
       const pending = !!(lastErr && lastErr.error === 'not_paid');
       if (pending) {
         wx.showToast({ title: '支付成功，余额到账中', icon: 'none' });
@@ -201,7 +187,6 @@ Page({
       }
       this.setData({ amount: 0, presetAmount: 0, customAmount: '' });
 
-      // ④ 同步最新余额/会员信息（写 storage + 更新 UI）
       await refreshUserToStorage();
       this.syncBalanceFromStorage();
 

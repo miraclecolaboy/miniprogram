@@ -1,5 +1,3 @@
-// utils/sku.js
-// 统一 SKU Key / 规格文案生成，避免多处实现不一致。
 
 function buildSkuKey(productId, specs, selectedSpecs) {
   const pid = String(productId || '').trim();

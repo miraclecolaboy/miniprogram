@@ -1,7 +1,7 @@
 <view class="detail-page">
   <scroll-view class="page-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
 
-    <!-- Poster -->
+    
     <view class="poster-wrapper llj-enter llj-delay-1">
       <view class="img-container">
         <swiper
@@ -31,7 +31,7 @@
       </view>
     </view>
 
-    <!-- Content Flow -->
+    
     <view class="content-flow">
       <view class="header-section llj-enter llj-delay-2">
         <view class="product-meta-row">
@@ -91,7 +91,7 @@
     </view>
   </scroll-view>
 
-  <!-- Floating Action Bar -->
+  
   <view class="float-bar-container llj-enter llj-delay-4">
     <view class="float-bar">
       <view class="total-info">

@@ -1,5 +1,3 @@
-// utils/common.js
-// 通用工具：集中复用，减少页面里重复的“格式化/数值转换/兼容”代码。
 
 function safeStr(v) {
   return String(v == null ? '' : v).trim();
@@ -17,7 +15,6 @@ function pad2(n) {
 function normalizeTsMs(ts) {
   const t = toNum(ts, 0);
   if (!t) return 0;
-  // 兼容秒级时间戳（1e12 约为 2001-09-09 的毫秒时间戳）
   return t < 1e12 ? t * 1000 : t;
 }
 

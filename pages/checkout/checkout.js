@@ -1,11 +1,9 @@
-// pages/checkout/checkout.js
 const { isLoginOK } = require('../../utils/auth');
 const { CART_CLEAR: KEY_CART_CLEAR } = require('../../utils/storageKeys');
 const { getShopConfigCache } = require('../../utils/shopConfigCache');
 
 const CACHED_SHOP_CFG = getShopConfigCache() || {};
 
-// 引入子模块保持不变
 const cartMethods = require('./checkout.cart');
 const locationMethods = require('./checkout.location');
 const shopMethods = require('./checkout.shop');
@@ -14,15 +12,11 @@ const syncMethods = require('./checkout.sync');
 
 Page(Object.assign({
   data: {
-    // 核心模式: 'ziti' (门店自提) | 'waimai' (外卖配送) | 'kuaidi' (全国快递)
     mode: 'ziti', 
-    // 自提子模式: 'ziti'(打包) | 'tangshi'(堂食)
     storeSubMode: 'ziti', 
     
-    // UI状态
     isMenuExpanded: false,
     
-    // 基础数据
     storeName: CACHED_SHOP_CFG.storeName || '',
     waimaiOn: CACHED_SHOP_CFG.waimaiOn !== false,
     kuaidiOn: CACHED_SHOP_CFG.kuaidiOn !== false,
@@ -34,7 +28,6 @@ Page(Object.assign({
     kuaidiOutDeliveryFee: Number(CACHED_SHOP_CFG.kuaidiOutDeliveryFee ?? 25),
     minOrderKuaidiOut: Number(CACHED_SHOP_CFG.minOrderKuaidiOut ?? 140),
     
-    // 购物车与费用
     cart: [],
     totalPrice: '0.00',
     finalPay: '0.00',
@@ -45,16 +38,13 @@ Page(Object.assign({
     discountTotal: '0.00',
     needMoreFreeDelivery: '0.00',
     
-    // 选项
     pickupTime: '立即取餐',
     timeList: [],
     remark: '',
     reservePhone: '',
     
-    // 支付状态
     paying: false,
     
-    // 权益
     selectedCoupon: null,
     selectedCouponKey: '',
     availableCoupons: [], 
@@ -66,7 +56,6 @@ Page(Object.assign({
 
   async onLoad(options) {
     this._initPromise = (async () => {
-      // 1. 初始化模式
       const rawMode = options.mode || 'ziti';
       const mode = ['waimai', 'kuaidi'].includes(rawMode) ? rawMode : 'ziti';
       const rawSub = options.storeSubMode || 'ziti';
@@ -75,7 +64,6 @@ Page(Object.assign({
       const cachedCfg = getShopConfigCache() || {};
       this.setData({ mode, storeSubMode, storeName: cachedCfg.storeName || '' });
 
-      // 2. 加载用户与购物车
       this.syncUserFromStorage();
       
       if (options.cart) {
@@ -88,7 +76,6 @@ Page(Object.assign({
         this.initCart([]);
       }
 
-      // 3. 生成时间 & 加载店铺
       this.genPickupTimes();
       await this.loadShopConfig(); 
       
@@ -105,7 +92,6 @@ Page(Object.assign({
   },
 
   async onShow() {
-    // 检查是否有清理标记 (支付成功返回)
     const clearMark = wx.getStorageSync(KEY_CART_CLEAR);
     if (clearMark && clearMark.ts) {
       wx.removeStorageSync(KEY_CART_CLEAR);
@@ -117,25 +103,20 @@ Page(Object.assign({
     this.recheckAddressForMode(false);
   },
 
-  // --- 1. 时间生成逻辑 (每10分钟一档) ---
   genPickupTimes() {
     const now = new Date();
-    // 基础缓冲：当前时间 + 15分钟准备时间
     let start = new Date(now.getTime() + 15 * 60 * 1000);
     
-    // 向上取整到最近的 10 分钟 (例如 10:03 -> 10:10, 10:12 -> 10:20)
     let minutes = start.getMinutes();
     let remainder = minutes % 10;
     if (remainder !== 0) {
       start.setMinutes(minutes + (10 - remainder));
     }
-    // 秒数清零
     start.setSeconds(0);
     start.setMilliseconds(0);
 
     const times = ['立即取餐'];
     
-    // 生成未来 3 小时的时间段 (约18个刻度)
     for (let i = 0; i < 18; i++) {
        let t = new Date(start.getTime() + i * 10 * 60 * 1000);
        
@@ -147,8 +128,6 @@ Page(Object.assign({
     
     this.setData({ timeList: times });
   },
-
-  // --- UI 交互 ---
 
   toggleMenuExpand() {
     this.setData({ isMenuExpanded: !this.data.isMenuExpanded });

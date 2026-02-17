@@ -5,9 +5,6 @@ const { now, isCollectionNotExists } = require('../utils/common');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-// --- 内部辅助 ---
-
-// 格式化地址列表
 async function _listAddresses(openid, limit = 50) {
   let gotU = null;
   try {
@@ -53,7 +50,6 @@ async function _listAddresses(openid, limit = 50) {
   return list.slice(0, limit);
 }
 
-// 统计订单数据
 async function getOrderStats(openid) {
   try {
     const countRes = await db.collection(COL_ORDERS).where({ openid }).count();
@@ -93,35 +89,28 @@ function normalizeReservePhone(v) {
   return String(v == null ? '' : v).replace(/\D+/g, '').slice(0, 11);
 }
 
-// 确保用户存在 (核心登录逻辑)
 async function ensureUser(openid, profile = null) {
   try {
-    // 尝试获取用户
     const got = await db.collection(COL_USERS).doc(openid).get();
     const u = got.data || {};
     const patch = { openid, lastLoginAt: now(), updatedAt: now() };
     
-    // [重构] 登录时不再依赖前端传来的微信信息，只更新登录时间
     await db.collection(COL_USERS).doc(openid).update({ data: patch });
     return { ...u, ...patch, _id: openid };
 
   } catch (e) {
-    if (isCollectionNotExists(e)) throw e; // 如果是其他错误，则抛出
+    if (isCollectionNotExists(e)) throw e;
 
-    // [重构] 捕获 "document not exists" 错误，说明是新用户，执行创建
-    // 1. 生成随机昵称
     const randomSuffix = Math.random().toString().slice(-6);
     const defaultNickName = `用户${randomSuffix}`;
     
-    // 2. 创建新用户文档
     const user = {
       openid,
       nickName: defaultNickName,
-      avatarUrl: '', // 头像默认为空
+      avatarUrl: '',
       gender: 0,
       balance: 0,
       points: 0,
-      // Level-based membership (cumulative recharge). Lv4 gets permanent discount.
       memberLevel: 0,
       totalRecharge: 0,
       reservePhone: '',
@@ -138,8 +127,6 @@ async function ensureUser(openid, profile = null) {
     return { ...user, _id: openid };
   }
 }
-
-// --- 导出接口 ---
 
 async function loginOrRegister(event, openid) {
   const src = (event && event.userInfo) || event || {};
@@ -168,7 +155,6 @@ async function getMe(openid) {
   const orderStats = await getOrderStats(openid);
   const coupons = normalizeUserCoupons(me && me.coupons);
 
-  // 异步更新统计信息，不阻塞返回
   db.collection(COL_USERS).doc(openid).update({ data: { orderStats, updatedAt: now() } }).catch(() => {});
 
   return { data: { ...me, coupons, _id: openid, addresses, orderStats } };
@@ -177,7 +163,6 @@ async function getMe(openid) {
 async function updateProfile(event, openid) {
   await ensureUser(openid, null);
   
-  // 获取旧头像以便清理
   let oldAvatar = '';
   try {
     const old = await db.collection(COL_USERS).doc(openid).get();
@@ -194,7 +179,6 @@ async function updateProfile(event, openid) {
 
   await db.collection(COL_USERS).doc(openid).update({ data: patch });
 
-  // 清理旧头像文件
   if (oldAvatar && patch.avatarUrl && oldAvatar !== patch.avatarUrl && oldAvatar.startsWith('cloud://')) {
     cloud.deleteFile({ fileList: [oldAvatar] }).catch(() => {});
   }
@@ -226,7 +210,6 @@ async function upsertAddress(event, openid) {
   let defaultId = String(u.defaultAddressId || '').trim();
   const tNow = now();
 
-  // 构建新地址对象
   const lat = Number(addr.lat ?? addr.latitude ?? addr.location?.lat);
   const lng = Number(addr.lng ?? addr.longitude ?? addr.location?.lng);
   const hasLL = Number.isFinite(lat) && Number.isFinite(lng);
@@ -241,10 +224,9 @@ async function upsertAddress(event, openid) {
     updatedAt: tNow
   };
 
-  // 更新数组
   const idx = addresses.findIndex(x => String(x.id || x._id) === id);
   if (idx >= 0) {
-    nextItem.createdAt = addresses[idx].createdAt || tNow; // 保持创建时间
+    nextItem.createdAt = addresses[idx].createdAt || tNow;
     const oldItem = addresses[idx] || {};
     const { region: _region, detail: _detail, baseAddress: _baseAddress, poiAddress: _poiAddress, ...rest } = oldItem;
     void _region;
@@ -258,7 +240,6 @@ async function upsertAddress(event, openid) {
 
   if (addr.isDefault || !defaultId) defaultId = id;
 
-  // 排序与截断
   addresses.sort((a, b) => {
     const isDefA = String(a.id) === defaultId;
     const isDefB = String(b.id) === defaultId;
@@ -285,7 +266,6 @@ async function deleteAddress(event, openid) {
   let addresses = (u.addresses || []).filter(x => String(x.id || x._id) !== id);
   let defaultId = u.defaultAddressId;
 
-  // 如果删的是默认地址，重置默认
   if (defaultId === id) {
     addresses.sort((a, b) => b.updatedAt - a.updatedAt);
     defaultId = addresses[0] ? String(addresses[0].id || addresses[0]._id) : '';

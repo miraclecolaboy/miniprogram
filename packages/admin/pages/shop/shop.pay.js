@@ -1,11 +1,9 @@
-// packages/admin/pages/shop/shop.pay.js
 
 const { getSession } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
 const { safeStr } = require('../../../../utils/common');
 
 module.exports = {
-  // --- 微信支付 ---
   onSubMchIdInput(e) { this.setData({ subMchId: safeStr(e.detail.value), payChanged: true }); },
 
   async onSavePayConfig() {

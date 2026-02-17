@@ -1,4 +1,3 @@
-// utils/auth.js
 const { MERCHANT_SESSION } = require('../../../utils/storageKeys');
 
 const SESSION_KEY = MERCHANT_SESSION;

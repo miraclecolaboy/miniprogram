@@ -1,6 +1,5 @@
-// pages/home/home.js
 const { callUser } = require('../../utils/cloud');
-const { getTempUrlMap } = require('../../utils/cloudFile'); // [新增] 引入工具
+const { getTempUrlMap } = require('../../utils/cloudFile');
 const { ORDER_MODE: KEY_ORDER_MODE } = require('../../utils/storageKeys');
 const { getShopConfigCache, setShopConfigCache } = require('../../utils/shopConfigCache');
 
@@ -8,14 +7,13 @@ const CACHED_SHOP_CFG = getShopConfigCache() || {};
 
 Page({
   data: {
-    showUI: true, // 控制动画重置
+    showUI: true,
     storeName: CACHED_SHOP_CFG.storeName || '',
     waimaiOn: CACHED_SHOP_CFG.waimaiOn !== false,
     kuaidiOn: CACHED_SHOP_CFG.kuaidiOn !== false,
     loading: true,
-    banners: [], // [新增] 轮播图 URL 列表
+    banners: [],
 
-    // 会员权益数据
     memberStats: {
       memberLevel: 0,
       memberName: '普通会员',
@@ -30,11 +28,10 @@ Page({
   },
 
   onShow() {
-    // 每次显示页面时，先隐藏再显示，强制触发 CSS 动画
     this.setData({ showUI: false }, () => {
       setTimeout(() => {
         this.setData({ showUI: true });
-      }, 50); // 50ms 延迟足以让渲染引擎重置
+      }, 50);
     });
 
     this.loadMemberStats();
@@ -49,7 +46,6 @@ Page({
       this.loadMemberStats({ returnPatch: true }),
     ]);
 
-    // Merge into a single initial setData (avoid flicker).
     this.setData({ ...(shopPatch || {}), ...(memberPatch || {}), loading: false });
   },
 
@@ -59,10 +55,8 @@ Page({
       const res = await callUser('getShopConfig', {});
       const data = res?.result?.data || {};
 
-      // Cache for other pages (avoid store name flicker on next entry).
       setShopConfigCache(data);
       
-      // [新增] 处理轮播图：ID 转 URL
       const bannerIds = Array.isArray(data.banners) ? data.banners : [];
       let banners = [];
       if (bannerIds.length > 0) {
@@ -74,7 +68,7 @@ Page({
         storeName: data.storeName || '',
         waimaiOn: data.waimaiOn !== false,
         kuaidiOn: data.kuaidiOn !== false,
-        banners // 设置转换后的图片链接
+        banners
       };
 
       if (returnPatch) return patch;
@@ -140,5 +134,12 @@ Page({
 
   onShareAppMessage() {
     return { title: this.data.storeName, path: '/pages/home/home' };
+  },
+
+  onShareTimeline() {
+    return {
+      title: this.data.storeName || '',
+      query: '',
+    };
   }
 });

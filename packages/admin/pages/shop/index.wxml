@@ -3,7 +3,7 @@
     <view class="page-header row-between">
       <view class="header-left">
         <view class="page-title">店铺配置</view>
-        <!-- <view class="page-sub">核销优先 / 分组折叠 / 便捷操作</view> -->
+        
       </view>
       <view class="btn btn-outline btn-mini" bindtap="onReload">刷新数据</view>
     </view>
@@ -13,7 +13,7 @@
         <view class="fold-head" bindtap="toggleSection" data-key="consume">
           <view class="fold-head-main">
             <view class="fold-title">快速核销</view>
-            <view class="fold-sub">输入 6 位码，核销后自动清空</view>
+            <view class="fold-sub">输入6位码，核销积分兑换物品</view>
           </view>
           <view class="fold-arrow">{{sectionOpen.consume ? '收起' : '展开'}}</view>
         </view>
@@ -74,7 +74,7 @@
             </view>
             <view class="form-group" style="margin-top: 24rpx;">
               <view class="label" style="margin-bottom: 8rpx;">营业时段</view>
-              <view class="hint">留空则默认 10:00-22:00；营业时间最多两段</view>
+              <view class="hint">留空则默认 10:00-22:00；客服和下单页面可选时间</view>
               <view class="time-range-row" wx:for="{{serviceHoursRanges}}" wx:key="index">
                 <input class="time-input" type="number" maxlength="2" value="{{item.sh}}" placeholder="10" data-index="{{index}}" data-field="sh" bindinput="onServiceHourPartInput" />
                 <text class="time-sep">:</text>

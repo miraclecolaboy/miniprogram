@@ -1,4 +1,3 @@
-// utils/cloud.js
 const FN_USER = 'user';
 
 function callUser(action, data = {}) {

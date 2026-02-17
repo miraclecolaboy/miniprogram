@@ -46,7 +46,6 @@
       </view>
     </view>
 
-
     <view class="card">
       <view class="card-title">售后详情</view>
 
@@ -87,7 +86,6 @@
         </block>
       </view>
     </view>
-
 
     <view class="card">
       <view class="card-title">审批操作</view>

@@ -1,9 +1,8 @@
-// cloudfunctions/admin/services/orderService.js
 const cloud = require('wx-server-sdk');
 const { 
   COL_ORDERS, 
   COL_SHOP_CONFIG,
-  COL_CUSTOMERS, // [修正] 确保引入用户集合常量
+  COL_CUSTOMERS,
   REFUND_CALLBACK_FN 
 } = require('../config/constants');
 const { now, moneyToFen, genOutRefundNo32 } = require('../utils/common');
@@ -17,15 +16,10 @@ function normalizePoints(v) {
   return Number.isFinite(n) ? Math.max(0, n) : 0;
 }
 
-// ... [listOrders, getOrder, updateOrderStatus, applyRefund 函数保持不变] ...
 async function listOrders(tab, pageNum, pageSize) {
   const skip = (pageNum - 1) * pageSize;
 
-  // 售后状态拆分：
-  // - "进行中"：需要放在【售后】栏，便于集中处理
-  // - "已处理"：放在【已完成】栏（包括拒绝/取消/退款成功等）
   const refundFinalStatuses = ['success', 'refunded', 'rejected', 'reject', 'cancelled', 'canceled'];
-  // 这些状态表示售后已结束，但订单可能仍需继续履约（如拒绝/取消售后）
   const refundEndedButOrderContinues = ['rejected', 'reject', 'cancelled', 'canceled'];
 
   const buildQuery = (noRefundCond) => {
@@ -57,17 +51,12 @@ async function listOrders(tab, pageNum, pageSize) {
       ]));
     }
     if (tab === 'refund') {
-      // 售后栏仅展示“处理中”的售后：refund.status 不在已处理集合内
       return db.collection(COL_ORDERS).where(_.and([
         { refund: _.exists(true) },
         { 'refund.status': _.nin(refundFinalStatuses) },
       ]));
     }
     if (tab === 'done') {
-      // 已完成：
-      // 1) 普通已完成/已取消订单（无售后字段）
-      //    - 其中“用户取消”不放在已完成里
-      // 2) 已处理完成的售后（refund.status 属于已处理集合）
       return db.collection(COL_ORDERS).where(_.or([
         _.and([
           _.or([
@@ -93,7 +82,6 @@ async function listOrders(tab, pageNum, pageSize) {
     return await query.orderBy('createdAt', 'desc').skip(skip).limit(pageSize).get();
   };
 
-  // Prefer exists(false) to match "field does not exist", fallback to eq(null) for portability.
   let res;
   try {
     res = await fetch({ refund: _.exists(false) });
@@ -148,9 +136,6 @@ async function applyRefund(orderId, reason, remark, sess) {
     return { ok: true };
 }
 
-/**
- * [核心修正] 修正事务 API 调用方式
- */
 async function handleRefund(orderId, decision, remark, sess) {
   if (!orderId) throw new Error('缺少订单ID');
   if (!['approve', 'reject'].includes(decision)) throw new Error('无效的决定');
@@ -317,7 +302,6 @@ async function orderUpdateWithLog({ id, patch, sess, action, note }) {
   });
   return { ok: true };
 }
-
 
 module.exports = {
   listOrders,

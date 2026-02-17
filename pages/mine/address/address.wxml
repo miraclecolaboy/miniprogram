@@ -7,7 +7,7 @@
     wx:for="{{list}}"
     wx:key="id"
   >
-    <!-- 左侧：地址内容（点击选择） -->
+    
     <view class="addr-content" bindtap="onChoose" data-id="{{item.id}}">
       <view class="addr-top">
         <text class="addr-name">{{item.name}}</text>
@@ -17,10 +17,10 @@
       <view class="addr-detail">{{item.address}}</view>
     </view>
 
-    <!-- 右侧：操作区（竖排） -->
+    
     <view class="addr-ops">
 
-      <!-- 非默认地址显示“设为默认” -->
+      
       <view
         wx:if="{{!item.isDefault}}"
         class="op-btn op-default"

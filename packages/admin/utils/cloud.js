@@ -1,4 +1,3 @@
-// utils/cloud.js
 const { clearSession } = require('./auth');
 
 let _authRedirecting = false;
@@ -17,14 +16,12 @@ function redirectToLoginOnce() {
   if (_authRedirecting) return;
   _authRedirecting = true;
 
-  // 关键：清掉本地 token，避免登录页 onLoad 又自动跳回业务页
   clearSession();
 
   if (!isOnLoginPage()) {
     wx.reLaunch({ url: '/packages/admin/pages/login/login' });
   }
 
-  // 释放锁，避免长时间卡死（也避免并发请求疯狂重入）
   setTimeout(() => {
     _authRedirecting = false;
   }, 1200);

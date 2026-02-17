@@ -1,11 +1,8 @@
-/* login.wxss */
-/* 引入原有样式，确保基础变量可用 */
 @import "../../styles/admin.wxss";
 
-/* 1. 页面容器：设置为全屏 Flex 布局，实现垂直水平居中 */
 page {
   height: 100%;
-  background-color: #f7f8fa; /* 给背景一个淡灰色，突出白色卡片 */
+  background-color: #f7f8fa;
 }
 
 .container {
@@ -18,47 +15,42 @@ page {
   box-sizing: border-box;
 }
 
-/* 2. 登录卡片：增加白底、阴影和内边距 */
 .card {
   width: 100%;
-  max-width: 680rpx; /* 稍微限制最大宽度 */
+  max-width: 680rpx;
   background: #ffffff;
-  border-radius: 24rpx; /* 更圆润的边角 */
-  padding: 60rpx 50rpx; /* 内部留白，让内容不拥挤 */
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05); /* 柔和的阴影 */
+  border-radius: 24rpx;
+  padding: 60rpx 50rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
-/* 3. 标题区域微调 */
 .row-between {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40rpx; /* 拉开标题与输入框的距离 */
+  margin-bottom: 40rpx;
 }
 
-/* 4. 输入框美化 */
 input {
-  background: #f5f7fa; /* 极淡的灰蓝色背景，比纯灰更有质感 */
+  background: #f5f7fa;
   border-radius: 12rpx;
-  height: 88rpx; /* 增加高度，更容易点击 */
+  height: 88rpx;
   line-height: 88rpx;
   padding: 0 30rpx;
   font-size: 28rpx;
   color: #333;
-  margin-top: 16rpx; /* 确保和 label 有间距 */
-  box-sizing: border-box; /* 确保 padding 不撑大宽度 */
+  margin-top: 16rpx;
+  box-sizing: border-box;
 }
-
 
 input:active, input:focus {
   background: #fff;
   border: 2rpx solid #000000; 
 }
 
-/* 5. 按钮美化 */
 button.btn-primary {
-  width: 100% !important; /* 强制按钮撑满卡片宽度 */
+  width: 100% !important;
   height: 88rpx;
   line-height: 88rpx;
   border-radius: 12rpx;
@@ -66,16 +58,14 @@ button.btn-primary {
   background-color: #000000; 
   color: #fff;
   font-weight: 500;
-  margin-top: 60rpx; /* 按钮与上方拉开距离 */
+  margin-top: 60rpx;
   padding: 0;
 }
 
-/* 辅助文字颜色 */
 .text-muted {
   color: #909399;
 }
 
-/* 间距工具类补充 (如果 admin.wxss 里没有的话) */
 .mt-32 { margin-top: 32rpx; }
 .mt-24 { margin-top: 24rpx; }
 .mt-16 { margin-top: 16rpx; }

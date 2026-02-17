@@ -1,4 +1,3 @@
-// packages/admin/pages/orders/orders.actions.js
 
 const { requireLogin } = require('../../utils/auth');
 const { call } = require('../../utils/cloud');
