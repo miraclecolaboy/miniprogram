@@ -11,14 +11,9 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 exports.main = async (event = {}) => {
   const action = event.action || '';
   const { OPENID } = cloud.getWXContext();
-  const triggerName = String(event?.TriggerName || '').trim();
 
   try {
     await initService.ensureCollections();
-
-    if (!action && (event?.Type === 'Timer' || event?.type === 'timer') && triggerName === 'autoDoneTwiceDaily') {
-      return await orderService.autoDoneKuaidiOrders();
-    }
 
     if (action === 'login') {
       return await authService.login(event.username, event.password, OPENID);

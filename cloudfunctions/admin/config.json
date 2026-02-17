@@ -8,11 +8,5 @@
       }
     ]
   },
-  "triggers": [
-    {
-      "name": "autoDoneTwiceDaily",
-      "type": "timer",
-      "config": "0 0 1,13 * * *"
-    }
-  ]
+  "triggers": []
 }
