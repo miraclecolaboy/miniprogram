@@ -240,6 +240,7 @@ async function createOrder(event, openid) {
       finalPayAmount = Math.max(0, Number(((afterVipFen - couponDiscountFen) / 100).toFixed(2)));
       const paidImmediately = payMethod === 'balance' || finalPayAmount <= 0;
       const paymentMethodFinal = finalPayAmount <= 0 ? 'free' : payMethod;
+      const shouldConsumeCouponNow = !!userCouponId && paidImmediately;
       const pointsEarn = normalizePoints(finalPayAmount);
       const userBalance = round2(toNum(user.balance, 0));
       let balanceBeforePay = null;
@@ -252,7 +253,7 @@ async function createOrder(event, openid) {
         await tx.collection(COL_USERS).doc(openid).update({ data: { balance: _.inc(-finalPayAmount) } });
       }
       
-      if (userCouponId) {
+      if (shouldConsumeCouponNow) {
         await tx.collection(COL_USERS).doc(openid).update({
           data: {
             coupons: _.pull({ userCouponId })
@@ -298,6 +299,8 @@ async function createOrder(event, openid) {
         payment: paymentDoc,
         ...(paymentMethodFinal === 'balance' ? { balanceBeforePay, balanceAfterPay } : {}),
         userCouponId: userCouponId || '',
+        couponConsumed: userCouponId ? shouldConsumeCouponNow : true,
+        couponConsumedAt: shouldConsumeCouponNow ? nowTs : 0,
         shippingInfo: address,
         receiverPhone: mode === 'ziti' ? reservePhoneFinal : '',
         reservePhone: mode === 'ziti' ? reservePhoneFinal : '',
@@ -336,8 +339,15 @@ async function createOrder(event, openid) {
         await db.collection('orders').doc(orderId).update({ data: { 'payment.outTradeNo': orderNo } });
         return { ok: true, data: { orderId, payment: payRes.payment, paid: false } };
       } catch (e) {
-        await db.collection('orders').doc(orderId).remove().catch(()=>{});
-        return { error: 'wxpay_failed', message: e.message || '无法发起微信支付' };
+        const failMsg = String(e?.message || '无法发起微信支付');
+        await db.collection('orders').doc(orderId).update({
+          data: {
+            'payment.createFailedAt': now(),
+            'payment.createFailMsg': failMsg,
+            updatedAt: now(),
+          }
+        }).catch(() => {});
+        return { error: 'wxpay_failed', message: failMsg, data: { orderId } };
       }
     }
 
@@ -354,25 +364,41 @@ async function sysHandlePaySuccess(payEvent) {
     const orderRes = await db.collection('orders').where({ 'payment.outTradeNo': outTradeNo }).limit(1).get();
     const order = orderRes.data[0];
     if (!order) return { errcode: 0, errmsg: 'OK' };
-    if (order.payment.status === 'paid') return { errcode: 0, errmsg: 'OK' };
+    const couponId = String(order.userCouponId || '').trim();
+    const couponNeedConsume = !!couponId && order.couponConsumed !== true;
+    const alreadyPaid = order.payment.status === 'paid';
+    if (alreadyPaid && !couponNeedConsume) return { errcode: 0, errmsg: 'OK' };
   
     const nowTs = now();
     const openid = order.openid;
-    
-    await db.collection('orders').doc(order._id).update({
-      data: {
-        status: 'processing', statusText: '准备中', paidAt: nowTs,
-        'payment.status': 'paid', 'payment.paidAt': nowTs,
-        'payment.transactionId': payEvent.transactionId || payEvent.transaction_id || ''
-      }
-    });
-    
-    const pointsEarn = normalizePoints(order.pointsEarn);
-    if (pointsEarn > 0 && openid) {
-      await db.collection(COL_USERS).doc(openid).update({
-        data: { points: _.inc(pointsEarn) }
-      }).catch(console.error);
+
+    const orderPatch = {
+      updatedAt: nowTs,
+    };
+    if (!alreadyPaid) {
+      orderPatch.status = 'processing';
+      orderPatch.statusText = '准备中';
+      orderPatch.paidAt = nowTs;
+      orderPatch['payment.status'] = 'paid';
+      orderPatch['payment.paidAt'] = nowTs;
+      orderPatch['payment.transactionId'] = payEvent.transactionId || payEvent.transaction_id || '';
     }
+
+    const userPatch = {};
+    const pointsEarn = normalizePoints(order.pointsEarn);
+    if (!alreadyPaid && pointsEarn > 0) {
+      userPatch.points = _.inc(pointsEarn);
+    }
+    if (couponNeedConsume) {
+      userPatch.coupons = _.pull({ userCouponId: couponId });
+      orderPatch.couponConsumed = true;
+      orderPatch.couponConsumedAt = nowTs;
+    }
+
+    if (openid && Object.keys(userPatch).length > 0) {
+      await db.collection(COL_USERS).doc(openid).update({ data: userPatch }).catch(console.error);
+    }
+    await db.collection('orders').doc(order._id).update({ data: orderPatch });
     
     return { errcode: 0, errmsg: 'OK' };
 }

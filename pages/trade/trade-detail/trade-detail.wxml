@@ -166,7 +166,7 @@
   <view class="sheet-modal safe-area-bottom" wx:if="{{refundSheetVisible}}">
     <view class="sheet-header">
       <text class="sheet-title">申请售后</text>
-      <view class="close-btn" bindtap="closeRefundSheet">×</view>
+      <view class="close-btn" bindtap="closeRefundSheet"></view>
     </view>
     <view class="sheet-body">
       <view class="sheet-label">请选择原因</view>

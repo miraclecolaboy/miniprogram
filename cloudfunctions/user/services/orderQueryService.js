@@ -123,27 +123,45 @@ async function _mapOrderForView(order) {
 
 async function listMyOrders(openid, { tab = 'doing', pageNum = 1, pageSize = 10 }) {
   const skip = (pageNum - 1) * pageSize;
+  const CANCELLED_BY_USER_TEXT = '用户取消';
 
   const buildQuery = (refundCond) => {
-    const where = { openid: openid };
-
     if (tab === 'doing') {
+      const where = { openid: openid };
       where.status = _.in(['pending_payment', 'processing', 'ready', 'delivering']);
       where.refund = refundCond;
+      return db.collection(COL_ORDERS)
+        .where(where)
+        .orderBy('createdAt', 'desc')
+        .skip(skip)
+        .limit(pageSize);
     } else if (tab === 'done') {
-      where.status = _.in(['done', 'cancelled']);
-      where.refund = refundCond;
+      return db.collection(COL_ORDERS)
+        .where(_.and([
+          { openid: openid },
+          { refund: refundCond },
+          _.or([
+            { status: 'done' },
+            _.and([
+              { status: 'cancelled' },
+              { statusText: _.neq(CANCELLED_BY_USER_TEXT) },
+            ]),
+          ]),
+        ]))
+        .orderBy('createdAt', 'desc')
+        .skip(skip)
+        .limit(pageSize);
     } else if (tab === 'refund') {
+      const where = { openid: openid };
       where.refund = _.exists(true);
+      return db.collection(COL_ORDERS)
+        .where(where)
+        .orderBy('createdAt', 'desc')
+        .skip(skip)
+        .limit(pageSize);
     } else {
       return null;
     }
-
-    return db.collection(COL_ORDERS)
-      .where(where)
-      .orderBy('createdAt', 'desc')
-      .skip(skip)
-      .limit(pageSize);
   };
 
   let query = buildQuery(_.exists(false));

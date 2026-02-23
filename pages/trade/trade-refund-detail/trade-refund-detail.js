@@ -97,11 +97,16 @@ Page({
       }
       
       const applyReasonText = [String(refund.reason || '').trim(), String(refund.remark || '').trim()].filter(Boolean).join('；');
+      const applyAtTs = Number(refund.appliedAt || refund.createTime || refund.createdAt || 0);
+      const applyTimeText = applyAtTs > 0
+        ? fmtTime(applyAtTs)
+        : s(refund.createTime || refund.appliedAtText || refund.createdAtText || '');
       
       const mappedRefund = {
           ...refund,
           statusText: refund.statusText || '售后处理中',
           applyReasonText: applyReasonText,
+          createTime: applyTimeText,
           actionType,
           actionText,
           actionDisabled

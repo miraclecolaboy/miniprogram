@@ -238,7 +238,7 @@ page {
   box-sizing: border-box; padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
 }
 .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 48rpx; }
-.sheet-title { font-size: 34rpx; font-weight: 700; color: #111; }
+.sheet-title { font-size: 32rpx; font-weight: 700; color: #111; }
 .close-btn { font-size: 44rpx; color: #999; line-height: 1; padding: 10rpx; }
 .sheet-label { font-size: 28rpx; font-weight: 600; margin-bottom: 24rpx; }
 .reason-tags { display: flex; flex-wrap: wrap; gap: 20rpx; margin-bottom: 48rpx; }

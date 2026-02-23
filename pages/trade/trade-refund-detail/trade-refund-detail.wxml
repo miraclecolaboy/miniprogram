@@ -153,7 +153,7 @@
   <view class="sheet-modal safe-area-bottom" wx:if="{{refundSheetVisible}}">
     <view class="sheet-header">
       <view class="sheet-title">修改申请</view>
-      <view class="close-btn" bindtap="closeRefundSheet">×</view>
+      <view class="close-btn" bindtap="closeRefundSheet"></view>
     </view>
     <view class="sheet-body">
       <view class="sheet-label">申请原因</view>
